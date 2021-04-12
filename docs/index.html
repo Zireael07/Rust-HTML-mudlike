@@ -5,10 +5,13 @@
     <title>My Rust project!</title>
   </head>
   <body>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script type="module" src="render.js"></script>
     <!-- load wasm -->
     <script type="module"src='bootstrapper.js'></script>
     <div class="wrapper">
-    <canvas id="canvas" height="600" width="800"/></canvas>
+    <div id="game" style="white-space: pre-line">This is a test area.
+      You see here: a ghost</div>
     </div>
   </body>
 </html>

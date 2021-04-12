@@ -2,10 +2,6 @@ extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;
 
-//the websys Canvas bindings uses it
-use wasm_bindgen::JsCast; // for dyn_into
-use std::f64;
-
 //better panics
 extern crate console_error_panic_hook;
 use std::panic;
@@ -17,26 +13,41 @@ macro_rules! log {
     }
 }
 
+#[wasm_bindgen]
+pub struct Universe {
+    map: Vec<Room> 
+}
+
+#[derive(Clone, Debug)]
+pub struct Room {
+    desc: String,
+}
+
+#[wasm_bindgen]
+impl Universe {
+    pub fn new() -> Universe {
+        let mut state = Universe{
+            map: Vec::new(),
+        };
+    
+        state.map.push(Room{desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string()});
+
+        log!("We have a universe");
+
+        // We'll return the state with the short-hand
+        state
+    }
+
+    pub fn get_map(&self) -> String {
+        let desc = &self.map[0].desc;
+        //TODO: prettify output!
+        return format!("{}", desc);
+    }
+
+}
+
 pub fn main() {
- let document = web_sys::window().unwrap().document().unwrap();
-    let canvas = document.get_element_by_id("canvas").unwrap();
-    let canvas: web_sys::HtmlCanvasElement = canvas
-        .dyn_into::<web_sys::HtmlCanvasElement>()
-        .map_err(|_| ())
-        .unwrap();
-
-    let context = canvas
-        .get_context("2d")
-        .unwrap()
-        .unwrap()
-        .dyn_into::<web_sys::CanvasRenderingContext2d>()
-        .unwrap();
-
-    log!("We have a context {:?}", context);
-
-    //clear
-    context.set_fill_style(&wasm_bindgen::JsValue::from_str("black"));
-    context.fill_rect(0.0, 0.0, 800.0, 600.0);
+    log!("We have a game!");
 }
 
 
@@ -45,5 +56,5 @@ pub fn main() {
 #[wasm_bindgen(start)]
 pub fn start() {
     panic::set_hook(Box::new(console_error_panic_hook::hook));
-    main()
+    //main()
 } 
