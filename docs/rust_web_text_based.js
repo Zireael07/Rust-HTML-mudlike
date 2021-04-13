@@ -46,19 +46,6 @@ function takeObject(idx) {
     return ret;
 }
 
-let cachegetInt32Memory0 = null;
-function getInt32Memory0() {
-    if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
-        cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
-    }
-    return cachegetInt32Memory0;
-}
-/**
-*/
-export function start() {
-    wasm.start();
-}
-
 let WASM_VECTOR_LEN = 0;
 
 let cachedTextEncoder = new TextEncoder('utf-8');
@@ -115,6 +102,19 @@ function passStringToWasm0(arg, malloc, realloc) {
 }
 /**
 */
+export function start() {
+    wasm.start();
+}
+
+let cachegetInt32Memory0 = null;
+function getInt32Memory0() {
+    if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
+        cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
+    }
+    return cachegetInt32Memory0;
+}
+/**
+*/
 export class Universe {
 
     static __wrap(ptr) {
@@ -143,19 +143,19 @@ export class Universe {
         return Universe.__wrap(ret);
     }
     /**
-    * @returns {string}
+    * @returns {any}
     */
-    get_map() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.universe_get_map(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
+    get_current_map() {
+        var ret = wasm.universe_get_current_map(this.ptr);
+        return takeObject(ret);
+    }
+    /**
+    * @param {string} cmd
+    */
+    process(cmd) {
+        var ptr0 = passStringToWasm0(cmd, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        wasm.universe_process(this.ptr, ptr0, len0);
     }
 }
 
@@ -202,6 +202,10 @@ async function init(input) {
     };
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
+    };
+    imports.wbg.__wbindgen_json_parse = function(arg0, arg1) {
+        var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
+        return addHeapObject(ret);
     };
     imports.wbg.__wbg_log_386a8115a84a780d = function(arg0) {
         console.log(getObject(arg0));
