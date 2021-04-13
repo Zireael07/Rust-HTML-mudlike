@@ -6,7 +6,7 @@
     height: 6em; /* 5 lines of text plus fudge*/
     line-height: 1.0;
     background: black;
-    color: white; /* Default - overwritten by gameMessage */
+    color: white; /* Default - can be overwritten */
     margin: 0;
     padding: 0.5em 1em; /*1 em seems to be 12.8px*/
     text-align: left;
@@ -14,4 +14,12 @@
     max-width: 30.2em;
     min-height: 20em;
 }    
-    
+
+button {
+    background: black;
+    color: cyan;
+    border-color: cyan;
+    border-style: solid;
+    font-family: "DejaVuSansMono", "DejaVu Sans Mono", monospace;
+    font-size: 1.0em;
+}
