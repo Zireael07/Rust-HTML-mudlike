@@ -36,7 +36,7 @@ pub enum Exit {
 #[derive(Clone, Debug, Serialize)]
 pub struct Room {
     desc: String,
-    exit: (Exit, usize), //vector indices seem to be usizes?
+    exits: Vec<(Exit, usize)>, //vector indices seem to be usizes?
 }
 
 
@@ -50,8 +50,9 @@ impl Universe {
             current_room: 0,
         };
     
-        state.map.push(Room{desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), exit: (Exit::Out, 1)});
-        state.map.push(Room{desc:"The town street looks a bit deserted at this hour. The sky is overcast and it looks like it's going to rain any moment.".to_string(), exit: (Exit::In,0)});
+        state.map.push(Room{desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), exits: vec![(Exit::Out, 1)]});
+        state.map.push(Room{desc:"The town street looks a bit deserted at this hour. The sky is overcast and it looks like it's going to rain any moment.".to_string(), exits: vec![(Exit::In,0), (Exit::In, 2)]});
+        state.map.push(Room{desc:"This place looks like a dump. Dust and cobwebs rule the corners, but a part of the room is clearly lived in - there's a desk, a lamp, a simple stove and what looks like a bedroll.".to_string(), exits: vec![(Exit::Out, 1)]});
 
         log!("We have a universe");
 

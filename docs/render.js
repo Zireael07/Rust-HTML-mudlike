@@ -23,8 +23,14 @@ function exitClick(button) {
 
 function draw() {
     var map = universe.get_current_map();
-    // those are backticks, not straight quotes!
-    var output = map.desc + `\n<button class="exit_button" id=item-${map.exit[1]}>${map.exit[0]}</button>`;
+
+    var output = map.desc + '\n';
+    for (var i =0; i < map.exits.length; i++) {
+        var exit = map.exits[i];
+        // those are backticks, not straight quotes!
+        output = output + `<button class="exit_button" id=item-${exit[1]}>${exit[0]}</button> `;
+    }
+
     document.getElementById("game").innerHTML = output;
 
     // interactivity!
