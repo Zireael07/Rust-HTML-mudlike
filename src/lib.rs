@@ -36,6 +36,8 @@ pub enum Exit {
 #[derive(Clone, Debug, Serialize)]
 pub struct Room {
     desc: String,
+    known: bool,
+    name: String,
     exits: Vec<(Exit, usize)>, //vector indices seem to be usizes?
 }
 
@@ -50,9 +52,9 @@ impl Universe {
             current_room: 0,
         };
     
-        state.map.push(Room{desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), exits: vec![(Exit::Out, 1)]});
-        state.map.push(Room{desc:"The town street looks a bit deserted at this hour. The sky is overcast and it looks like it's going to rain any moment.".to_string(), exits: vec![(Exit::In,0), (Exit::In, 2)]});
-        state.map.push(Room{desc:"This place looks like a dump. Dust and cobwebs rule the corners, but a part of the room is clearly lived in - there's a desk, a lamp, a simple stove and what looks like a bedroll.".to_string(), exits: vec![(Exit::Out, 1)]});
+        state.map.push(Room{name:"Pub".to_string(), desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), known: true, exits: vec![(Exit::Out, 1)]});
+        state.map.push(Room{name:"Street".to_string(), desc:"The town street looks a bit deserted at this hour. The sky is overcast and it looks like it's going to rain any moment.".to_string(), known: false, exits: vec![(Exit::In,0), (Exit::In, 2)]});
+        state.map.push(Room{name:"Hovel".to_string(), desc:"This place looks like a dump. Dust and cobwebs rule the corners, but a part of the room is clearly lived in - there's a desk, a lamp, a simple stove and what looks like a bedroll.".to_string(), known: false, exits: vec![(Exit::Out, 1)]});
 
         log!("We have a universe");
 
@@ -70,6 +72,18 @@ impl Universe {
         //return format!("{} \n Exits: {:?}", room.desc, room.exit.0);
     }
 
+    // see comment above
+    pub fn get_room_id(&self, id: usize) -> JsValue {
+        let room = &self.map[id];
+        return JsValue::from_serde(room).unwrap();
+    }
+
+
+    fn know_room(&mut self, id: usize) {
+        self.map[id].known = true;
+    }
+
+    // what it says on the tin
     fn command_handler(&mut self, cmd: String) {
         //split by spaces
         let v: Vec<&str> = cmd.split(' ').collect();
@@ -79,6 +93,8 @@ impl Universe {
             "go" => {
                 let new_room = v[1].parse::<usize>().unwrap();
                 self.current_room = new_room;
+                //mark as known
+                self.know_room(new_room);
                 //log!("{}", &format!("New room {}", self.current_room));
             },
             _ => { log!("Unknown command entered"); }

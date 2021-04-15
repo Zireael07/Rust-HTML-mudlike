@@ -17,18 +17,26 @@ function exitClick(button) {
     var reg = id.match(/(\d+)/); 
     var i = reg[0];
     //console.log("ID: ", i);
-    console.log("Clicked exit");
+    //console.log("Clicked exit");
     process("go " + i);
 }
 
 function draw() {
     var map = universe.get_current_map();
 
-    var output = map.desc + '\n';
+    var output = map.desc + '\n\n';
     for (var i =0; i < map.exits.length; i++) {
         var exit = map.exits[i];
+
+        // display names of known rooms
+        var exit_room_id = exit[1];
+        var exit_room = universe.get_room_id(exit_room_id);
+        var exit_display = exit[0];
+        if (exit_room.known) {
+            exit_display = "To " + exit_room.name;
+        }
         // those are backticks, not straight quotes!
-        output = output + `<button class="exit_button" id=item-${exit[1]}>${exit[0]}</button> `;
+        output = output + `<button class="exit_button" id=item-${exit_room_id}>${exit_display}</button> `;
     }
 
     document.getElementById("game").innerHTML = output;
