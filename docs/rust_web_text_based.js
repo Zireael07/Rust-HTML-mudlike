@@ -150,6 +150,14 @@ export class Universe {
         return takeObject(ret);
     }
     /**
+    * @param {number} id
+    * @returns {any}
+    */
+    get_room_id(id) {
+        var ret = wasm.universe_get_room_id(this.ptr, id);
+        return takeObject(ret);
+    }
+    /**
     * @param {string} cmd
     */
     process(cmd) {
