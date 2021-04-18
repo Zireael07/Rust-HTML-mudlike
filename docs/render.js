@@ -61,7 +61,7 @@ async function initGame(wasm) {
 }
 
 function initRenderer(wasm) {
-    universe = rust.Universe.new();
+    //universe = rust.Universe.new();
 
     draw();
 

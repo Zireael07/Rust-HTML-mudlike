@@ -241,7 +241,7 @@ function handleError(f) {
         }
     };
 }
-function __wbg_adapter_51(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_52(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__h6c24671936eba317(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -273,6 +273,11 @@ export class Universe {
     static new() {
         var ret = wasm.universe_new();
         return Universe.__wrap(ret);
+    }
+    /**
+    */
+    game_start() {
+        wasm.universe_game_start(this.ptr);
     }
     /**
     * @returns {any}
@@ -414,7 +419,7 @@ async function init(input) {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_51(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_52(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -497,7 +502,7 @@ async function init(input) {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper484 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper486 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 78, __wbg_adapter_20);
         return addHeapObject(ret);
     };
