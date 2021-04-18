@@ -32,7 +32,7 @@
         ),
         (
             name: "Capsule",
-            desc: "This is a tiny capsule, roughly a person's height across. At least enough so one can lay down comfortably and there's an overhead storage space for anything a person might have, too.",
+            desc: "This is a tiny capsule, roughly a person's height across. At least long enough so one can lay down comfortably and there's an overhead storage space for anything a person might have, too.",
             known: false,
             exits: [(East, 4)],
         )

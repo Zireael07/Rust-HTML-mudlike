@@ -15,7 +15,7 @@ html, body, #wrapper {
     height: 100%;
     min-height: 100vh;
     line-height: 1.0;
-    background: #002b36; /* Solarized base03 */
+    background: #002b36; /* Solarized base03 #002b36 */
     color:#fdf6e3; /* Solarized base3; default - can be overwritten */
     margin: 2px;
     padding: 0.5em 1em; /*1 em seems to be 12.8px*/
