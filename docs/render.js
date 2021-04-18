@@ -49,6 +49,16 @@ function draw() {
     }
 }
 
+//logic shuffled to Rust (see load_datafiles())
+//needs to be async to be able to use await
+async function initGame(wasm) {
+    universe = rust.Universe.new();
+    //async/await again to load text data
+    //workaround
+    universe = await rust.load_datafile(universe);
+
+    initRenderer(wasm);
+}
 
 function initRenderer(wasm) {
     universe = rust.Universe.new();
@@ -57,4 +67,4 @@ function initRenderer(wasm) {
 
 }
 
-export { initRenderer }
+export { initGame }
