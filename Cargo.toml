@@ -44,3 +44,6 @@ serde = { version = "1.0", features = ["derive"] }
 
 # Data files
 ron = "*"
+
+# ECS
+hecs = "0.3.0"

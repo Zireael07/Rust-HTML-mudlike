@@ -13,10 +13,16 @@ use std::panic;
 
 use serde::{Serialize, Deserialize};
 
+//ECS
+use hecs::World;
+use hecs::Entity;
+
+
 mod universe_private;
 use universe_private::*;
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
+#[macro_export]
 macro_rules! log {
     ( $( $t:tt )* ) => {
         web_sys::console::log_1(&format!( $( $t )* ).into());
@@ -27,6 +33,7 @@ macro_rules! log {
 pub struct Universe {
     map: Vec<Room>,
     current_room: usize, //TODO: will likely be a property of player
+    ecs_world: World,
 }
 
 
@@ -104,6 +111,7 @@ impl Universe {
         let mut state = Universe{
             map: Vec::new(),
             current_room: 0,
+            ecs_world: World::new(),
         };
 
         //state.map.push(Room{name:"Pub".to_string(), desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), known: true, exits: vec![(Exit::Out, 1)]});
@@ -128,6 +136,19 @@ impl Universe {
     pub fn get_room_id(&self, id: usize) -> JsValue {
         let room = &self.map[id];
         return JsValue::from_serde(room).unwrap();
+    }
+
+    pub fn display_entities_in_room(&self) -> JsValue {
+        //let room = &self.map[self.current_room];
+        let entities = self.get_entities_in_room(self.current_room);
+
+        //separated because in the future, we'll want to do more interesting stuff probably
+        let mut disp = Vec::new();
+        for e in entities {
+            disp.push(self.get_data_for_id(e));
+        }
+
+        return JsValue::from_serde(&disp).unwrap();
     }
 
 

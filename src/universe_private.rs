@@ -1,3 +1,4 @@
+use super::log;
 use super::{Universe, Room, Exit, DataMaster};
 
 
@@ -37,5 +38,31 @@ impl Universe {
 
         //log!("Hallway: {:?}", state.map[4].exits);
 
+        //two parts of data aren't in a special struct - entity name and room it is in
+        self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
     }
+
+    pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {
+        let mut list = Vec::new();
+        for (id, (room_id)) in self.ecs_world.query::<(&usize)>()
+        .with::<String>()
+        .iter() {
+            if *room_id == rid {
+                list.push(id.to_bits())
+            }
+        }
+        return list;
+    }
+
+     //we store a list of ids and get the actual data with this separate function
+    pub fn get_data_for_id(&self, id: u64) -> (u64, String) {
+        let ent = hecs::Entity::from_bits(id); //restore
+
+        let name = self.ecs_world.get::<String>(ent).unwrap().to_string();
+        
+        return (id, name);
+        
+        //return format!("{} {}", id, name);
+    }
+
 }

@@ -33,3 +33,8 @@ button {
     margin-left: 2px;
     margin-right: 2px;
 }
+
+.ent_button {
+    color: yellow;
+    border-color: yellow;
+}

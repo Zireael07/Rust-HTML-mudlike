@@ -23,8 +23,18 @@ function exitClick(button) {
 
 function draw() {
     var map = universe.get_current_map();
+    var entities = universe.display_entities_in_room();
 
     var output = map.desc + '\n\n';
+
+    output = output + "You see here: ";
+    for (var i=0; i < entities.length; i++){
+        var entity = entities[i];
+        output = output + `<button class="ent_button" id=ent-${entity[0]}>${entity[1]}</button>`;
+    }
+
+    output = output + "\n\n";
+
     for (var i =0; i < map.exits.length; i++) {
         var exit = map.exits[i];
 
