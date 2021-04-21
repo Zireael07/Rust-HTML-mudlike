@@ -3,6 +3,38 @@ import * as rust from './rust_web_text_based.js';
 
 var universe, g_wasm; // Can't be initialized yet because WASM is not ready
 
+//Toki Pona words
+var wordlist = {
+    "e": "object marker", //like '(w)o' in Japanese
+    "ijo": "thing",
+    "ilo": "tool, device",
+    "jan": "person",
+    "kili": "fruit",
+    "li": "pred marker", //sort of like 'wa' in Japanese
+    "lili": "small",
+    "lukin": "eye, to look",
+    "mama": "parent",
+    "meli": "woman",
+    "mi": "mine",
+    "mije": "man",
+    "moku": "eat, food",
+    "ona": "3rd person sg/pl",
+    "pali": "to do/work/make",
+    "pana": "give, send",
+    "pipi": "bug(s)",
+    "pona": "good",
+    "soweli": "animal",
+    "suli": "great",
+    "suwi": "sweet",
+    "telo": "water, fluid",
+    "utala": "fight",
+    "wawa": "strong",
+    "waso": "bird",
+}
+
+
+
+
 //this calls back to Rust
 function process(cmd) {
     universe.process(cmd);
@@ -46,7 +78,7 @@ function npcClick(button) {
     mije sina li suli.\
     soweli ale li pona.\
     kili li moku suli.\
-    jan lili li pana e telo lukin.\
+    jan lili li (pana e telo lukin).\
     ona li lukin e lipu.\
     soweli ike li utala e meli.\
     jan utala li moku e kili suli.\
@@ -68,7 +100,18 @@ function npcClick(button) {
     for (var i=0; i < sentences.length;i++) {
         var s = sentences[i];
         output += s + '\n';
+        //gloss
+        var tokens = RiTa.tokenize(s);
+        for (var i=0; i<tokens.length;i++){
+            var t = tokens[i];
+            if (t != ".") {
+                output += wordlist[t] + " ";
+            }
+            
+        }
     }
+
+
     document.getElementById("game").innerHTML = output;
 }
 
