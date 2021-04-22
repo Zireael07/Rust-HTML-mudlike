@@ -29,6 +29,12 @@ macro_rules! log {
     }
 }
 
+//ECS
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Item{}
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct InBackpack{}
+
 #[wasm_bindgen]
 pub struct Universe {
     map: Vec<Room>,
@@ -170,6 +176,11 @@ impl Universe {
                 self.know_room(new_room);
                 //log!("{}", &format!("New room {}", self.current_room));
             },
+            "get" => {
+                let item_id = v[1].parse::<u64>().unwrap();
+                let ent = hecs::Entity::from_bits(item_id); //restore
+                self.pickup_item(&ent);
+            }
             _ => { log!("Unknown command entered"); }
         }
     }

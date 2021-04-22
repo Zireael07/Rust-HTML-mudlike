@@ -53,6 +53,15 @@ function exitClick(button) {
     process("go " + i);
 }
 
+function itemClick(button) {
+    //extract id from item id
+    var id = button.id;
+    var reg = id.match(/(\d+)/); 
+    var i = reg[0];
+    process("get " + i);
+}
+
+
 function npcClick(button) {
     //extract id from item id
     var id = button.id;
@@ -125,7 +134,11 @@ function draw() {
     output = output + "You see here: ";
     for (var i=0; i < entities.length; i++){
         var entity = entities[i];
-        output = output + `<button class="ent_button" id=ent-${entity[0]}>${entity[1]}</button>`;
+        if (entity[2]) {
+            output = output + `<button class="it_button" id=ent-${entity[0]}>${entity[1]}</button>`;
+        } else {
+            output = output + `<button class="ent_button" id=ent-${entity[0]}>${entity[1]}</button>`;
+        }
     }
 
     output = output + "\n\n";
@@ -156,6 +169,12 @@ function draw() {
     for (var i = 0; i < npc_buttons.length; i++) {
         var button = npc_buttons[i];
         button.onclick = function(e) { npcClick(e.target); }
+    }
+
+    var it_buttons = document.querySelectorAll(".it_button");
+    for (var i = 0; i < it_buttons.length; i++) {
+        var button = it_buttons[i];
+        button.onclick = function(e) { itemClick(e.target); }
     }
 }
 

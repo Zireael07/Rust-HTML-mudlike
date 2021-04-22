@@ -1,6 +1,9 @@
 use super::log;
-use super::{Universe, Room, Exit, DataMaster};
+use super::{Universe, Room, Exit, DataMaster, 
+    Item, InBackpack
+};
 
+use hecs::Entity;
 
 //Methods not exposed to JS
 impl Universe {
@@ -40,11 +43,14 @@ impl Universe {
 
         //two parts of data aren't in a special struct - entity name and room it is in
         self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
+        //item
+        self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
     }
 
     pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {
         let mut list = Vec::new();
         for (id, (room_id)) in self.ecs_world.query::<(&usize)>()
+        .without::<InBackpack>()
         .with::<String>()
         .iter() {
             if *room_id == rid {
@@ -55,14 +61,38 @@ impl Universe {
     }
 
      //we store a list of ids and get the actual data with this separate function
-    pub fn get_data_for_id(&self, id: u64) -> (u64, String) {
+    pub fn get_data_for_id(&self, id: u64) -> (u64, String, Option<Item>) {
         let ent = hecs::Entity::from_bits(id); //restore
 
         let name = self.ecs_world.get::<String>(ent).unwrap().to_string();
+        let mut item: Option<Item> = None;
+
+        if self.ecs_world.get::<Item>(ent).is_ok() {
+            //need to dereference it
+            item = Some(*self.ecs_world.get::<Item>(ent).unwrap())
+        }
         
-        return (id, name);
+        return (id, name, item);
         
         //return format!("{} {}", id, name);
+    }
+
+    pub fn items_in_inventory(&self) -> Vec<String>{
+        let mut names = Vec::new();
+        //test
+        for (id, (item, backpack)) in &mut self.ecs_world.query::<(&Item, &InBackpack)>().iter(){
+            //log!("{}", &format!("Item in inventory: {}", self.ecs_world.get::<&str>(id).unwrap().to_string()));
+            //log!("{}", &format!("ID: {:?}", id));
+            //ids.push(id.to_bits());
+            let name = self.ecs_world.get::<String>(id).unwrap().to_string();
+            names.push(name);
+        }
+        return names;
+    }
+
+    pub fn pickup_item(&mut self, item: &Entity) {
+        self.ecs_world.insert_one(*item, InBackpack{});
+        //self.items_in_inventory();
     }
 
 }
