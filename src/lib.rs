@@ -154,7 +154,15 @@ impl Universe {
             disp.push(self.get_data_for_id(e));
         }
 
+        //let inv = self.get_items_in_inventory();
+
         return JsValue::from_serde(&disp).unwrap();
+    }
+
+    pub fn display_inventory(&self) -> JsValue {
+        let inv = self.items_in_inventory();
+
+        return JsValue::from_serde(&inv).unwrap();
     }
 
 

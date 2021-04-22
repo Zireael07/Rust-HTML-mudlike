@@ -61,6 +61,36 @@ function itemClick(button) {
     process("get " + i);
 }
 
+function inventoryClick(button, inv) {
+    var str = 'You are carrying: ';
+    var output = document.getElementById("game").innerHTML;
+    var is_open = output.indexOf(str);
+
+    //don't append if already open
+    if (is_open == -1) {
+        //append to game view
+        output += '\n\n ';
+        output += str;
+
+        //nice formatting
+        if (inv.length == 1) {
+            output += inv[0];
+        }
+        else {
+            for (var i=0; i<inv.length;i++) {
+                var item = inv[i];
+                output += item + ", ";
+            }
+        }
+
+
+        document.getElementById("game").innerHTML = output;
+
+        addHandlers(inv);
+    }
+
+   
+}
 
 function npcClick(button) {
     //extract id from item id
@@ -120,14 +150,17 @@ function npcClick(button) {
         }
     }
 
-
     document.getElementById("game").innerHTML = output;
+
+    let inv = universe.display_inventory();
+    addHandlers(inv);
 }
 
 
 function draw() {
     var map = universe.get_current_map();
     var entities = universe.display_entities_in_room();
+    let inv = universe.display_inventory();
 
     var output = map.desc + '\n\n';
 
@@ -157,25 +190,39 @@ function draw() {
         output = output + `<button class="exit_button" id=item-${exit_room_id}>${exit_display}</button> `;
     }
 
+    if (inv.length > 0) {
+        output = output + '\n\n';
+        output = output +  `<button class="inv_button" id=inventory>Inventory</button>`;
+    }
+
     document.getElementById("game").innerHTML = output;
 
-    // interactivity!
-    var buttons = document.querySelectorAll(".exit_button");
-    for (var i = 0; i < buttons.length; i++) {
-        var button = buttons[i];
-        button.onclick = function(e) { exitClick(e.target); }
-    }
-    var npc_buttons = document.querySelectorAll(".ent_button");
-    for (var i = 0; i < npc_buttons.length; i++) {
-        var button = npc_buttons[i];
-        button.onclick = function(e) { npcClick(e.target); }
-    }
+    addHandlers(inv);
+}
 
-    var it_buttons = document.querySelectorAll(".it_button");
-    for (var i = 0; i < it_buttons.length; i++) {
-        var button = it_buttons[i];
-        button.onclick = function(e) { itemClick(e.target); }
-    }
+function addHandlers(inv){
+        // interactivity!
+        var buttons = document.querySelectorAll(".exit_button");
+        for (var i = 0; i < buttons.length; i++) {
+            var button = buttons[i];
+            button.onclick = function(e) { exitClick(e.target); }
+        }
+        var npc_buttons = document.querySelectorAll(".ent_button");
+        for (var i = 0; i < npc_buttons.length; i++) {
+            var button = npc_buttons[i];
+            button.onclick = function(e) { npcClick(e.target); }
+        }
+    
+        var it_buttons = document.querySelectorAll(".it_button");
+        for (var i = 0; i < it_buttons.length; i++) {
+            var button = it_buttons[i];
+            button.onclick = function(e) { itemClick(e.target); }
+        }
+    
+        if (inv.length > 0) {
+            var inv_button = document.querySelector(".inv_button");
+            inv_button.onclick = function(e) { inventoryClick(e.target, inv); }
+        }
 }
 
 //logic shuffled to Rust (see load_datafiles())
