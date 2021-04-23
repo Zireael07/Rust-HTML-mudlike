@@ -1,0 +1,45 @@
+html, body, #wrapper {
+    background-color: lightcyan;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+#game {
+    font-size: 16px;
+    box-sizing: border-box;
+	font-family: "DejaVuSansMono", "DejaVu Sans Mono", monospace;
+    font-size: 0.8em;
+    /* Size to cover the whole screen */
+    height: 100%;
+    min-height: 100vh;
+    line-height: 1.0;
+    background: #002b36; /* Solarized base03 #002b36 */
+    color:#fdf6e3; /* Solarized base3; default - can be overwritten */
+    margin: 2px;
+    padding: 0.5em 1em; /*1 em seems to be 12.8px*/
+    text-align: left;
+    z-index: 1;
+}    
+
+button {
+    background: #002b36; /* solarized base03 */
+    color: cyan;
+    border-color: cyan;
+    border-style: solid;
+    font-family: "DejaVuSansMono", "DejaVu Sans Mono", monospace;
+    font-size: 1.0em;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.ent_button {
+    color: yellow;
+    border-color: yellow;
+}
+
+.it_button {
+    color: lightyellow;
+    border-color: lightyellow;
+}

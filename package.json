@@ -1,0 +1,13 @@
+{
+  "name": "rust-web-text-based-game",
+  "collaborators": [
+    "Zireael07 <zi@mail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "rust_web_text_based_bg.wasm",
+    "rust_web_text_based.js"
+  ],
+  "module": "rust_web_text_based.js",
+  "sideEffects": false
+}
