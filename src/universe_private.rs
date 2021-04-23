@@ -5,6 +5,9 @@ use super::{Universe, Room, Exit, DataMaster,
 
 use hecs::Entity;
 
+//RNG
+use rand::Rng;
+
 //Methods not exposed to JS
 impl Universe {
     //moved because of //https://github.com/rustwasm/wasm-bindgen/issues/111 preventing using our data
@@ -40,6 +43,105 @@ impl Universe {
         }
 
         //log!("Hallway: {:?}", state.map[4].exits);
+
+        //proceduralize the town
+        let mut end = self.map.len();
+        log!("End is {}", end);
+        let mut rng = rand::thread_rng();
+        let more : bool = rand::random(); //generates a boolean
+        let max = rng.gen_range(1,3);
+
+        //finish up the starting line
+        for i in 0..1+more as i32 {
+            let mut all = self.map[3].clone();
+            let mut hov = self.map[2].clone();
+            let mut stre = self.map[1].clone();
+            all.exits = vec![(Exit::South, 1)];
+            self.map.push(all);
+            self.map.push(hov);
+        }
+
+        //log!("Hov is {:?}", &self.map[end+1]);
+        //log!("All is {:?}", &self.map[end]);
+
+        let mut street = &mut self.map[1];
+        street.exits.push((Exit::North, end));
+        street.exits.push((Exit::In, end+1));
+
+        end = self.map.len();
+
+        match max {
+            1 => {
+                for i in 0..1+more as i32 {
+                    let mut stre = self.map[1].clone();
+                    let mut hov = self.map[2].clone();
+                    let mut all = self.map[3].clone();
+                    //end+1 is stre below
+                    stre.exits = vec![(Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
+                    hov.exits = vec![(Exit::Out, end)];
+                    all.exits = vec![(Exit::South, end)];
+                    self.map.push(stre);
+                    self.map.push(hov);
+                    self.map.push(all);
+                }
+                let mut alley = &mut self.map[3];
+                alley.exits.push((Exit::North, end));
+
+            },
+            2 => {
+                for i in 0..1+more as i32 {
+                    let mut stre = self.map[1].clone();
+                    let mut hov = self.map[2].clone();
+                    let mut all = self.map[3].clone();
+                    //end+1 is stre below
+                    stre.exits = vec![(Exit::North, 1), (Exit::South, end+2), (Exit::In, end+1)];
+                    hov.exits = vec![(Exit::Out, end)];
+                    all.exits = vec![(Exit::North, end)];
+                    self.map.push(stre);
+                    self.map.push(hov);
+                    self.map.push(all);
+                }
+                let mut street = &mut self.map[1];
+                street.exits.push((Exit::South, end));
+            },
+            3 => {
+                //add to both north and south end
+                for i in 0..1+more as i32 {
+                    let mut stre = self.map[1].clone();
+                    let mut hov = self.map[2].clone();
+                    let mut all = self.map[3].clone();
+                    //end+1 is stre below
+                    stre.exits = vec![(Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
+                    hov.exits = vec![(Exit::Out, end)];
+                    all.exits = vec![(Exit::South, end)];
+                    self.map.push(stre);
+                    self.map.push(hov);
+                    self.map.push(all);
+                }
+                let mut alley = &mut self.map[3];
+                alley.exits.push((Exit::North, end));
+                //south half
+                let endi = self.map.len();
+                
+                for i in 0..1+more as i32 {
+                    let mut stre = self.map[1].clone();
+                    let mut hov = self.map[2].clone();
+                    let mut all = self.map[3].clone();
+                    //end+1 is stre below
+                    stre.exits = vec![(Exit::North, 1), (Exit::South, endi+2), (Exit::In, endi+1)];
+                    hov.exits = vec![(Exit::Out, endi)];
+                    all.exits = vec![(Exit::North, endi)];
+                    self.map.push(stre);
+                    self.map.push(hov);
+                    self.map.push(all);
+                }
+                let mut street = &mut self.map[1];
+                street.exits.push((Exit::South, endi));
+            },
+            _ => {},
+        }
+
+
 
         //two parts of data aren't in a special struct - entity name and room it is in
         self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
