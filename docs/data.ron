@@ -26,7 +26,7 @@
         ),
         (
             name: "Hotel hallway",
-            desc: "This is a small hotel's hallway. Both walls are lined with identical doors, with green or red neon lights overhead.",
+            desc: "This is a small hotel's hallway. Both walls are lined with identical doors, with green or red neon lights overhead to indicate occupancy.",
             known: false,
             exits: [(Out, 3), (West, 5)],
         ),
