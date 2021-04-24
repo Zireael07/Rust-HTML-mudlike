@@ -1,5 +1,5 @@
 [package]
-name = "rust-web-text-based-game"
+name = "rust-web-text-based"
 version = "0.1.0"
 authors = ["Zireael07 <zi@mail.com>"]
 edition = "2018"
