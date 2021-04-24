@@ -31,9 +31,17 @@ macro_rules! log {
 
 //ECS
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Player{}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Item{}
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct InBackpack{}
+
+//don't need to be serialized
+pub struct WantsToDropItem {
+    pub item : Entity
+}
 
 #[wasm_bindgen]
 pub struct Universe {
@@ -188,7 +196,17 @@ impl Universe {
                 let item_id = v[1].parse::<u64>().unwrap();
                 let ent = hecs::Entity::from_bits(item_id); //restore
                 self.pickup_item(&ent);
-            }
+            },
+            "drop" => {
+                let item_id = v[1].parse::<u64>().unwrap();
+                let ent = hecs::Entity::from_bits(item_id); //restore
+                let player = self.get_player();
+                if player.is_some(){
+                    //log!("Dropping item");
+                    self.drop_item(&player.unwrap(), &ent);
+                }
+            },
+                
             _ => { log!("Unknown command entered"); }
         }
     }

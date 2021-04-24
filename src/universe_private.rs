@@ -1,6 +1,6 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
-    Item, InBackpack
+    Player, Item, InBackpack, WantsToDropItem
 };
 
 use hecs::Entity;
@@ -141,7 +141,8 @@ impl Universe {
             _ => {},
         }
 
-
+        //player dummy entity
+        self.ecs_world.spawn((Player{}, 0 as usize));
 
         //two parts of data aren't in a special struct - entity name and room it is in
         self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
@@ -179,22 +180,48 @@ impl Universe {
         //return format!("{} {}", id, name);
     }
 
-    pub fn items_in_inventory(&self) -> Vec<String>{
-        let mut names = Vec::new();
+    pub fn items_in_inventory(&self) -> Vec<(u64, String)>{
+        let mut data = Vec::new();
         //test
         for (id, (item, backpack)) in &mut self.ecs_world.query::<(&Item, &InBackpack)>().iter(){
             //log!("{}", &format!("Item in inventory: {}", self.ecs_world.get::<&str>(id).unwrap().to_string()));
             //log!("{}", &format!("ID: {:?}", id));
             //ids.push(id.to_bits());
             let name = self.ecs_world.get::<String>(id).unwrap().to_string();
-            names.push(name);
+            data.push((id.to_bits(), name));
         }
-        return names;
+        return data;
+    }
+
+    pub fn get_player(&self) -> Option<Entity> {
+        //get player entity
+        let mut play: Option<Entity> = None;
+        for (id, (player)) in self.ecs_world.query::<(&Player)>().iter() {
+            play = Some(id);
+        }
+        return play;
     }
 
     pub fn pickup_item(&mut self, item: &Entity) {
         self.ecs_world.insert_one(*item, InBackpack{});
         //self.items_in_inventory();
+    }
+
+    pub fn drop_item(&mut self, user: &Entity, it: &Entity) {
+        // The indirection is here to make it possible for non-player Entities to drop items
+        //tell the engine that we want to drop the item
+        self.ecs_world.insert_one(*user, WantsToDropItem{item:*it});
+
+        //scope to get around borrow checker
+        {
+            for (id, (wantstodrop)) in self.ecs_world.query::<(&WantsToDropItem)>().iter(){
+                let mut room = self.ecs_world.get_mut::<usize>(wantstodrop.item).unwrap();
+                *room = self.current_room;
+            }
+        }
+
+        self.ecs_world.remove_one::<InBackpack>(*it);
+        
     }
 
 }

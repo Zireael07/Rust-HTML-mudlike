@@ -61,6 +61,14 @@ function itemClick(button) {
     process("get " + i);
 }
 
+function dropClick(button) {
+    //extract id from item id
+    var id = button.id;
+    var reg = id.match(/(\d+)/); 
+    var i = reg[0];
+    process("drop " + i);
+}
+
 function inventoryClick(button, inv) {
     var str = 'You are carrying: ';
     var output = document.getElementById("game").innerHTML;
@@ -73,15 +81,15 @@ function inventoryClick(button, inv) {
         output += str;
 
         //nice formatting
-        if (inv.length == 1) {
-            output += inv[0];
-        }
-        else {
+        // if (inv.length == 1) {
+        //     var item = inv[0];
+        // }
+        // else {
             for (var i=0; i<inv.length;i++) {
                 var item = inv[i];
-                output += item + ", ";
+                output += `<button class="it_inv_button" id=ent-${item[0]}>${item[1]}</button>` + " ";
             }
-        }
+        //}
 
 
         document.getElementById("game").innerHTML = output;
@@ -217,6 +225,12 @@ function addHandlers(inv){
         for (var i = 0; i < it_buttons.length; i++) {
             var button = it_buttons[i];
             button.onclick = function(e) { itemClick(e.target); }
+        }
+
+        var it_buttons = document.querySelectorAll(".it_inv_button");
+        for (var i = 0; i < it_buttons.length; i++) {
+            var button = it_buttons[i];
+            button.onclick = function(e) { dropClick(e.target); }
         }
     
         if (inv.length > 0) {
