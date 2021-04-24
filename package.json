@@ -5,9 +5,9 @@
   ],
   "version": "0.1.0",
   "files": [
-    "rust_web_text_based_bg.wasm",
-    "rust_web_text_based.js"
+    "rust_web_text_based_game_bg.wasm",
+    "rust_web_text_based_game.js"
   ],
-  "module": "rust_web_text_based.js",
+  "module": "rust_web_text_based_game.js",
   "sideEffects": false
 }

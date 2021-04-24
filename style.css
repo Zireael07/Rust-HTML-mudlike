@@ -39,7 +39,7 @@ button {
     border-color: yellow;
 }
 
-.it_button {
+.it_button, .it_inv_button {
     color: lightyellow;
     border-color: lightyellow;
 }
