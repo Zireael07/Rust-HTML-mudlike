@@ -1,6 +1,6 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
-    Player, Item, InBackpack, WantsToDropItem
+    Player, CombatStats, Item, InBackpack, WantsToDropItem
 };
 
 use hecs::Entity;
@@ -142,10 +142,11 @@ impl Universe {
         }
 
         //player dummy entity
-        self.ecs_world.spawn((Player{}, 0 as usize));
+        self.ecs_world.spawn((Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1}));
 
         //two parts of data aren't in a special struct - entity name and room it is in
         self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
+        self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}));
         //item
         self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
     }
@@ -222,6 +223,37 @@ impl Universe {
 
         self.ecs_world.remove_one::<InBackpack>(*it);
         
+    }
+
+
+    //a very simple test, akin to flipping a coin or throwing a d2
+    fn make_test_d2(&self, skill: u32) -> Vec<bool> {
+        let mut rolls = Vec::new();
+        for _ in 0..10-skill { // exclusive of end
+            rolls.push(rand::random()) // generates a boolean
+        }
+        return rolls
+    }
+
+    pub fn attack(&self, target: &Entity) {
+        let res = self.make_test_d2(1);
+        let sum = res.iter().filter(|&&b| b).count(); //iter returns references and filter works with references too - double indirection
+        //game_message(&format!("Test: {} sum: {{g{}", Rolls(res), sum));
+
+        if sum >= 5 {
+            //game_message(&format!("Attack hits!"));
+
+            //deal damage
+            // the mut here is obligatory!!!
+            let mut stats = self.ecs_world.get_mut::<CombatStats>(*target).unwrap();
+            stats.hp = stats.hp - 2; // - offensive_bonus;
+            log!("{}", &format!("Dealt 2 damage"));
+            //game_message(&format!("Dealt {{r{}}} damage", 2+offensive_bonus));
+            
+            //can't remove dead here due to borrow checker
+        } else {
+            log!("Attack missed!");
+        }
     }
 
 }

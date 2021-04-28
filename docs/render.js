@@ -106,6 +106,7 @@ function npcClick(button) {
     var reg = id.match(/(\d+)/); 
     var i = reg[0];
     
+    process("npc_interact " + i);
     
     //test generating sentences
     //https://observablehq.com/@dhowe/tut-rita-ngrams

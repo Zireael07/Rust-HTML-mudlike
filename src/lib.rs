@@ -34,6 +34,14 @@ macro_rules! log {
 pub struct Player{}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct CombatStats {
+    pub max_hp : i32,
+    pub hp : i32,
+    pub defense : i32,
+    pub power : i32
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Item{}
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct InBackpack{}
@@ -204,6 +212,14 @@ impl Universe {
                 if player.is_some(){
                     //log!("Dropping item");
                     self.drop_item(&player.unwrap(), &ent);
+                }
+            },
+            "npc_interact" => {
+                let id = v[1].parse::<u64>().unwrap();
+                let entity = hecs::Entity::from_bits(id); //restore
+                if self.ecs_world.get::<CombatStats>(entity).is_ok() {
+                    log!("This is an enemy, attack");
+                    self.attack(&entity);
                 }
             },
                 
