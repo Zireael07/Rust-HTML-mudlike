@@ -245,7 +245,7 @@ function handleError(f) {
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
-function __wbg_adapter_71(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_72(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__h6a0f8b64d4415ab6(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -305,6 +305,13 @@ export class Universe {
     */
     display_inventory() {
         var ret = wasm.universe_display_inventory(this.ptr);
+        return takeObject(ret);
+    }
+    /**
+    * @returns {any}
+    */
+    display_messages() {
+        var ret = wasm.universe_display_messages(this.ptr);
         return takeObject(ret);
     }
     /**
@@ -466,7 +473,7 @@ async function init(input) {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_71(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_72(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -572,7 +579,7 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper660 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper671 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 102, __wbg_adapter_22);
         return addHeapObject(ret);
     };
