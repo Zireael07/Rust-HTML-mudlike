@@ -170,6 +170,7 @@ function draw() {
     var map = universe.get_current_map();
     var entities = universe.display_entities_in_room();
     let inv = universe.display_inventory();
+    let messages = universe.display_messages();
 
     var output = map.desc + '\n\n';
 
@@ -199,8 +200,14 @@ function draw() {
         output = output + `<button class="exit_button" id=item-${exit_room_id}>${exit_display}</button> `;
     }
 
+    output = output + '\n\n';
+    
+    for (var i=0; i<messages.length; i++) {
+        var msg = messages[i];
+        output = output + msg +'\n';
+    }
+
     if (inv.length > 0) {
-        output = output + '\n\n';
         output = output +  `<button class="inv_button" id=inventory>Inventory</button>`;
     }
 

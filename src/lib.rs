@@ -51,6 +51,11 @@ pub struct WantsToDropItem {
     pub item : Entity
 }
 
+//game log
+pub struct GameMessages {
+    pub entries: Vec<String>
+}
+
 #[wasm_bindgen]
 pub struct Universe {
     map: Vec<Room>,
@@ -181,6 +186,10 @@ impl Universe {
         return JsValue::from_serde(&inv).unwrap();
     }
 
+    pub fn display_messages(&self) -> JsValue {
+        let messages = self.get_messages();
+        return JsValue::from_serde(&messages).unwrap();
+    }
 
     fn know_room(&mut self, id: usize) {
         self.map[id].known = true;

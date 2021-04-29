@@ -1,6 +1,6 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
-    Player, CombatStats, Item, InBackpack, WantsToDropItem
+    Player, GameMessages, CombatStats, Item, InBackpack, WantsToDropItem
 };
 
 use hecs::Entity;
@@ -142,7 +142,7 @@ impl Universe {
         }
 
         //player dummy entity
-        self.ecs_world.spawn((Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1}));
+        self.ecs_world.spawn((Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1}, GameMessages{entries:vec![]}));
 
         //two parts of data aren't in a special struct - entity name and room it is in
         self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
@@ -203,6 +203,20 @@ impl Universe {
         return play;
     }
 
+    pub fn get_messages(&self) -> Vec<String> {
+        let mut msg: Vec<String> = vec![];
+        let player = self.get_player();
+        if player.is_some(){
+            //cannot move out of dereference
+            //msg = self.ecs_world.get::<GameMessages>(player.unwrap()).unwrap().entries;
+            //hack fix
+            for e in self.ecs_world.get::<GameMessages>(player.unwrap()).unwrap().entries.iter() {
+                msg.push(e.to_string());
+            }
+        }
+        return msg;
+    }
+
     pub fn pickup_item(&mut self, item: &Entity) {
         self.ecs_world.insert_one(*item, InBackpack{});
         //self.items_in_inventory();
@@ -247,12 +261,17 @@ impl Universe {
             // the mut here is obligatory!!!
             let mut stats = self.ecs_world.get_mut::<CombatStats>(*target).unwrap();
             stats.hp = stats.hp - 2; // - offensive_bonus;
-            log!("{}", &format!("Dealt 2 damage"));
+            
+            let player = self.get_player();
+            let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
+            log.entries.push(format!("Dealt 2 damage"));
             //game_message(&format!("Dealt {{r{}}} damage", 2+offensive_bonus));
             
             //can't remove dead here due to borrow checker
         } else {
-            log!("Attack missed!");
+            let player = self.get_player();
+            let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
+            log.entries.push(format!("Attack missed!"));
         }
     }
 
