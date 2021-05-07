@@ -34,6 +34,9 @@ macro_rules! log {
 pub struct Player{}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct AI {}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct CombatStats {
     pub max_hp : i32,
     pub hp : i32,
@@ -50,6 +53,8 @@ pub struct InBackpack{}
 pub struct WantsToDropItem {
     pub item : Entity
 }
+// tells the engine to nuke us
+pub struct ToRemove {pub yes: bool} //bool is temporary while we can't modify entities when iterating
 
 //game log
 pub struct GameMessages {
@@ -213,6 +218,8 @@ impl Universe {
                 let item_id = v[1].parse::<u64>().unwrap();
                 let ent = hecs::Entity::from_bits(item_id); //restore
                 self.pickup_item(&ent);
+                //enemy turn
+                self.end_turn();
             },
             "drop" => {
                 let item_id = v[1].parse::<u64>().unwrap();
@@ -221,6 +228,8 @@ impl Universe {
                 if player.is_some(){
                     //log!("Dropping item");
                     self.drop_item(&player.unwrap(), &ent);
+                    //enemy turn
+                    self.end_turn();
                 }
             },
             "npc_interact" => {
@@ -228,7 +237,9 @@ impl Universe {
                 let entity = hecs::Entity::from_bits(id); //restore
                 if self.ecs_world.get::<CombatStats>(entity).is_ok() {
                     log!("This is an enemy, attack");
-                    self.attack(&entity);
+                    self.attack(&entity);                    
+                    //enemy turn
+                    self.end_turn();
                 }
             },
                 

@@ -1,6 +1,6 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
-    Player, GameMessages, CombatStats, Item, InBackpack, WantsToDropItem
+    Player, GameMessages, AI, CombatStats, Item, InBackpack, WantsToDropItem, ToRemove
 };
 
 use hecs::Entity;
@@ -273,6 +273,71 @@ impl Universe {
             let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
             log.entries.push(format!("Attack missed!"));
         }
+    }
+
+    pub fn end_turn(&mut self) {
+        self.get_AI();
+        self.remove_dead();
+    }
+
+    fn get_AI(&mut self) {
+        for (id, (ai, room_id)) in &mut self.ecs_world.query::<(&AI, &usize)>()
+        .with::<String>()
+        .iter()
+        {
+            if *room_id == self.current_room {
+                //get player entity
+                let mut play: Option<Entity> = None;
+                for (id, (player)) in self.ecs_world.query::<(&Player)>().iter() {
+                    play = Some(id);
+                }
+                match play {
+                    Some(entity) => {
+                        self.attack(&entity);
+                        let mut log = self.ecs_world.get_mut::<GameMessages>(entity).unwrap();
+                        log.entries.push(format!("AI {} kicked at the player", self.ecs_world.get::<String>(id).unwrap().to_string()));
+                    },
+                    None => {},
+                }
+            }
+            
+        }
+    }
+
+    fn remove_dead(&mut self) {
+        // Here we query entities with 0 or less hp and despawn them
+        let mut to_remove: Vec<Entity> = Vec::new();
+        for (id, stats) in &mut self.ecs_world.query::<&CombatStats>() {
+            if stats.hp <= 0 {
+                if id.id() > 0 { 
+                    to_remove.push(id);
+                }
+                // player - just a log message
+                else {
+                    let player = self.get_player();
+                    let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
+                    log.entries.push(format!("You are DEAD!"));
+                }
+            }
+        }
+
+        for (id, remove) in &mut self.ecs_world.query::<&ToRemove>() {
+            if remove.yes {
+                to_remove.push(id);
+            }
+        }
+
+        for entity in to_remove {
+            // not item
+            if self.ecs_world.get::<Item>(entity).is_err() {
+                let player = self.get_player();
+                let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
+                log.entries.push(format!("AI {} is dead", self.ecs_world.get::<String>(entity).unwrap().to_string()));
+            }
+            
+            self.ecs_world.despawn(entity).unwrap();
+        }
+
     }
 
 }
