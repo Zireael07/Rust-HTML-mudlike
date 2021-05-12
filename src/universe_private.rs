@@ -1,6 +1,6 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
-    Player, GameMessages, AI, CombatStats, Item, InBackpack, WantsToDropItem, ToRemove
+    Player, GameMessages, AI, CombatStats, Item, InBackpack, WantsToDropItem, ToRemove, Equippable, Equipped, EquipmentSlot
 };
 
 use hecs::Entity;
@@ -146,7 +146,9 @@ impl Universe {
 
         //two parts of data aren't in a special struct - entity name and room it is in
         self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
-        self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}));
+        let th = self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}));
+        let l_jacket = self.ecs_world.spawn(("Leather jacket".to_string(), Item{}, Equippable{slot: EquipmentSlot::Torso})); //ToRemove{yes:false}
+        self.ecs_world.insert_one(l_jacket, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Torso});
         //item
         self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
     }
@@ -307,6 +309,7 @@ impl Universe {
     fn remove_dead(&mut self) {
         // Here we query entities with 0 or less hp and despawn them
         let mut to_remove: Vec<Entity> = Vec::new();
+        let mut to_drop : Vec<(Entity)> = Vec::new();
         for (id, stats) in &mut self.ecs_world.query::<&CombatStats>() {
             if stats.hp <= 0 {
                 if id.id() > 0 { 
@@ -330,12 +333,33 @@ impl Universe {
         for entity in to_remove {
             // not item
             if self.ecs_world.get::<Item>(entity).is_err() {
+                //drop their stuff
+                for (ent_id, (equipped)) in self.ecs_world.query::<(&Equipped)>()
+                .with::<String>()
+                .iter()
+                {
+                    let owner = hecs::Entity::from_bits(equipped.owner);
+                    if owner == entity {
+                        to_drop.push((ent_id));
+                    }
+                }
+
+                //log message
                 let player = self.get_player();
                 let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
                 log.entries.push(format!("AI {} is dead", self.ecs_world.get::<String>(entity).unwrap().to_string()));
             }
             
             self.ecs_world.despawn(entity).unwrap();
+        }
+
+        // deferred some actions because we can't add or remove components when iterating
+        for it in to_drop.iter() {
+            self.ecs_world.remove_one::<Equipped>(*it);
+            //put in current room
+            self.ecs_world.insert_one(*it, self.current_room);
+
+            log!("{}", &format!("Dropping item {} room {} ", self.ecs_world.get::<String>(*it).unwrap().to_string(), self.current_room));
         }
 
     }

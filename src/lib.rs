@@ -56,6 +56,18 @@ pub struct WantsToDropItem {
 // tells the engine to nuke us
 pub struct ToRemove {pub yes: bool} //bool is temporary while we can't modify entities when iterating
 
+#[derive(Debug, PartialEq, Copy, Clone, Serialize, Deserialize)]
+pub enum EquipmentSlot { Melee, Torso, Legs, Feet }
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Equippable {
+    pub slot : EquipmentSlot
+}
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Equipped {
+    pub owner : u64, //because Entity cannot be serialized by serde
+    pub slot : EquipmentSlot
+}
+
 //game log
 pub struct GameMessages {
     pub entries: Vec<String>
