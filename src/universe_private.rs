@@ -1,6 +1,7 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
-    Player, GameMessages, AI, CombatStats, Item, InBackpack, WantsToDropItem, ToRemove, Equippable, Equipped, EquipmentSlot
+    Player, GameMessages, AI, CombatStats, 
+    Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, Equippable, Equipped, EquipmentSlot
 };
 
 use hecs::Entity;
@@ -142,7 +143,7 @@ impl Universe {
         }
 
         //player dummy entity
-        self.ecs_world.spawn((Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1}, GameMessages{entries:vec![]}));
+        self.ecs_world.spawn(("Player".to_string(), Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1}, GameMessages{entries:vec![]}));
 
         //two parts of data aren't in a special struct - entity name and room it is in
         self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
@@ -156,7 +157,7 @@ impl Universe {
     pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {
         let mut list = Vec::new();
         for (id, (room_id)) in self.ecs_world.query::<(&usize)>()
-        .without::<InBackpack>()
+        .without::<InBackpack>().without::<Player>()
         .with::<String>()
         .iter() {
             if *room_id == rid {
@@ -239,6 +240,106 @@ impl Universe {
 
         self.ecs_world.remove_one::<InBackpack>(*it);
         
+    }
+
+    pub fn use_item(&mut self, user: &Entity, it: &Entity) {
+        // The indirection is here to make it possible for non-player Entities to use items
+        //tell the engine that we want to use the item
+        self.ecs_world.insert_one(*user, WantsToUseItem{item:*it});
+
+        //message
+        log!("{}", &format!("{} used {}", self.ecs_world.get::<String>(*user).unwrap().to_string(), self.ecs_world.get::<String>(*it).unwrap().to_string()));
+        // apply the use effects
+        let mut wants : Vec<Entity> = Vec::new();
+        let mut to_unequip : Vec<Entity> = Vec::new();
+        for (id, (wantstouse)) in self.ecs_world.query::<(&WantsToUseItem)>().iter(){
+            //log!("{}", &format!("Want to use item: {:?}", wantstouse.item));
+            //log!("{}", &format!("Item: {}", self.ecs_world.get::<String>(wantstouse.item).unwrap().to_string()));
+
+            // If it heals, apply the healing
+            // NOTE: no & here!!!
+            // if self.ecs_world.get::<ProvidesHealing>(wantstouse.item).is_ok() {
+            //     //actually heal!
+            //     let mut stats = self.ecs_world.get_mut::<CombatStats>(*user).unwrap();
+            //     stats.hp += self.ecs_world.get::<ProvidesHealing>(wantstouse.item).unwrap().heal_amount;
+            //     game_message(&format!("{{g{} heals {} damage", self.ecs_world.get::<String>(*user).unwrap().to_string(), self.ecs_world.get::<ProvidesHealing>(wantstouse.item).unwrap().heal_amount));                
+            // } else {
+            //     log!("Item doesn't provide healing");
+            // }
+
+            // // food or drink?
+            // if self.ecs_world.get::<ProvidesQuench>(wantstouse.item).is_ok(){
+            //     game_message(&format!("{{gYou drink the {}", self.ecs_world.get::<String>(*it).unwrap().to_string()));
+            // } else if self.ecs_world.get::<ProvidesFood>(wantstouse.item).is_ok(){
+            //     game_message(&format!("{{gYou eat the {}", self.ecs_world.get::<String>(*it).unwrap().to_string()));
+            // }
+
+            // If it is equippable, then we want to equip it - and unequip whatever else was in that slot
+            if self.ecs_world.get::<Equippable>(wantstouse.item).is_ok() {
+                //if it's equipped already...
+                if self.ecs_world.get::<Equipped>(wantstouse.item).is_ok(){
+                    let equipped = self.ecs_world.get::<Equipped>(wantstouse.item).unwrap();
+                    let owner = hecs::Entity::from_bits(equipped.owner);
+                    if owner == *user {
+                        to_unequip.push(wantstouse.item);
+                        //if target == *player_entity {
+                        let player = self.get_player();
+                        let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();    
+                        log.entries.push(format!("You unequip {}.", self.ecs_world.get::<String>(wantstouse.item).unwrap().to_string()));
+                    }
+                }
+                else {
+                    let can_equip = self.ecs_world.get::<Equippable>(wantstouse.item).unwrap();
+                    let target_slot = can_equip.slot;
+            
+                    // Remove any items the target has in the item's slot
+                    //let mut to_unequip : Vec<Entity> = Vec::new();
+    
+                    //find items in slot
+                    for (ent_id, (equipped)) in self.ecs_world.query::<(&Equipped)>()
+                    .with::<String>()
+                    .iter()
+                    {
+                        let owner = hecs::Entity::from_bits(equipped.owner);
+                        if owner == *user && equipped.slot == target_slot {
+                            to_unequip.push(ent_id);
+                            //if target == *player_entity {
+                            let player = self.get_player();
+                            let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();    
+                            log.entries.push(format!("You unequip {}.", self.ecs_world.get::<String>(ent_id).unwrap().to_string()));
+                        }   
+                    }
+                    wants.push(wantstouse.item);
+                    let player = self.get_player();
+                    let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
+                    log.entries.push(format!("{} equips {}", self.ecs_world.get::<String>(*user).unwrap().to_string(), self.ecs_world.get::<String>(*it).unwrap().to_string()));
+                }
+               
+            }
+
+            // if self.ecs_world.get::<Consumable>(wantstouse.item).is_ok() {
+            //     log!("Item is a consumable");
+            //     //FIXME: we can't add components or remove entities while iterating, so this is a hack
+            //     self.ecs_world.get_mut::<ToRemove>(wantstouse.item).unwrap().yes = true;
+            // }
+        }
+
+        // deferred some actions because we can't add or remove components when iterating
+        for item in to_unequip.iter() {
+            self.ecs_world.remove_one::<Equipped>(*item);
+        }
+
+        for item in wants.iter() {
+            let eq = { //scope to get around borrow checker
+                let get = self.ecs_world.get::<Equippable>(*item).unwrap();
+                *get //clone here to get around borrow checker
+            };
+            // slot related to item's slot
+            self.ecs_world.insert_one(*item, Equipped{owner:user.to_bits(), slot:eq.slot});
+            
+            //self.ecs_world.remove_one::<InBackpack>(*item);
+        }
+
     }
 
 

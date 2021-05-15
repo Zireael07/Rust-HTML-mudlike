@@ -50,6 +50,9 @@ pub struct Item{}
 pub struct InBackpack{}
 
 //don't need to be serialized
+pub struct WantsToUseItem {
+    pub item : Entity
+}
 pub struct WantsToDropItem {
     pub item : Entity
 }
@@ -240,6 +243,17 @@ impl Universe {
                 if player.is_some(){
                     //log!("Dropping item");
                     self.drop_item(&player.unwrap(), &ent);
+                    //enemy turn
+                    self.end_turn();
+                }
+            },
+            "use" => {
+                let item_id = v[1].parse::<u64>().unwrap();
+                let ent = hecs::Entity::from_bits(item_id); //restore
+                let player = self.get_player();
+                if player.is_some(){
+                    //log!("Dropping item");
+                    self.use_item(&player.unwrap(), &ent);
                     //enemy turn
                     self.end_turn();
                 }
