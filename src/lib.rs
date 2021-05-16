@@ -71,6 +71,13 @@ pub struct Equipped {
     pub slot : EquipmentSlot
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Consumable{} //in the sense that it is limited use only
+#[derive(Clone, Copy, Serialize, Deserialize)]
+pub struct ProvidesHealing {
+    pub heal_amount : i32
+}
+
 //game log
 pub struct GameMessages {
     pub entries: Vec<String>

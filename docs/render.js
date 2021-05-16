@@ -69,6 +69,7 @@ function itemBackpackClick(button) {
     
     var output = document.getElementById("game").innerHTML;
     output += "\n\n";
+    //TODO: only display use button if item is usable
     output += `<button class="inv_use_button" id=ent-${id}>Use</button>` + " " + `<button class="inv_drop_button" id=ent-${id}>Drop</button>`
 
     document.getElementById("game").innerHTML = output;

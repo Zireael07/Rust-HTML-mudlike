@@ -1,7 +1,9 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
     Player, GameMessages, AI, CombatStats, 
-    Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, Equippable, Equipped, EquipmentSlot
+    Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
+    Consumable, ProvidesHealing,
+    Equippable, Equipped, EquipmentSlot
 };
 
 use hecs::Entity;
@@ -152,6 +154,7 @@ impl Universe {
         self.ecs_world.insert_one(l_jacket, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Torso});
         //item
         self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
+        self.ecs_world.spawn(("Medkit".to_string(), 2 as usize, Item{}, Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false}));
     }
 
     pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {
@@ -258,14 +261,16 @@ impl Universe {
 
             // If it heals, apply the healing
             // NOTE: no & here!!!
-            // if self.ecs_world.get::<ProvidesHealing>(wantstouse.item).is_ok() {
-            //     //actually heal!
-            //     let mut stats = self.ecs_world.get_mut::<CombatStats>(*user).unwrap();
-            //     stats.hp += self.ecs_world.get::<ProvidesHealing>(wantstouse.item).unwrap().heal_amount;
-            //     game_message(&format!("{{g{} heals {} damage", self.ecs_world.get::<String>(*user).unwrap().to_string(), self.ecs_world.get::<ProvidesHealing>(wantstouse.item).unwrap().heal_amount));                
-            // } else {
-            //     log!("Item doesn't provide healing");
-            // }
+            if self.ecs_world.get::<ProvidesHealing>(wantstouse.item).is_ok() {
+                //actually heal!
+                let mut stats = self.ecs_world.get_mut::<CombatStats>(*user).unwrap();
+                stats.hp += self.ecs_world.get::<ProvidesHealing>(wantstouse.item).unwrap().heal_amount;
+                let player = self.get_player();
+                let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
+                log.entries.push(format!("{} heals {} damage", self.ecs_world.get::<String>(*user).unwrap().to_string(), self.ecs_world.get::<ProvidesHealing>(wantstouse.item).unwrap().heal_amount));                
+            } else {
+                log!("Item doesn't provide healing");
+            }
 
             // // food or drink?
             // if self.ecs_world.get::<ProvidesQuench>(wantstouse.item).is_ok(){
@@ -317,11 +322,11 @@ impl Universe {
                
             }
 
-            // if self.ecs_world.get::<Consumable>(wantstouse.item).is_ok() {
-            //     log!("Item is a consumable");
-            //     //FIXME: we can't add components or remove entities while iterating, so this is a hack
-            //     self.ecs_world.get_mut::<ToRemove>(wantstouse.item).unwrap().yes = true;
-            // }
+            if self.ecs_world.get::<Consumable>(wantstouse.item).is_ok() {
+                log!("Item is a consumable");
+                //FIXME: we can't add components or remove entities while iterating, so this is a hack
+                self.ecs_world.get_mut::<ToRemove>(wantstouse.item).unwrap().yes = true;
+            }
         }
 
         // deferred some actions because we can't add or remove components when iterating
