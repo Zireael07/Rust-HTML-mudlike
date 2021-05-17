@@ -78,6 +78,16 @@ pub struct ProvidesHealing {
     pub heal_amount : i32
 }
 
+#[derive(Clone, Copy, Serialize, Deserialize)]
+pub struct MeleeBonus {
+    pub bonus : i32
+}
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct DefenseBonus {
+    pub bonus : f32
+}
+
+
 //game log
 pub struct GameMessages {
     pub entries: Vec<String>

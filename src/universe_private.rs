@@ -3,7 +3,7 @@ use super::{Universe, Room, Exit, DataMaster,
     Player, GameMessages, AI, CombatStats, 
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing,
-    Equippable, Equipped, EquipmentSlot
+    Equippable, Equipped, EquipmentSlot, MeleeBonus
 };
 
 use hecs::Entity;
@@ -155,6 +155,7 @@ impl Universe {
         //item
         self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
         self.ecs_world.spawn(("Medkit".to_string(), 2 as usize, Item{}, Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false}));
+        self.ecs_world.spawn(("Combat knife".to_string(), 1 as usize, Item{}, Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 2}, ToRemove{yes:false}));
     }
 
     pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {
@@ -365,15 +366,21 @@ impl Universe {
         if sum >= 5 {
             //game_message(&format!("Attack hits!"));
 
+            //item bonuses
+            let mut offensive_bonus = 0;
+            for (id, (power_bonus, equipped_by)) in self.ecs_world.query::<(&MeleeBonus, &Equipped)>().iter() {
+                //if equipped_by.owner == attacker {
+                    offensive_bonus += power_bonus.bonus;
+            }
+
             //deal damage
             // the mut here is obligatory!!!
             let mut stats = self.ecs_world.get_mut::<CombatStats>(*target).unwrap();
-            stats.hp = stats.hp - 2; // - offensive_bonus;
+            stats.hp = stats.hp - 2 - offensive_bonus;
             
             let player = self.get_player();
             let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
-            log.entries.push(format!("Dealt 2 damage"));
-            //game_message(&format!("Dealt {{r{}}} damage", 2+offensive_bonus));
+            log.entries.push(format!("Dealt {} damage", 2+offensive_bonus));
             
             //can't remove dead here due to borrow checker
         } else {
