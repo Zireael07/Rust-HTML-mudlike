@@ -3,7 +3,7 @@ use super::{Universe, Room, Exit, DataMaster,
     Player, GameMessages, AI, CombatStats, 
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing,
-    Equippable, Equipped, EquipmentSlot, MeleeBonus
+    Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus
 };
 
 use hecs::Entity;
@@ -150,12 +150,20 @@ impl Universe {
         //two parts of data aren't in a special struct - entity name and room it is in
         self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
         let th = self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}));
-        let l_jacket = self.ecs_world.spawn(("Leather jacket".to_string(), Item{}, Equippable{slot: EquipmentSlot::Torso})); //ToRemove{yes:false}
+        let l_jacket = self.ecs_world.spawn(("Leather jacket".to_string(), Item{}, Equippable{slot: EquipmentSlot::Torso}, DefenseBonus{ bonus: 0.15})); //ToRemove{yes:false}
+        let boots = self.ecs_world.spawn(("Boots".to_string(), Item{}, Equippable{slot: EquipmentSlot::Feet}, DefenseBonus{ bonus: 0.15}));
+        let jeans = self.ecs_world.spawn(("Jeans".to_string(), Item{}, Equippable{slot: EquipmentSlot::Legs}, DefenseBonus{ bonus: 0.1}));
         self.ecs_world.insert_one(l_jacket, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Torso});
+        self.ecs_world.insert_one(boots, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Feet});
+        self.ecs_world.insert_one(jeans, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Legs});
         //item
         self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
         self.ecs_world.spawn(("Medkit".to_string(), 2 as usize, Item{}, Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false}));
         self.ecs_world.spawn(("Combat knife".to_string(), 1 as usize, Item{}, Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 2}, ToRemove{yes:false}));
+
+        self.ecs_world.spawn(("Leather jacket".to_string(), 2 as usize, Item{}, Equippable{slot: EquipmentSlot::Torso}, DefenseBonus{ bonus: 0.15})); //ToRemove{yes:false}
+        self.ecs_world.spawn(("Boots".to_string(), 2 as usize, Item{}, Equippable{slot: EquipmentSlot::Feet}, DefenseBonus{ bonus: 0.15}));
+        self.ecs_world.spawn(("Jeans".to_string(), 2 as usize, Item{}, Equippable{slot: EquipmentSlot::Legs}, DefenseBonus{ bonus:0.1}));
     }
 
     pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {
