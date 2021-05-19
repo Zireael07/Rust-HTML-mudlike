@@ -104,17 +104,26 @@ function inventoryOpenClick(button, inv) {
     if (is_open == -1) {
         //append to game view
         output += '\n\n ';
-        output += str;
+
+        output += 'You are wearing: ';
+        var equip = inv[0];
+        for (var i=0; i<equip.length;i++){
+            var item = equip[i];
+            output += `<button class="it_inv_button" id=ent-${item[0]}>${item[1]}</button>` + " ";
+        }
+
+        output += '\n' + str;
 
         //nice formatting
         // if (inv.length == 1) {
         //     var item = inv[0];
         // }
         // else {
-            for (var i=0; i<inv.length;i++) {
-                var item = inv[i];
-                output += `<button class="it_inv_button" id=ent-${item[0]}>${item[1]}</button>` + " ";
-            }
+        var carried = inv[1];
+        for (var i=0; i<carried.length;i++) {
+            var item = carried[i];
+            output += `<button class="it_inv_button" id=ent-${item[0]}>${item[1]}</button>` + " ";
+        }
         //}
 
 

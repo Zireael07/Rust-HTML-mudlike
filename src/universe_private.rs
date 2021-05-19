@@ -196,16 +196,30 @@ impl Universe {
         //return format!("{} {}", id, name);
     }
 
-    pub fn items_in_inventory(&self) -> Vec<(u64, String)>{
+    pub fn items_in_inventory(&self) -> Vec<Vec<(u64, String, Option<Equipped>)>>{
         let mut data = Vec::new();
+        let mut tmp = Vec::new();
         //test
         for (id, (item, backpack)) in &mut self.ecs_world.query::<(&Item, &InBackpack)>().iter(){
             //log!("{}", &format!("Item in inventory: {}", self.ecs_world.get::<&str>(id).unwrap().to_string()));
             //log!("{}", &format!("ID: {:?}", id));
             //ids.push(id.to_bits());
             let name = self.ecs_world.get::<String>(id).unwrap().to_string();
-            data.push((id.to_bits(), name));
+            let mut equipped: Option<Equipped> = None;
+            if self.ecs_world.get::<Equipped>(id).is_ok(){
+                equipped = Some(*self.ecs_world.get::<Equipped>(id).unwrap());
+            }
+            tmp.push((id.to_bits(), name, equipped));
         }
+
+        //has to be outside loop
+        //split into two lists, one for equipped and the other for not
+        let (equip,inv):(_,Vec<_>)=tmp
+            .into_iter()
+            .partition(|x| x.2.is_some());
+
+        data = vec![equip, inv];
+
         return data;
     }
 
