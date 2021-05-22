@@ -10,7 +10,7 @@
             name: "Street",
             desc: "The town street looks a bit deserted at this hour. The sky is overcast and it looks like it's going to rain any moment.",
             known: false,
-            exits: [(In,0), (North, 3), (In, 2)],
+            exits: [(West, 6), (In,0), (North, 3), (In, 2)],
         ),
         (
             name: "Hovel",
@@ -35,6 +35,18 @@
             desc: "This is a tiny capsule, roughly a person's height across. At least long enough so one can lay down comfortably and there's an overhead storage space for anything a person might have, too.",
             known: false,
             exits: [(East, 4)],
+        ),
+        (
+            name: "Field",
+            desc: "The town gives way to a sparse field, dotted here and there with shrubs or small trees. The ground is littered with rocks and rubbish.",
+            known: false,
+            exits: [(East, 1), (North, 7)]
+        ),
+        (
+            name: "Mountain",
+            desc: "A mountain of some sort of a white, er, whitish stone. It looks difficult if not impossible to climb, with its sheer walls.",
+            known: false,
+            exits: [(South, 6)]
         )
     ]
 )
