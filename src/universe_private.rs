@@ -1,12 +1,14 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
-    Player, GameMessages, AI, CombatStats, 
+    Player, GameMessages, AI, CombatStats, NPCName,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus
 };
 
 use hecs::Entity;
+
+use std::collections::HashMap;
 
 //RNG
 use rand::Rng;
@@ -148,7 +150,12 @@ impl Universe {
         self.ecs_world.spawn(("Player".to_string(), Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1}, GameMessages{entries:vec![]}));
 
         //two parts of data aren't in a special struct - entity name and room it is in
-        self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
+        let pat = self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
+        //randomized NPC name
+        let sel_name = Universe::randomized_NPC_name(true, data.names);
+        let nm = self.ecs_world.insert_one(pat, NPCName{name: sel_name.to_string()});
+        log!("{}", &format!("{}", sel_name.to_string()));
+
         let th = self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}));
         let l_jacket = self.ecs_world.spawn(("Leather jacket".to_string(), Item{}, Equippable{slot: EquipmentSlot::Torso}, DefenseBonus{ bonus: 0.15})); //ToRemove{yes:false}
         let boots = self.ecs_world.spawn(("Boots".to_string(), Item{}, Equippable{slot: EquipmentSlot::Feet}, DefenseBonus{ bonus: 0.15}));
@@ -497,6 +504,31 @@ impl Universe {
             log!("{}", &format!("Dropping item {} room {} ", self.ecs_world.get::<String>(*it).unwrap().to_string(), self.current_room));
         }
 
+    }
+
+    pub fn randomized_NPC_name(male: bool, names: HashMap<String, Vec<String>>) -> String {
+        let mut rng = rand::thread_rng();
+
+        //we know the key exists
+        let SPANISH_MALE = &names["spanish_male"];
+        let SPANISH_FEMALE = &names["spanish_female"];
+        let SPANISH_LAST = &names["spanish_last"];
+        //log!("{}", &format!("female names {:?} ", names["spanish_female"]));
+
+        if !male {
+            let sel_id = rng.gen_range(0, SPANISH_FEMALE.len());
+            let sel_name = &SPANISH_FEMALE[sel_id];
+    
+            let sell_id = rng.gen_range(0, SPANISH_LAST.len());
+            let last_name = &SPANISH_LAST[sell_id];
+            return format!("{} {}", sel_name, last_name);            
+        } else {
+            let sel_id = rng.gen_range(0, SPANISH_MALE.len());
+            let sel_name = &SPANISH_MALE[sel_id];
+            let sell_id = rng.gen_range(0, SPANISH_LAST.len());
+            let last_name = &SPANISH_LAST[sell_id];
+            return format!("{} {}", sel_name, last_name);
+        }
     }
 
 }

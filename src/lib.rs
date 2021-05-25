@@ -12,6 +12,7 @@ extern crate console_error_panic_hook;
 use std::panic;
 
 use serde::{Serialize, Deserialize};
+use std::collections::HashMap;
 
 //ECS
 use hecs::World;
@@ -35,6 +36,10 @@ pub struct Player{}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct AI {}
+
+pub struct NPCName {
+    pub name: String
+}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct CombatStats {
@@ -124,6 +129,7 @@ pub struct Room {
 #[derive(Deserialize)]
 pub struct DataMaster {
     pub rooms : Vec<Room>,
+    pub names : HashMap<String, Vec<String>>,
 }
 
 
@@ -163,6 +169,10 @@ pub async fn load_datafile(mut state: Universe) -> Universe {
     for r in &data.rooms {
         log!("{}", &format!("From data: {} {} {} {:?}", r.name, r.desc, r.known, r.exits));
     }
+
+    // for n in &data.names {
+    //     log!("{}", &format!("Loaded names: {:?}", n));
+    // }
 
     state.game_start(data);
 
