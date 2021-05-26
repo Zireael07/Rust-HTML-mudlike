@@ -2,7 +2,7 @@ use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
     Player, GameMessages, AI, CombatStats, NPCName,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
-    Consumable, ProvidesHealing,
+    Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus
 };
 
@@ -148,6 +148,9 @@ impl Universe {
 
         //player dummy entity
         self.ecs_world.spawn(("Player".to_string(), Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1}, GameMessages{entries:vec![]}));
+        //starting inventory
+        self.give_item("Protein shake".to_string());
+        self.give_item("Medkit".to_string());
 
         //two parts of data aren't in a special struct - entity name and room it is in
         let pat = self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
@@ -253,6 +256,28 @@ impl Universe {
         return msg;
     }
 
+    pub fn give_item(&mut self, name: String) {
+        //let current_room = self.current_room;
+
+        let mut item: Option<Entity> = None;
+        //TODO: should be a dict lookup
+        if name == "Protein shake".to_string() {
+            item = Some(self.ecs_world.spawn(("Protein shake".to_string(), self.current_room, Item{}, ProvidesFood{}, ProvidesQuench{}, Consumable{}, ToRemove{yes:false})));
+        }
+        if name == "Medkit".to_string() {
+            item = Some(self.ecs_world.spawn(("Medkit".to_string(), self.current_room, Item{}, ToRemove{yes:false}, Consumable{}, ProvidesHealing{heal_amount:5})));
+        }
+        match item {
+            Some(it) => {
+                //puts the item in backpack
+                self.pickup_item(&it);
+            },
+            None => {},
+        }
+
+    }
+
+
     pub fn pickup_item(&mut self, item: &Entity) {
         self.ecs_world.insert_one(*item, InBackpack{});
         //self.items_in_inventory();
@@ -303,11 +328,15 @@ impl Universe {
             }
 
             // // food or drink?
-            // if self.ecs_world.get::<ProvidesQuench>(wantstouse.item).is_ok(){
-            //     game_message(&format!("{{gYou drink the {}", self.ecs_world.get::<String>(*it).unwrap().to_string()));
-            // } else if self.ecs_world.get::<ProvidesFood>(wantstouse.item).is_ok(){
-            //     game_message(&format!("{{gYou eat the {}", self.ecs_world.get::<String>(*it).unwrap().to_string()));
-            // }
+            if self.ecs_world.get::<ProvidesQuench>(wantstouse.item).is_ok(){
+                let player = self.get_player();
+                let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap(); 
+                log.entries.push(format!("You drink the {}", self.ecs_world.get::<String>(*it).unwrap().to_string()));
+            } else if self.ecs_world.get::<ProvidesFood>(wantstouse.item).is_ok(){
+                let player = self.get_player();
+                let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap(); 
+                log.entries.push(format!("You eat the {}", self.ecs_world.get::<String>(*it).unwrap().to_string()));
+            }
 
             // If it is equippable, then we want to equip it - and unequip whatever else was in that slot
             if self.ecs_world.get::<Equippable>(wantstouse.item).is_ok() {

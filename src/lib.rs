@@ -83,6 +83,11 @@ pub struct ProvidesHealing {
     pub heal_amount : i32
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct ProvidesFood {}
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct ProvidesQuench {}
+
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct MeleeBonus {
     pub bonus : i32
