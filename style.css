@@ -10,7 +10,7 @@ html, body, #wrapper {
     font-size: 16px;
     box-sizing: border-box;
 	font-family: "DejaVuSansMono", "DejaVu Sans Mono", monospace;
-    font-size: 0.8em;
+    /*font-size: 0.8em;*/
     /* Size to cover the whole screen */
     height: 100%;
     min-height: 100vh;
