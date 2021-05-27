@@ -35,6 +35,12 @@ macro_rules! log {
 pub struct Player{}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Needs{
+    pub hunger: i32,
+    pub thirst: i32,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct AI {}
 
 pub struct NPCName {
@@ -260,6 +266,7 @@ impl Universe {
                 //mark as known
                 self.know_room(new_room);
                 //log!("{}", &format!("New room {}", self.current_room));
+                self.end_turn();
             },
             "get" => {
                 let item_id = v[1].parse::<u64>().unwrap();

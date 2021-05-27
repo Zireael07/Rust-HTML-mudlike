@@ -1,6 +1,7 @@
 use super::log;
 use super::{Universe, Room, Exit, DataMaster, 
-    Player, GameMessages, AI, CombatStats, NPCName,
+    Player, GameMessages, Needs,
+    AI, CombatStats, NPCName,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus
@@ -147,7 +148,8 @@ impl Universe {
         }
 
         //player dummy entity
-        self.ecs_world.spawn(("Player".to_string(), Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1}, GameMessages{entries:vec![]}));
+        self.ecs_world.spawn(("Player".to_string(), Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1},  Needs{hunger:500, thirst:300},
+         GameMessages{entries:vec![]}));
         //starting inventory
         self.give_item("Protein shake".to_string());
         self.give_item("Medkit".to_string());
@@ -451,6 +453,7 @@ impl Universe {
     pub fn end_turn(&mut self) {
         self.get_AI();
         self.remove_dead();
+        self.survival_tick();
     }
 
     fn get_AI(&mut self) {
@@ -533,6 +536,22 @@ impl Universe {
             log!("{}", &format!("Dropping item {} room {} ", self.ecs_world.get::<String>(*it).unwrap().to_string(), self.current_room));
         }
 
+    }
+
+    fn survival_tick(&mut self) {
+        //get player entity
+        let mut play: Option<Entity> = None;
+        for (id, (player)) in self.ecs_world.query::<(&Player)>().iter() {
+            play = Some(id);
+        }
+        match play {
+            Some(entity) => {
+                let mut needs = self.ecs_world.get_mut::<Needs>(entity).unwrap();
+                needs.hunger -= 1;
+                needs.thirst -= 1;
+            },
+            None => {},
+        }
     }
 
     pub fn randomized_NPC_name(male: bool, names: HashMap<String, Vec<String>>) -> String {
