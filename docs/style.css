@@ -4,13 +4,13 @@ html, body, #wrapper {
     width: 100%;
     margin: 0;
     overflow: hidden;
+    font-size: 100%;
 }
 
 #game {
     font-size: 16px;
     box-sizing: border-box;
 	font-family: "DejaVuSansMono", "DejaVu Sans Mono", monospace;
-    /*font-size: 0.8em;*/
     /* Size to cover the whole screen */
     height: 100%;
     min-height: 100vh;
@@ -20,7 +20,6 @@ html, body, #wrapper {
     margin: 2px;
     padding: 0.5em 1em; /*1 em seems to be 12.8px*/
     text-align: left;
-    z-index: 1;
 }    
 
 button {
@@ -42,4 +41,9 @@ button {
 .it_button, .it_inv_button {
     color: lightyellow;
     border-color: lightyellow;
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    #game { font-size: 24px;}
 }
