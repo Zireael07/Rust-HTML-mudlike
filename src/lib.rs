@@ -21,6 +21,7 @@ use hecs::Entity;
 
 mod universe_private;
 use universe_private::*;
+mod lispy;
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 #[macro_export]
@@ -200,6 +201,10 @@ impl Universe {
         };
 
         //state.map.push(Room{name:"Pub".to_string(), desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), known: true, exits: vec![(Exit::Out, 1)]});
+
+        //test scripting
+        log!("Test scripting...");
+        lispy::run_lisp();
 
         log!("We have a universe");
 
