@@ -12,7 +12,7 @@ use super::log;
 */
 
 #[derive(Clone)]
-enum RispExp {
+pub enum RispExp {
   Bool(bool), 
   Symbol(String),
   Number(f64),
@@ -41,13 +41,13 @@ impl fmt::Display for RispExp {
 }
 
 #[derive(Debug)]
-enum RispErr {
+pub enum RispErr {
   Reason(String),
 }
 
 #[derive(Clone)]
-struct RispEnv {
-  data: HashMap<String, RispExp>,
+pub struct RispEnv {
+  pub data: HashMap<String, RispExp>,
 }
 
 /*
@@ -128,7 +128,7 @@ macro_rules! ensure_tonicity {
   }};
 }
 
-fn default_env() -> RispEnv {
+pub fn default_env() -> RispEnv {
   let mut data: HashMap<String, RispExp> = HashMap::new();
   data.insert(
     "+".to_string(), 
@@ -177,7 +177,7 @@ fn default_env() -> RispEnv {
   RispEnv {data}
 }
 
-fn parse_list_of_floats(args: &[RispExp]) -> Result<Vec<f64>, RispErr> {
+pub fn parse_list_of_floats(args: &[RispExp]) -> Result<Vec<f64>, RispErr> {
   args
     .iter()
     .map(|x| parse_single_float(x))
@@ -323,7 +323,7 @@ fn parse_eval(expr: String, env: &mut RispEnv) -> Result<RispExp, RispErr> {
 fn slurp_expr() -> String {
   let mut expr = String::new();
   
-  expr = "{+ 2 3 4}".to_string();
+  expr = "{go {+ 2 3}}".to_string();
 
   //io::stdin().read_line(&mut expr)
   //  .expect("Failed to read line");
@@ -332,7 +332,7 @@ fn slurp_expr() -> String {
 }
 
 //split out for ease of use
-fn read_eval(env: &mut RispEnv) {
+pub fn read_eval(env: &mut RispEnv) {
     log!("lispy >");
     let expr = slurp_expr();
     match parse_eval(expr, env) {

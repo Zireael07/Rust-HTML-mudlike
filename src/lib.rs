@@ -22,6 +22,7 @@ use hecs::Entity;
 mod universe_private;
 use universe_private::*;
 mod lispy;
+use lispy::{RispExp, RispErr, parse_list_of_floats};
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 #[macro_export]
@@ -204,7 +205,28 @@ impl Universe {
 
         //test scripting
         log!("Test scripting...");
-        lispy::run_lisp();
+        let env = &mut lispy::default_env();
+        env.data.insert(
+            "go".to_string(), 
+            RispExp::Func(
+              |args: &[RispExp]| -> Result<RispExp, RispErr> {
+                let floats = parse_list_of_floats(args)?;
+                let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
+                log!("{}", format!("{}", first));
+                //TODO: figure out how to use state here
+                // let new_room = first as usize;
+                // state.current_room = new_room;
+                // //mark as known
+                // state.know_room(new_room);
+                // //log!("{}", &format!("New room {}", self.current_room));
+                // state.end_turn();
+                
+                Ok(RispExp::Bool(true))
+              }
+            )
+          );
+
+        lispy::read_eval(env);
 
         log!("We have a universe");
 
