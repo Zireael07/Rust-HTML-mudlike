@@ -146,6 +146,15 @@ pub struct DataMaster {
 }
 
 
+pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
+
+//https://dev.to/mnivoliez/getting-started-with-rust-enum-on-steroids-8b4
+// turns out Rust enums can contain more data...
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum ScriptCommand {
+    GoRoom { id: usize },
+}
+
 /// Public methods, exported to JavaScript.
 #[wasm_bindgen]
 //async loader based on https://rustwasm.github.io/docs/wasm-bindgen/examples/fetch.html
@@ -213,13 +222,14 @@ impl Universe {
                 let floats = parse_list_of_floats(args)?;
                 let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
                 log!("{}", format!("{}", first));
+
+                //I don't know a better way to do it, this avoids having to use state
+                // based on the non-textual version's commands, which was then based on bracketlib's input handling
+                unsafe {
+                    GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::GoRoom{id: first as usize});
+                }
+
                 //TODO: figure out how to use state here
-                // let new_room = first as usize;
-                // state.current_room = new_room;
-                // //mark as known
-                // state.know_room(new_room);
-                // //log!("{}", &format!("New room {}", self.current_room));
-                // state.end_turn();
                 
                 Ok(RispExp::Bool(true))
               }
@@ -345,6 +355,31 @@ impl Universe {
         log!("Rust engine input cmd: {}", cmd);
 
         self.command_handler(cmd);
+
+        //handle script engine
+        unsafe {
+            if GLOBAL_SCRIPT_OUTPUT != None {
+                log!("script output {:?}", GLOBAL_SCRIPT_OUTPUT);
+                match GLOBAL_SCRIPT_OUTPUT.unwrap() {
+                    ScriptCommand::GoRoom{id} => {
+                        let new_room = id;
+                        self.current_room = new_room;
+                        //mark as known
+                        self.know_room(new_room);
+                        //log!("{}", &format!("New room {}", self.current_room));
+                        self.end_turn();
+                    },
+                    _ => { log!("{}", format!("Unimplemented scripting command {:?} ", GLOBAL_SCRIPT_OUTPUT)); }
+                }
+            }
+        }
+
+           
+
+        //clear
+        unsafe {
+            GLOBAL_SCRIPT_OUTPUT = None;
+        }
     }
 }
 
