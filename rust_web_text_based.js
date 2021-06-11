@@ -361,16 +361,16 @@ async function init(input) {
     }
     const imports = {};
     imports.wbg = {};
-    imports.wbg.__wbg_universe_new = function(arg0) {
-        var ret = Universe.__wrap(arg0);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
         var ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
+    };
+    imports.wbg.__wbg_universe_new = function(arg0) {
+        var ret = Universe.__wrap(arg0);
+        return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_cb_drop = function(arg0) {
         const obj = takeObject(arg0).original;
@@ -579,8 +579,8 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper787 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 116, __wbg_adapter_22);
+    imports.wbg.__wbindgen_closure_wrapper827 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 132, __wbg_adapter_22);
         return addHeapObject(ret);
     };
 
