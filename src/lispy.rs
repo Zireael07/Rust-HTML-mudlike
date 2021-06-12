@@ -14,6 +14,7 @@ use super::log;
 #[derive(Clone)]
 pub enum RispExp {
   Bool(bool), 
+  String(String),
   Symbol(String),
   Number(f64),
   List(Vec<RispExp>),
@@ -24,6 +25,7 @@ impl fmt::Display for RispExp {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let str = match self {
       RispExp::Bool(a) => a.to_string(),
+      RispExp::String(a) => a.to_string(),
       RispExp::Symbol(s) => s.clone(),
       RispExp::Number(n) => n.to_string(),
       RispExp::List(list) => {
@@ -101,7 +103,15 @@ fn parse_atom(token: &str) -> RispExp {
       let potential_float: Result<f64, ParseFloatError> = token.parse();
       match potential_float {
         Ok(v) => RispExp::Number(v),
-        Err(_) => RispExp::Symbol(token.to_string().clone())
+        Err(_) => {
+          //log!("{}", format!("{} is a string or a symbol", token));
+          if token.chars().nth(0) == Some('"') {
+            RispExp::String(token.to_string().clone())
+          }
+          else {
+            RispExp::Symbol(token.to_string().clone())
+          }
+        } 
       }
     }  
   }
@@ -184,7 +194,7 @@ pub fn parse_list_of_floats(args: &[RispExp]) -> Result<Vec<f64>, RispErr> {
     .collect::<Result<Vec<f64>, RispErr>>()
 }
 
-fn parse_single_float(exp: &RispExp) -> Result<f64, RispErr> {
+pub fn parse_single_float(exp: &RispExp) -> Result<f64, RispErr> {
   match exp {
     RispExp::Number(num) => Ok(*num),
     _ => Err(RispErr::Reason("expected a number".to_string())),
@@ -306,6 +316,7 @@ fn eval(exp: &RispExp, env: &mut RispEnv) -> Result<RispExp, RispErr> {
       RispErr::Reason("unexpected form".to_string())
     ),
     RispExp::Bool(_a) => Ok(exp.clone()),
+    RispExp::String(_a) => Ok(exp.clone()),
   }
 }
 
@@ -323,7 +334,7 @@ fn parse_eval(expr: String, env: &mut RispEnv) -> Result<RispExp, RispErr> {
 fn slurp_expr() -> String {
   let mut expr = String::new();
   
-  expr = "{go {+ 2 3}}".to_string();
+  expr = "{spawn {+ 2 3} \"patron\" }".to_string();
 
   //io::stdin().read_line(&mut expr)
   //  .expect("Failed to read line");

@@ -22,7 +22,7 @@ use hecs::Entity;
 mod universe_private;
 use universe_private::*;
 mod lispy;
-use lispy::{RispExp, RispErr, parse_list_of_floats};
+use lispy::{RispExp, RispErr, parse_list_of_floats, parse_single_float};
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 #[macro_export]
@@ -150,9 +150,10 @@ pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
 
 //https://dev.to/mnivoliez/getting-started-with-rust-enum-on-steroids-8b4
 // turns out Rust enums can contain more data...
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ScriptCommand {
     GoRoom { id: usize },
+    Spawn { room: usize, name:String},
 }
 
 /// Public methods, exported to JavaScript.
@@ -228,9 +229,29 @@ impl Universe {
                 unsafe {
                     GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::GoRoom{id: first as usize});
                 }
+                Ok(RispExp::Bool(true))
+              }
+            )
+          );
+          env.data.insert(
+            "spawn".to_string(), 
+            RispExp::Func(
+              |args: &[RispExp]| -> Result<RispExp, RispErr> {
+                let float = parse_single_float(args.get(0).unwrap())?; //ok_or(RispErr::Reason("expected a number".to_string())))?;
+                //let first = *float.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
+                let second = args.get(1).ok_or(
+                    RispErr::Reason(
+                      "expected second form".to_string(),
+                    )
+                  )?;
+                log!("{}", format!("{} {}", float, second));
 
-                //TODO: figure out how to use state here
-                
+                //I don't know a better way to do it, this avoids having to use state
+                // based on the non-textual version's commands, which was then based on bracketlib's input handling
+                unsafe {
+                    // this monster strips quote characters from around the lispy string
+                    GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() });
+                }
                 Ok(RispExp::Bool(true))
               }
             )
@@ -360,7 +381,8 @@ impl Universe {
         unsafe {
             if GLOBAL_SCRIPT_OUTPUT != None {
                 log!("script output {:?}", GLOBAL_SCRIPT_OUTPUT);
-                match GLOBAL_SCRIPT_OUTPUT.unwrap() {
+                //unfortunately we need a clone here to work with non-Copy enum
+                match GLOBAL_SCRIPT_OUTPUT.clone().unwrap() {
                     ScriptCommand::GoRoom{id} => {
                         let new_room = id;
                         self.current_room = new_room;
@@ -369,6 +391,9 @@ impl Universe {
                         //log!("{}", &format!("New room {}", self.current_room));
                         self.end_turn();
                     },
+                    ScriptCommand::Spawn{room, name} => {
+                        self.ecs_world.spawn((name.trim().to_string(), room as usize));
+                    }
                     _ => { log!("{}", format!("Unimplemented scripting command {:?} ", GLOBAL_SCRIPT_OUTPUT)); }
                 }
             }
