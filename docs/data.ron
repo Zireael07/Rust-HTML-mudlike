@@ -40,13 +40,30 @@
             name: "Field",
             desc: "The town gives way to a sparse field, dotted here and there with shrubs or small trees. The ground is littered with rocks and rubbish.",
             known: false,
-            exits: [(East, 1), (North, 7)]
+            exits: [(East, 1), (West, 7), (North, 9)]
+        ),
+        (   name: "Farm",
+            desc: "A small farm - an obviously lived-in building accompanied by a stable. Some horses run about the backyard, and there's a slightly run-down but well maintained wagon in the front.",
+            known: false,
+            exits: [(East, 6), (West, 8)] 
+        ),
+        (
+            name: "Orchard",
+            desc: "A small grove of apple trees. The grass beneath one of the trees is smushed and seems to bear an indentation - clearly someone or something's favorite spot.",
+            known: false,
+            exits: [(East, 7)],
         ),
         (
             name: "Mountain",
             desc: "A mountain of some sort of a white, er, whitish stone. It looks difficult if not impossible to climb, with its sheer walls.",
             known: false,
-            exits: [(South, 6)]
+            exits: [(South, 6), (North, 10)]
+        ),
+        (
+            name: "Mountain",
+            desc: "The mountain looks slightly less sheer here and there seems to be an opening in one of the walls.",
+            known: false,
+            exits: [(South, 9)]
         )
     ],
     //based on https://github.com/joke2k/faker/
