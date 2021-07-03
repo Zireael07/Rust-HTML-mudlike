@@ -1,5 +1,5 @@
 use super::log;
-use super::{Universe, Room, Exit, DataMaster, 
+use super::{Universe, Room, Exit, Distance, DataMaster, 
     Player, GameMessages, Needs,
     AI, CombatStats, NPCName,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
@@ -192,7 +192,7 @@ impl Universe {
     }
 
      //we store a list of ids and get the actual data with this separate function
-    pub fn get_data_for_id(&self, id: u64) -> (u64, String, Option<Item>) {
+    pub fn get_data_for_id(&self, id: u64) -> (u64, String, Option<Item>, Distance) {
         let ent = hecs::Entity::from_bits(id); //restore
 
         let name = self.ecs_world.get::<String>(ent).unwrap().to_string();
@@ -202,8 +202,11 @@ impl Universe {
             //need to dereference it
             item = Some(*self.ecs_world.get::<Item>(ent).unwrap())
         }
+
+        //default to distance of medium
+        let dist = Distance::Medium;
         
-        return (id, name, item);
+        return (id, name, item, dist);
         
         //return format!("{} {}", id, name);
     }

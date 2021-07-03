@@ -146,6 +146,13 @@ pub struct DataMaster {
 }
 
 
+#[repr(u8)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum Distance {
+    Near = 0,
+    Medium = 1,
+    Far = 2
+}
 pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
 
 //https://dev.to/mnivoliez/getting-started-with-rust-enum-on-steroids-8b4

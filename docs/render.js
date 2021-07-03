@@ -213,9 +213,9 @@ function draw() {
     for (var i=0; i < entities.length; i++){
         var entity = entities[i];
         if (entity[2]) {
-            output = output + `<button class="it_button" id=ent-${entity[0]}>${entity[1]}</button>`;
+            output = output + `<button class="it_button" id=ent-${entity[0]}>${entity[1]} [${entity[3]}]</button>`;
         } else {
-            output = output + `<button class="ent_button" id=ent-${entity[0]}>${entity[1]}</button>`;
+            output = output + `<button class="ent_button" id=ent-${entity[0]}>${entity[1]} [${entity[3]}]</button>`;
         }
     }
 
