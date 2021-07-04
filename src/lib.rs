@@ -104,7 +104,10 @@ pub struct MeleeBonus {
 pub struct DefenseBonus {
     pub bonus : f32
 }
-
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct EncDistance {
+    pub dist: Distance
+}
 
 //game log
 pub struct GameMessages {
@@ -147,7 +150,7 @@ pub struct DataMaster {
 
 
 #[repr(u8)]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Distance {
     Near = 0,
     Medium = 1,

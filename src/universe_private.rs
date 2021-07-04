@@ -1,7 +1,7 @@
 use super::log;
 use super::{Universe, Room, Exit, Distance, DataMaster, 
     Player, GameMessages, Needs,
-    AI, CombatStats, NPCName,
+    AI, CombatStats, NPCName, EncDistance,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus
@@ -161,7 +161,7 @@ impl Universe {
         let nm = self.ecs_world.insert_one(pat, NPCName{name: sel_name.to_string()});
         log!("{}", &format!("{}", sel_name.to_string()));
 
-        let th = self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}));
+        let th = self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
         let l_jacket = self.ecs_world.spawn(("Leather jacket".to_string(), Item{}, Equippable{slot: EquipmentSlot::Torso}, DefenseBonus{ bonus: 0.15})); //ToRemove{yes:false}
         let boots = self.ecs_world.spawn(("Boots".to_string(), Item{}, Equippable{slot: EquipmentSlot::Feet}, DefenseBonus{ bonus: 0.15}));
         let jeans = self.ecs_world.spawn(("Jeans".to_string(), Item{}, Equippable{slot: EquipmentSlot::Legs}, DefenseBonus{ bonus: 0.1}));
@@ -204,7 +204,11 @@ impl Universe {
         }
 
         //default to distance of medium
-        let dist = Distance::Medium;
+        let mut dist = Distance::Medium;
+
+        if self.ecs_world.get::<EncDistance>(ent).is_ok() {
+            dist = self.ecs_world.get::<EncDistance>(ent).unwrap().dist;
+        }
         
         return (id, name, item, dist);
         
