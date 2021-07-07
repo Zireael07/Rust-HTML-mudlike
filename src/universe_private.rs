@@ -82,17 +82,22 @@ impl Universe {
                     let mut stre = self.map[1].clone();
                     let mut hov = self.map[2].clone();
                     let mut all = self.map[3].clone();
+                    let mut field = self.map[6].clone();
                     //end+1 is stre below
-                    stre.exits = vec![(Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
+                    stre.exits = vec![(Exit::West, end+3), (Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
                     hov.exits = vec![(Exit::Out, end)];
                     all.exits = vec![(Exit::South, end)];
+                    field.exits = vec![(Exit::East, end), (Exit::West, 11)];
                     self.map.push(stre);
                     self.map.push(hov);
                     self.map.push(all);
+                    self.map.push(field);
+                    let mut tower = &mut self.map[11];
+                    tower.exits.push((Exit::East, end+3));
                 }
                 let mut alley = &mut self.map[3];
                 alley.exits.push((Exit::North, end));
-
+                log!("Added northern street");
             },
             2 => {
                 for i in 0..1+more as i32 {
@@ -109,6 +114,7 @@ impl Universe {
                 }
                 let mut street = &mut self.map[1];
                 street.exits.push((Exit::South, end));
+                log!("Added southern street")
             },
             3 => {
                 //add to both north and south end
@@ -116,13 +122,18 @@ impl Universe {
                     let mut stre = self.map[1].clone();
                     let mut hov = self.map[2].clone();
                     let mut all = self.map[3].clone();
+                    let mut field = self.map[6].clone();
                     //end+1 is stre below
-                    stre.exits = vec![(Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
+                    stre.exits = vec![(Exit::West, end+3), (Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
                     hov.exits = vec![(Exit::Out, end)];
                     all.exits = vec![(Exit::South, end)];
+                    field.exits = vec![(Exit::East, end), (Exit::West, 11)];
                     self.map.push(stre);
                     self.map.push(hov);
                     self.map.push(all);
+                    self.map.push(field);
+                    let mut tower = &mut self.map[11];
+                    tower.exits.push((Exit::East, end+3));
                 }
                 let mut alley = &mut self.map[3];
                 alley.exits.push((Exit::North, end));
@@ -143,6 +154,7 @@ impl Universe {
                 }
                 let mut street = &mut self.map[1];
                 street.exits.push((Exit::South, endi));
+                log!("Added southern and nothern streets");
             },
             _ => {},
         }

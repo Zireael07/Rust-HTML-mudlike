@@ -64,6 +64,18 @@
             desc: "The mountain looks slightly less sheer here and there seems to be an opening in one of the walls.",
             known: false,
             exits: [(South, 9)]
+        ),
+        (
+            name: "Tower",
+            desc: "A tall tower sticks out in the landscape. This huge construction of metal trusses is most likely an old radio tower.",
+            known: false,
+            exits: [],
+        ),
+        (
+            name: "Lab",
+            desc: "This sparsely furnished building contains mostly intricate lab equipment you cannot figure the exact use of, and rows upon rows of roughly cylindrical blue containers, each one as tall as a human is, or even larger.",
+            known: false,
+            exits: [],
         )
     ],
     //based on https://github.com/joke2k/faker/
