@@ -72,6 +72,12 @@
             exits: [],
         ),
         (
+            name: "Vertical farm",
+            desc: "A building made mostly of glass. As you peek inside, you see rows of purple LED lights and trays upon trays of varied edible plant produce in differing stages of growth.",
+            known: false,
+            exits: [],
+        ),
+        (
             name: "Lab",
             desc: "This sparsely furnished building contains mostly intricate lab equipment you cannot figure the exact use of, and rows upon rows of roughly cylindrical blue containers, each one as tall as a human is, or even larger.",
             known: false,
