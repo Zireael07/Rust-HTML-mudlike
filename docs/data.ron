@@ -78,11 +78,17 @@
             exits: [],
         ),
         (
+            name: "Abandoned place",
+            desc: "This place looks like it's been abandoned a long time ago. Dust and cobwebs and broken furniture are everywhere. Even the floor doesn't look too stable.",
+            known: false,
+            exits: [(Out, 1)],
+        ),
+        (
             name: "Lab",
             desc: "This sparsely furnished building contains mostly intricate lab equipment you cannot figure the exact use of, and rows upon rows of roughly cylindrical blue containers, each one as tall as a human is, or even larger.",
             known: false,
             exits: [],
-        )
+        ),
     ],
     //based on https://github.com/joke2k/faker/
     names: {

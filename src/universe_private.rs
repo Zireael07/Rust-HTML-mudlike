@@ -80,7 +80,7 @@ impl Universe {
             1 => {
                 for i in 0..1+more as i32 {
                     let mut stre = self.map[1].clone();
-                    let mut hov = self.map[2].clone();
+                    let mut hov = self.map[13].clone();
                     let mut all = self.map[3].clone();
                     let mut field = self.map[6].clone();
                     //end+1 is stre below
