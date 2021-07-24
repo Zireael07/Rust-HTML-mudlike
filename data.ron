@@ -64,7 +64,43 @@
             desc: "The mountain looks slightly less sheer here and there seems to be an opening in one of the walls.",
             known: false,
             exits: [(South, 9)]
-        )
+        ),
+        (
+            name: "Tower",
+            desc: "A tall tower sticks out in the landscape. This huge construction of metal trusses is most likely an old radio tower.",
+            known: false,
+            exits: [],
+        ),
+        (
+            name: "Vertical farm",
+            desc: "A building made mostly of glass. As you peek inside, you see rows of purple LED lights and trays upon trays of varied edible plant produce in differing stages of growth.",
+            known: false,
+            exits: [],
+        ),
+        (
+            name: "Abandoned place",
+            desc: "This place looks like it's been abandoned a long time ago. Dust and cobwebs and broken furniture are everywhere. Even the floor doesn't look too stable.",
+            known: false,
+            exits: [(Out, 1)],
+        ),
+        (
+            name: "Prison",
+            desc: "This large gray non-descript building has bars on its windows and is surrounded by barbed wire fence. Cameras on each corner watch both the inside and the outside of the fenced area. Several figures in jumpsuits walk on a small patch of land.",
+            known: false,
+            exits: []
+        ),
+        (
+            name: "Cell",
+            desc: "This is a tiny capsule, roughly a person's height across. At least long enough so one can lay down comfortably. Unlike the hotel, there is no locker overhead and the entrance is barred.",
+            known: false,
+            exits: [],
+        ),
+        (
+            name: "Lab",
+            desc: "This sparsely furnished building contains mostly intricate lab equipment you cannot figure the exact use of, and rows upon rows of roughly cylindrical blue containers, each one as tall as a human is, or even larger.",
+            known: false,
+            exits: [],
+        ),
     ],
     //based on https://github.com/joke2k/faker/
     names: {
