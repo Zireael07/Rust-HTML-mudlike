@@ -1,3 +1,5 @@
+#![enable(implicit_some)]
+
 (
     rooms: [
         (
@@ -100,6 +102,26 @@
             desc: "This sparsely furnished building contains mostly intricate lab equipment you cannot figure the exact use of, and rows upon rows of roughly cylindrical blue containers, each one as tall as a human is, or even larger.",
             known: false,
             exits: [],
+        ),
+    ],
+    items: [
+            (
+            name: "Boots",
+            item: Item(), //unit struct
+            equippable: (slot: Feet),
+            defense: DefenseBonus(bonus:0.15)
+        ),
+        (
+            name: "Leather jacket",
+            item: Item(), //unit struct
+            equippable: (slot: Torso),
+            defense: DefenseBonus(bonus:0.15)
+        ),
+        (
+            name: "Jeans",
+            item: Item(), //unit struct
+            equippable: (slot: Legs),
+            defense: DefenseBonus(bonus:0.1),
         ),
     ],
     //based on https://github.com/joke2k/faker/
