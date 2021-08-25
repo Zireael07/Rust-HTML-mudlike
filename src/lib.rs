@@ -141,11 +141,21 @@ pub struct Room {
     exits: Vec<(Exit, usize)>, //vector indices seem to be usizes?
 }
 
+//for data loading
+#[derive(Serialize, Deserialize)]
+pub struct ItemPrefab {
+    pub name: String,
+    pub item: Option<Item>,
+    pub equippable: Option<Equippable>,
+    pub defense: Option<DefenseBonus>,
+}
+
 //what it says
 #[derive(Deserialize)]
 pub struct DataMaster {
     pub rooms : Vec<Room>,
     pub names : HashMap<String, Vec<String>>,
+    pub items: Vec<ItemPrefab>,
 }
 
 
@@ -206,6 +216,10 @@ pub async fn load_datafile(mut state: Universe) -> Universe {
     // for n in &data.names {
     //     log!("{}", &format!("Loaded names: {:?}", n));
     // }
+
+    for i in &data.items {
+        log!("{}", &format!("{} {:?} {:?} {:?}", i.name, i.item, i.equippable, i.defense));
+    }
 
     state.game_start(data);
 
