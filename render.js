@@ -229,7 +229,7 @@ function draw() {
         var exit_room = universe.get_room_id(exit_room_id);
         var exit_display = exit[0];
         if (exit_room.known) {
-            exit_display = "To " + exit_room.name;
+            exit_display = "To " + exit_room.name + "["+exit[0]+"]";
         }
         // those are backticks, not straight quotes!
         output = output + `<button class="exit_button" id=item-${exit_room_id}>${exit_display}</button> `;
