@@ -103,6 +103,12 @@
             known: false,
             exits: [],
         ),
+        (
+            name: "Earthship",
+            desc: "It looks like a natural hill, but as you approach closer, you realize it's a construction of rammed earth with wall-spanning windows on the southern side.",
+            known: false,
+            exits: [],
+        )
     ],
     items: [
             (
