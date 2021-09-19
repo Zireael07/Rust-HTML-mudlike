@@ -3,107 +3,126 @@
 (
     rooms: [
         (
+            id: 0,
             name: "Pub",
             desc: "This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.",
             known: true,
             exits: [(Out, 1)],
         ),
         (
+            id: 1,
             name: "Street",
             desc: "The town street looks a bit deserted at this hour. The sky is overcast and it looks like it's going to rain any moment.",
             known: false,
             exits: [(West, 6), (In,0), (North, 3), (In, 2)],
         ),
         (
+            id: 2,
             name: "Hovel",
             desc: "This place looks like a dump. Dust and cobwebs rule the corners, but a part of the room is clearly lived in - there's a desk, a lamp, a simple stove and what looks like a bedroll.",
             known: false,
             exits: [(Out, 1)],
         ),
         (
+            id: 3,
             name: "Alley",
             desc: "This is a narrow, cramped alleyway lit by dim, flickering neon signs. Cables swing overhead to the tune of the whistling wind.",
             known: false,
             exits: [(South, 1), (In, 4)],
         ),
         (
+            id: 4,
             name: "Hotel hallway",
             desc: "This is a small hotel's hallway. Both walls are lined with identical doors, with green or red neon lights overhead to indicate occupancy.",
             known: false,
             exits: [(Out, 3), (West, 5)],
         ),
         (
+            id: 5,
             name: "Capsule",
             desc: "This is a tiny capsule, roughly a person's height across. At least long enough so one can lay down comfortably and there's an overhead storage space for anything a person might have, too.",
             known: false,
             exits: [(East, 4)],
         ),
         (
+            id: 6,
             name: "Field",
             desc: "The town gives way to a sparse field, dotted here and there with shrubs or small trees. The ground is littered with rocks and rubbish.",
             known: false,
             exits: [(East, 1), (West, 7), (North, 9)]
         ),
-        (   name: "Farm",
+        (   
+            id: 7,
+            name: "Farm",
             desc: "A small farm - an obviously lived-in building accompanied by a stable. Some horses run about the backyard, and there's a slightly run-down but well maintained wagon in the front.",
             known: false,
             exits: [(East, 6), (West, 8)] 
         ),
         (
+            id: 8,
             name: "Orchard",
             desc: "A small grove of apple trees. The grass beneath one of the trees is smushed and seems to bear an indentation - clearly someone or something's favorite spot.",
             known: false,
             exits: [(East, 7)],
         ),
         (
+            id: 9,
             name: "Mountain",
             desc: "A mountain of some sort of a white, er, whitish stone. It looks difficult if not impossible to climb, with its sheer walls.",
             known: false,
             exits: [(South, 6), (North, 10)]
         ),
         (
+            id: 10,
             name: "Mountain",
             desc: "The mountain looks slightly less sheer here and there seems to be an opening in one of the walls.",
             known: false,
             exits: [(South, 9)]
         ),
         (
+            id: 11,
             name: "Tower",
             desc: "A tall tower sticks out in the landscape. This huge construction of metal trusses is most likely an old radio tower.",
             known: false,
             exits: [],
         ),
         (
+            id: 12,
             name: "Vertical farm",
             desc: "A building made mostly of glass. As you peek inside, you see rows of purple LED lights and trays upon trays of varied edible plant produce in differing stages of growth.",
             known: false,
             exits: [],
         ),
         (
+            id: 13,
             name: "Abandoned place",
             desc: "This place looks like it's been abandoned a long time ago. Dust and cobwebs and broken furniture are everywhere. Even the floor doesn't look too stable.",
             known: false,
             exits: [(Out, 1)],
         ),
         (
+            id: 14,
             name: "Prison",
             desc: "This large gray non-descript building has bars on its windows and is surrounded by barbed wire fence. Cameras on each corner watch both the inside and the outside of the fenced area. Several figures in jumpsuits walk on a small patch of land.",
             known: false,
             exits: []
         ),
         (
+            id: 15,
             name: "Cell",
             desc: "This is a tiny capsule, roughly a person's height across. At least long enough so one can lay down comfortably. Unlike the hotel, there is no locker overhead and the entrance is barred.",
             known: false,
             exits: [],
         ),
         (
+            id: 16,
             name: "Lab",
             desc: "This sparsely furnished building contains mostly intricate lab equipment you cannot figure the exact use of, and rows upon rows of roughly cylindrical blue containers, each one as tall as a human is, or even larger.",
             known: false,
             exits: [],
         ),
         (
+            id: 17,
             name: "Earthship",
             desc: "It looks like a natural hill, but as you approach closer, you realize it's a construction of rammed earth with wall-spanning windows on the southern side.",
             known: false,

@@ -135,6 +135,7 @@ pub enum Exit {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Room {
+    id: usize,
     desc: String,
     known: bool,
     name: String,
@@ -210,7 +211,7 @@ pub async fn load_datafile(mut state: Universe) -> Universe {
 
     //debug
     for r in &data.rooms {
-        log!("{}", &format!("From data: {} {} {} {:?}", r.name, r.desc, r.known, r.exits));
+        log!("{}", &format!("From data: {} {} {} {} {:?}", r.id, r.name, r.desc, r.known, r.exits));
     }
 
     // for n in &data.names {
