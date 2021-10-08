@@ -24,16 +24,16 @@ impl Markov {
         }
     }
 
-    pub fn parse(&mut self, sentence: &str) {
+    pub fn parse(&mut self, sentence: &str, num: int) {
         let words = sentence.split(" ").collect::<Vec<&str>>();
         let word_count = words.len();
     
-        //note: this works on bigrams (every pair of words)
-        //TODO: make number of words configurable
         for n in 0..word_count {
-            if n + 2 < word_count {
-                let key = format!("{} {}", words[n], words[n + 1]);
-                let value = words[n + 2];
+            if n + num < word_count {
+                let key_vec = word_count[n, n+num-1].to_vec();
+                let key = key_vec.join(" ");
+                //let key = format!("{} {}", words[n], words[n + 1]);
+                let value = words[n + num];
     
                 self.insert(key, value.to_string())
             }
