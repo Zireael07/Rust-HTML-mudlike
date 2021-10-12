@@ -23,6 +23,8 @@ mod universe_private;
 use universe_private::*;
 mod lispy;
 use lispy::{RispExp, RispErr, parse_list_of_floats, parse_single_float};
+mod language;
+use language::{Markov, add_text};
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 #[macro_export]
@@ -167,6 +169,12 @@ pub enum Distance {
     Medium = 1,
     Far = 2
 }
+
+struct Weather {
+    pub temp: f32, //in Kelvin
+}
+
+
 pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
 
 //https://dev.to/mnivoliez/getting-started-with-rust-enum-on-steroids-8b4
@@ -389,6 +397,12 @@ impl Universe {
                     //enemy turn
                     self.end_turn();
                 }
+                //language
+                //fn generate(num: i32) {
+                let mut lang = Markov::new();
+                add_text(&mut lang);
+                log!("{:?}", lang.generate_sentence());
+                //}
             },
                 
             _ => { log!("Unknown command entered"); }

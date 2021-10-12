@@ -7,7 +7,8 @@
 use std::collections::HashMap;
 
 //RNG
-use rand::Rng;
+use rand::{Rng, thread_rng};
+use rand::prelude::SliceRandom;
 
 struct SentenceState {
     pub topic: String,
@@ -24,13 +25,14 @@ impl Markov {
         }
     }
 
-    pub fn parse(&mut self, sentence: &str, num: int) {
+    pub fn parse(&mut self, sentence: &str, num: usize) {
         let words = sentence.split(" ").collect::<Vec<&str>>();
         let word_count = words.len();
     
         for n in 0..word_count {
             if n + num < word_count {
-                let key_vec = word_count[n, n+num-1].to_vec();
+                //slice to vector
+                let key_vec = &words[n..n+num-1].to_vec();
                 let key = key_vec.join(" ");
                 //let key = format!("{} {}", words[n], words[n + 1]);
                 let value = words[n + num];
@@ -50,16 +52,16 @@ impl Markov {
     }
 
     pub fn generate_sentence(self) -> String {
-        let mut rng = thread_rng();
+        let mut rng = rand::thread_rng();
         let keys = self.map.keys().collect::<Vec<&String>>();
     
-        let mut key = rng.choose(&keys).expect("could not get random value").to_string();
+        let mut key = keys.choose(&mut rng).expect("could not get random value").to_string();
         let mut sentence = key.clone();
     
         loop {
             match self.map.get(&key) {
                 Some(values) => {
-                    let value = rng.choose(values).expect("could not get value");
+                    let value = values.choose(&mut rng).expect("could not get value");
                     sentence = format!("{} {}", sentence, value);
     
                     key = next_key(&key, value);
@@ -75,4 +77,38 @@ impl Markov {
 fn next_key(key: &str, value: &str) -> String {
     let last_word = key.split(" ").last().expect("could not get last word");
     format!("{} {}", last_word, value)
+}
+
+pub fn add_text(lang: &mut Markov){
+    //some Toki Pona sentences
+    lang.parse("ona li suli.",3);
+    lang.parse("kili li pona.",3);
+    lang.parse("sina li suli.",3);
+    lang.parse("soweli lili suwi.",3);
+    lang.parse("mama mi li pona.",3);
+    lang.parse("jan utala li wawa.",3);
+    lang.parse("jan lili mi li suwi.",3);
+    lang.parse("soweli lili li wawa ala.",3);
+    lang.parse("meli mi li pona.",3);
+    lang.parse("mije sina li suli.",3);
+    lang.parse("soweli ale li pona.",3);
+    lang.parse("kili li moku suli.",3);
+    lang.parse("jan lili li (pana e telo lukin).",3);
+    lang.parse("ona li lukin e lipu.",3);
+    lang.parse("soweli ike li utala e meli.",3);
+    lang.parse("jan utala li moku e kili suli.",3);
+    lang.parse("soweli lili li moku e telo.",3);
+    lang.parse("mi telo e ijo suli.",3);
+    lang.parse("jan wawa li pali e tomo.",3);
+    lang.parse("jan pali li telo e kasi.",3);
+    lang.parse("jan wawa li jo e kiwen suli.",3);
+    lang.parse("waso lili li moku e pipi.",3);
+    lang.parse("meli li toki e soweli, e waso.",3);
+    lang.parse("jan pali li pona e ilo, li lukin e lipu.",3);
+    lang.parse("jan pali li pana e moku pona.",3);
+
+
+    // for s in text {
+    //     lang.parse(s);
+    // }
 }
