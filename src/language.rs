@@ -17,13 +17,15 @@ struct SentenceState {
 }
 
 pub struct Markov {
-    pub map: HashMap<String, Vec<String>>
+    pub map: HashMap<String, Vec<String>>,
+    pub nouns: Vec<String>
 }
 
 impl Markov {
     pub fn new() -> Markov {
         Markov {
-            map: HashMap::new()
+            map: HashMap::new(),
+            nouns: Vec::new()
         }
     }
 
@@ -53,11 +55,12 @@ impl Markov {
         }
     }
 
+    //key function in this module
     pub fn generate_sentence(self) -> String {
         let mut rng = rand::thread_rng();
         let keys = self.map.keys().collect::<Vec<&String>>();
     
-        let mut key = keys.choose(&mut rng).expect("could not get random value").to_string();
+        let mut key = initial_key(keys, self.nouns);
         let mut sentence = key.clone();
     
         loop {
@@ -80,6 +83,27 @@ impl Markov {
     // }
 }
 
+fn initial_key(keys: Vec<&String>, nouns: Vec<String>) -> String {
+    let mut rng = rand::thread_rng();
+    //return keys.choose(&mut rng).expect("could not get random value").to_string();
+
+    //the initial key HAS to contain a noun
+    //let valid_keys = keys.iter().filter(|&k| for n in self.nouns { k.contains(&n); } )
+    let mut valid_keys: Vec<&String> = Vec::new();
+    for k in keys {
+        let words = k.split(" ").collect::<Vec<&str>>();
+        for n in &nouns {
+            if words[0] == n.as_str() {
+            //if k.contains(n.as_str()) {
+                valid_keys.push(k);
+            }
+        }
+    }
+
+
+    return valid_keys.choose(&mut rng).expect("could not get random value").to_string();
+}
+
 fn next_key(sentence: &str, value: &str) -> String {
     //get last 3 words in the sentence
     let words = sentence.split(" ").collect::<Vec<&str>>();
@@ -97,7 +121,7 @@ pub fn add_text(lang: &mut Markov){
     lang.parse("ona li suli.",2);
     lang.parse("kili li pona.",2);
     lang.parse("sina li suli.",2);
-    lang.parse("soweli lili suwi.",2);
+    lang.parse("soweli lili li suwi.",2);
     lang.parse("mama mi li pona.",3);
     lang.parse("jan utala li wawa.",3);
     lang.parse("jan lili mi li suwi.",3);
@@ -124,4 +148,16 @@ pub fn add_text(lang: &mut Markov){
     // for s in text {
     //     lang.parse(s);
     // }
+
+    //some additional info
+    lang.nouns.push("jan".to_string());
+    lang.nouns.push("kili".to_string());
+    lang.nouns.push("mama".to_string());
+    lang.nouns.push("mije".to_string());
+    lang.nouns.push("meli".to_string());
+    lang.nouns.push("waso".to_string());
+    lang.nouns.push("soweli".to_string());
+    //not quite but will do for now
+    lang.nouns.push("mi".to_string());
+    lang.nouns.push("sina".to_string());
 }
