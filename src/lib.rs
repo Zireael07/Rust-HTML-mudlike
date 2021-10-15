@@ -401,6 +401,11 @@ impl Universe {
                 //fn generate(num: i32) {
                 let mut lang = Markov::new();
                 add_text(&mut lang);
+                //debug
+                for (key, value) in &lang.map {
+                    log!("{}: {:?}", key, value)
+                }
+
                 log!("{:?}", lang.generate_sentence());
                 //}
             },

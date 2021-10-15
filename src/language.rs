@@ -4,6 +4,8 @@
 //ref: https://bookowl.github.io/2016/12/08/Rusty-(Markov)-Chains/
 //ref: https://blakewilliams.me/posts/generating-arbitrary-text-with-markov-chains-in-rust
 
+use super::log;
+
 use std::collections::HashMap;
 
 //RNG
@@ -15,7 +17,7 @@ struct SentenceState {
 }
 
 pub struct Markov {
-    map: HashMap<String, Vec<String>>
+    pub map: HashMap<String, Vec<String>>
 }
 
 impl Markov {
@@ -32,11 +34,11 @@ impl Markov {
         for n in 0..word_count {
             if n + num < word_count {
                 //slice to vector
-                let key_vec = &words[n..n+num-1].to_vec();
+                let key_vec = &words[n..n+num].to_vec();
                 let key = key_vec.join(" ");
                 //let key = format!("{} {}", words[n], words[n + 1]);
                 let value = words[n + num];
-    
+                //log!("Parsed to: {} {} ", key, value);
                 self.insert(key, value.to_string())
             }
         }
@@ -64,7 +66,7 @@ impl Markov {
                     let value = values.choose(&mut rng).expect("could not get value");
                     sentence = format!("{} {}", sentence, value);
     
-                    key = next_key(&key, value);
+                    key = next_key(&sentence, value);
                 }
                 None => break
             }
@@ -72,19 +74,30 @@ impl Markov {
     
         sentence
     }
+
+    // pub fn debug(self) {
+
+    // }
 }
 
-fn next_key(key: &str, value: &str) -> String {
-    let last_word = key.split(" ").last().expect("could not get last word");
-    format!("{} {}", last_word, value)
+fn next_key(sentence: &str, value: &str) -> String {
+    //get last 3 words in the sentence
+    let words = sentence.split(" ").collect::<Vec<&str>>();
+    let word_count = words.len();
+    let last_words = &words[(word_count-3)..];
+    log!("Next key for: {:?} ", last_words);
+    let key = last_words.join(" ");
+    //let last_word = key.split(" ").last().expect("could not get last word");
+    return key;
+    //format!("{} {}", last_word, value)
 }
 
 pub fn add_text(lang: &mut Markov){
     //some Toki Pona sentences
-    lang.parse("ona li suli.",3);
-    lang.parse("kili li pona.",3);
-    lang.parse("sina li suli.",3);
-    lang.parse("soweli lili suwi.",3);
+    lang.parse("ona li suli.",2);
+    lang.parse("kili li pona.",2);
+    lang.parse("sina li suli.",2);
+    lang.parse("soweli lili suwi.",2);
     lang.parse("mama mi li pona.",3);
     lang.parse("jan utala li wawa.",3);
     lang.parse("jan lili mi li suwi.",3);
