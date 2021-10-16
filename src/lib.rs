@@ -344,6 +344,24 @@ impl Universe {
         self.map[id].known = true;
     }
 
+    pub fn get_sentences(&self) -> JsValue {
+        let mut lang = Markov::new();
+        add_text(&mut lang);
+        //debug
+        for (key, value) in &lang.map {
+            log!("{}: {:?}", key, value)
+        }
+
+        //log!("{:?}", lang.generate_sentence());
+        let sentences = lang.generate_sentence();
+        return JsValue::from_serde(&sentences).unwrap();
+    }
+
+    pub fn get_tokens(&self, s: String) -> JsValue {
+        let tokens = language::tokenize(s);
+        return JsValue::from_serde(&tokens).unwrap();
+    }
+
     // what it says on the tin
     fn command_handler(&mut self, cmd: String) {
         //split by spaces
@@ -397,16 +415,17 @@ impl Universe {
                     //enemy turn
                     self.end_turn();
                 }
-                //language
-                //fn generate(num: i32) {
-                let mut lang = Markov::new();
-                add_text(&mut lang);
-                //debug
-                for (key, value) in &lang.map {
-                    log!("{}: {:?}", key, value)
-                }
+                //language is handled in get_sentences() above
 
-                log!("{:?}", lang.generate_sentence());
+                //fn generate(num: i32) {
+                // let mut lang = Markov::new();
+                // add_text(&mut lang);
+                // //debug
+                // for (key, value) in &lang.map {
+                //     log!("{}: {:?}", key, value)
+                // }
+
+                // log!("{:?}", lang.generate_sentence());
                 //}
             },
                 

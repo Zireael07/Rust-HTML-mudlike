@@ -81,6 +81,7 @@ impl Markov {
     // pub fn debug(self) {
 
     // }
+
 }
 
 fn initial_key(keys: Vec<&String>, nouns: Vec<String>) -> String {
@@ -115,6 +116,21 @@ fn next_key(sentence: &str, value: &str) -> String {
     return key;
     //format!("{} {}", last_word, value)
 }
+
+pub fn tokenize(sentence: String) -> Vec<String> {
+    //split by specified characters
+    let words = sentence.split(|c| (c == ' ') || (c == ';') || (c == ',' ) || (c == '.') || (c == ')') || (c == '(')).collect::<Vec<&str>>();
+    
+    //we need a Vec<String> because we'll be using it on JS side...
+    let mut v = Vec::new();
+    for w in words {
+        v.push(w.to_string());
+    }
+    return v;
+
+    //return format!("{}", words);
+}
+
 
 pub fn add_text(lang: &mut Markov){
     //some Toki Pona sentences
