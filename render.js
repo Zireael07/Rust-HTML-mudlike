@@ -30,6 +30,11 @@ var wordlist = {
     "utala": "fight",
     "wawa": "strong",
     "waso": "bird",
+    //punctuation so that it doesn't show up as undefined
+    ".": "",
+    ",": "",
+    "(": "",
+    ")": "",
 }
 
 
@@ -144,38 +149,10 @@ function npcClick(button) {
     process("npc_interact " + i);
     
     //test generating sentences
-    //https://observablehq.com/@dhowe/tut-rita-ngrams
-    var rm = RiTa.markov(3);
-
-    //sentences from https://rnd.neocities.org/tokipona/
-    //catch: sina li suli would be sina suli in standard Toki Pona
-    rm.addText("ona li suli.\
-    kili li pona.\
-    sina li suli.\
-    soweli lili suwi.\
-    mama mi li pona.\
-    jan utala li wawa.\
-    jan lili mi li suwi.\
-    soweli lili li wawa ala.\
-    meli mi li pona.\
-    mije sina li suli.\
-    soweli ale li pona.\
-    kili li moku suli.\
-    jan lili li (pana e telo lukin).\
-    ona li lukin e lipu.\
-    soweli ike li utala e meli.\
-    jan utala li moku e kili suli.\
-    soweli lili li moku e telo.\
-    mi telo e ijo suli.\
-    jan wawa li pali e tomo.\
-    jan pali li telo e kasi.\
-    jan wawa li jo e kiwen suli.\
-    waso lili li moku e pipi.\
-    meli li toki e soweli, e waso.\
-    jan pali li pona e ilo, li lukin e lipu.\
-    jan pali li pana e moku pona."
-    );
-    var sentences = rm.generate(2);
+    // this is a basic Rust implementation that has some simple rules in addition to Markov chain
+    var sentence = universe.get_sentences();
+    //hack for now
+    var sentences = [sentence]
 
     //append to game view
     var output = document.getElementById("game").innerHTML;
@@ -184,10 +161,10 @@ function npcClick(button) {
         var s = sentences[i];
         output += s + '\n';
         //gloss
-        var tokens = RiTa.tokenize(s);
+        var tokens = universe.get_tokens(s);
         for (var i=0; i<tokens.length;i++){
             var t = tokens[i];
-            if (t != ".") {
+            if (t != "") {
                 output += wordlist[t] + " ";
             }
             
