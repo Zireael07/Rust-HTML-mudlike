@@ -5,11 +5,15 @@ var universe, g_wasm; // Can't be initialized yet because WASM is not ready
 
 //Toki Pona words
 var wordlist = {
+    "ala": "not",
+    "ale": "all, every",
     "e": "object marker", //like '(w)o' in Japanese
     "ijo": "thing",
     "ilo": "tool, device",
     "jan": "person",
+    "kasi": "plant(s)",
     "kili": "fruit",
+    "kiwen": "stone, rock",
     "li": "pred marker", //sort of like 'wa' in Japanese
     "lili": "small",
     "lukin": "eye, to look",
@@ -23,10 +27,13 @@ var wordlist = {
     "pana": "give, send",
     "pipi": "bug(s)",
     "pona": "good",
+    "sina": "you",
     "soweli": "animal",
     "suli": "great",
     "suwi": "sweet",
     "telo": "water, fluid",
+    "toki": "talk",
+    "tomo": "house",
     "utala": "fight",
     "wawa": "strong",
     "waso": "bird",
@@ -165,7 +172,11 @@ function npcClick(button) {
         for (var i=0; i<tokens.length;i++){
             var t = tokens[i];
             if (t != "") {
-                output += wordlist[t] + " ";
+                if (i < tokens.length-2) {
+                    output += wordlist[t] + " - ";
+                } else {
+                    output += wordlist[t];
+                }
             }
             
         }
