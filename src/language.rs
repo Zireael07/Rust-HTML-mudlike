@@ -4,6 +4,8 @@
 //ref: https://bookowl.github.io/2016/12/08/Rusty-(Markov)-Chains/
 //ref: https://blakewilliams.me/posts/generating-arbitrary-text-with-markov-chains-in-rust
 
+//ref: https://github.com/gabrielebarbieri/markovconstraints
+
 use super::log;
 
 use std::collections::HashMap;
@@ -18,18 +20,23 @@ struct SentenceState {
 
 pub struct Markov {
     pub map: HashMap<String, Vec<String>>,
-    pub nouns: Vec<String>
+    pub nouns: Vec<String>,
+    pub constraints: HashMap<String, Vec<String>>,
 }
 
 impl Markov {
     pub fn new() -> Markov {
         Markov {
             map: HashMap::new(),
-            nouns: Vec::new()
+            nouns: Vec::new(),
+            constraints: HashMap::new(),
         }
     }
 
     pub fn parse(&mut self, sentence: &str, num: usize) {
+        //TODO: treat stuff in brackets in a special way (as a single block)
+        
+        //just basic n-gram parsing
         let words = sentence.split(" ").collect::<Vec<&str>>();
         let word_count = words.len();
     
@@ -61,12 +68,27 @@ impl Markov {
         let keys = self.map.keys().collect::<Vec<&String>>();
     
         let mut key = initial_key(keys, self.nouns);
+        let topic = key.split(" ").collect::<Vec<&str>>()[0].to_string();
+        //log!("Topic: {}", topic);
         let mut sentence = key.clone();
     
         loop {
             match self.map.get(&key) {
                 Some(values) => {
-                    let value = values.choose(&mut rng).expect("could not get value");
+                    let mut valid = values.clone();
+                    //do we have a constraint set by topic?
+                    match self.constraints.get(&topic) {
+                        Some(constr) => {
+                            log!("We have a constraint, {:?}", constr);
+                            //filter values by topic
+                            valid.retain(|v| !constr.contains(&v));
+                            log!("Valid: {:?}", valid);
+                        }
+                        None => {}
+                    }
+
+                    let value = valid.choose(&mut rng).expect("could not get value");
+                    //let value = values.choose(&mut rng).expect("could not get value");
                     sentence = format!("{} {}", sentence, value);
     
                     key = next_key(&sentence, value);
@@ -106,15 +128,16 @@ fn initial_key(keys: Vec<&String>, nouns: Vec<String>) -> String {
 }
 
 fn next_key(sentence: &str, value: &str) -> String {
-    //get last 3 words in the sentence
+    //get last 2 words in the sentence
     let words = sentence.split(" ").collect::<Vec<&str>>();
     let word_count = words.len();
-    let last_words = &words[(word_count-3)..];
+    let last_words = &words[(word_count-2)..];
     log!("Next key for: {:?} ", last_words);
     let key = last_words.join(" ");
+
     //let last_word = key.split(" ").last().expect("could not get last word");
-    return key;
     //format!("{} {}", last_word, value)
+    return key;
 }
 
 pub fn tokenize(sentence: String) -> Vec<String> {
@@ -138,27 +161,27 @@ pub fn add_text(lang: &mut Markov){
     lang.parse("kili li pona.",2);
     lang.parse("sina li suli.",2);
     lang.parse("soweli lili li suwi.",2);
-    lang.parse("mama mi li pona.",3);
-    lang.parse("jan utala li wawa.",3);
-    lang.parse("jan lili mi li suwi.",3);
-    lang.parse("soweli lili li wawa ala.",3);
-    lang.parse("meli mi li pona.",3);
-    lang.parse("mije sina li suli.",3);
-    lang.parse("soweli ale li pona.",3);
-    lang.parse("kili li moku suli.",3);
-    lang.parse("jan lili li (pana e telo lukin).",3);
-    lang.parse("ona li lukin e lipu.",3);
-    lang.parse("soweli ike li utala e meli.",3);
-    lang.parse("jan utala li moku e kili suli.",3);
-    lang.parse("soweli lili li moku e telo.",3);
-    lang.parse("mi telo e ijo suli.",3);
-    lang.parse("jan wawa li pali e tomo.",3);
-    lang.parse("jan pali li telo e kasi.",3);
-    lang.parse("jan wawa li jo e kiwen suli.",3);
-    lang.parse("waso lili li moku e pipi.",3);
-    lang.parse("meli li toki e soweli, e waso.",3);
-    lang.parse("jan pali li pona e ilo, li lukin e lipu.",3);
-    lang.parse("jan pali li pana e moku pona.",3);
+    lang.parse("mama mi li pona.",2);
+    lang.parse("jan utala li wawa.",2);
+    lang.parse("jan lili mi li suwi.",2);
+    lang.parse("soweli lili li wawa ala.",2);
+    lang.parse("meli mi li pona.",2);
+    lang.parse("mije sina li suli.",2);
+    lang.parse("soweli ale li pona.",2);
+    lang.parse("kili li moku suli.",2);
+    lang.parse("jan lili li (pana e telo lukin).",2);
+    lang.parse("ona li lukin e lipu.",2);
+    lang.parse("soweli ike li utala e meli.",2);
+    lang.parse("jan utala li moku e kili suli.",2);
+    lang.parse("soweli lili li moku e telo.",2);
+    lang.parse("mi telo e ijo suli.",2);
+    lang.parse("jan wawa li pali e tomo.",2);
+    lang.parse("jan pali li telo e kasi.",2);
+    lang.parse("jan wawa li jo e kiwen suli.",2);
+    lang.parse("waso lili li moku e pipi.",2);
+    lang.parse("meli li toki e soweli, e waso.",2);
+    lang.parse("jan pali li pona e ilo, li lukin e lipu.",2);
+    lang.parse("jan pali li pana e moku pona.",2);
 
 
     // for s in text {
@@ -176,4 +199,11 @@ pub fn add_text(lang: &mut Markov){
     //not quite but will do for now
     lang.nouns.push("mi".to_string());
     lang.nouns.push("sina".to_string());
+
+    //constraints
+    lang.constraints.insert("kili".to_string(), vec!["telo".to_string(), "e".to_string()]);
+    //debug
+    for (key, value) in &lang.constraints {
+        log!("{}: {:?}", key, value)
+    }
 }
