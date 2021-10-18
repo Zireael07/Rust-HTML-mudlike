@@ -474,5 +474,16 @@
     "Vizcaíno", "Viña", "Viñas", "Vázquez", "Vélez", "Yuste", "Yáñez",
     "Zabala", "Zabaleta", "Zamora", "Zamorano", "Zapata", "Zaragoza", "Zorrilla",
     "Zurita", "Águila", "Álamo", "Álvarez", "Álvaro", "Ángel", "Ávila"],
-    }
+    },
+    toki_pona: [
+        "ona li suli.", "kili li pona.", "sina li suli.",
+        "soweli lili li suwi.", "mama mi li pona.", "jan utala li wawa.", "jan lili mi li suwi.",
+        "soweli lili li wawa ala.", "meli mi li pona.", "mije sina li suli.", "soweli ale li pona.", "kili li moku suli.", 
+        "jan lili li (pana e telo lukin).",
+        "ona li lukin e lipu.", "soweli ike li utala e meli.", "jan utala li moku e kili suli.",
+        "soweli lili li moku e telo.", "mi telo e ijo suli.",
+        "jan wawa li pali e tomo.", "jan pali li telo e kasi.", "jan wawa li jo e kiwen suli.",
+        "waso lili li moku e pipi.", "meli li toki e soweli, e waso.",
+        "jan pali li pona e ilo, li lukin e lipu.", "jan pali li pana e moku pona."
+    ],
 )

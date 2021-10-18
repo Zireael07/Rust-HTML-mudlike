@@ -6,6 +6,7 @@ use super::{Universe, Room, Exit, Distance, DataMaster,
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus
 };
+use super::language;
 
 use hecs::Entity;
 
@@ -18,7 +19,15 @@ use rand::Rng;
 impl Universe {
     //moved because of //https://github.com/rustwasm/wasm-bindgen/issues/111 preventing using our data
     pub fn game_start(&mut self, data: DataMaster) {
-    
+        //load sentences into the generator
+        for s in data.toki_pona {
+            self.language.parse(&s, 2);
+        }
+        //do the rest of the setup
+        language::setup(&mut self.language);
+
+
+        //setup the rooms
         for r in data.rooms {
             self.map.push(r);
         }

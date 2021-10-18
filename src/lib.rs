@@ -24,7 +24,7 @@ use universe_private::*;
 mod lispy;
 use lispy::{RispExp, RispErr, parse_list_of_floats, parse_single_float};
 mod language;
-use language::{Markov, add_text};
+use language::{Markov};
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 #[macro_export]
@@ -121,6 +121,7 @@ pub struct Universe {
     map: Vec<Room>,
     current_room: usize, //TODO: will likely be a property of player
     ecs_world: World,
+    language: Markov,
 }
 
 
@@ -159,6 +160,7 @@ pub struct DataMaster {
     pub rooms : Vec<Room>,
     pub names : HashMap<String, Vec<String>>,
     pub items: Vec<ItemPrefab>,
+    pub toki_pona: Vec<String>
 }
 
 
@@ -230,6 +232,10 @@ pub async fn load_datafile(mut state: Universe) -> Universe {
         log!("{}", &format!("{} {:?} {:?} {:?}", i.name, i.item, i.equippable, i.defense));
     }
 
+    // for s in &data.toki_pona {
+    //     log!("{}", s);
+    // }
+
     state.game_start(data);
 
     return state
@@ -242,6 +248,7 @@ impl Universe {
             map: Vec::new(),
             current_room: 0,
             ecs_world: World::new(),
+            language: Markov::new(),
         };
 
         //state.map.push(Room{name:"Pub".to_string(), desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), known: true, exits: vec![(Exit::Out, 1)]});
@@ -345,15 +352,14 @@ impl Universe {
     }
 
     pub fn get_sentences(&self) -> JsValue {
-        let mut lang = Markov::new();
-        add_text(&mut lang);
+        let sentences = self.language.generate_sentence();
+
         //debug
-        for (key, value) in &lang.map {
+        for (key, value) in &self.language.map {
             log!("{}: {:?}", key, value)
         }
 
-        //log!("{:?}", lang.generate_sentence());
-        let sentences = lang.generate_sentence();
+
         return JsValue::from_serde(&sentences).unwrap();
     }
 
@@ -416,17 +422,6 @@ impl Universe {
                     self.end_turn();
                 }
                 //language is handled in get_sentences() above
-
-                //fn generate(num: i32) {
-                // let mut lang = Markov::new();
-                // add_text(&mut lang);
-                // //debug
-                // for (key, value) in &lang.map {
-                //     log!("{}: {:?}", key, value)
-                // }
-
-                // log!("{:?}", lang.generate_sentence());
-                //}
             },
                 
             _ => { log!("Unknown command entered"); }

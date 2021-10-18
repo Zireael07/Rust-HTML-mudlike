@@ -4,7 +4,8 @@
 //ref: https://bookowl.github.io/2016/12/08/Rusty-(Markov)-Chains/
 //ref: https://blakewilliams.me/posts/generating-arbitrary-text-with-markov-chains-in-rust
 
-//ref: https://github.com/gabrielebarbieri/markovconstraints
+//ref: https://kevingal.com/blog/toki-poetry.html
+//ref: https://github.com/gabrielebarbieri/markovconstraints (the idea that we can just exclude some options)
 
 use super::log;
 
@@ -35,6 +36,7 @@ impl Markov {
 
     pub fn parse(&mut self, sentence: &str, num: usize) {
         //TODO: treat stuff in brackets in a special way (as a single block)
+        //FIXME: commas should be ignored - no meaning in Toki Pona per https://github.com/ae-dschorsaanjo/lipu-lili-pi-toki-pona/blob/master/grammar.md
         
         //just basic n-gram parsing
         let words = sentence.split(" ").collect::<Vec<&str>>();
@@ -56,6 +58,7 @@ impl Markov {
     fn insert(&mut self, key: String, value: String) {
         if self.map.contains_key(&key) {
             let current_value = self.map.get_mut(&key).unwrap();
+            //FIXME: don't add values that are already in
             current_value.push(value);
         } else {
             self.map.insert(key, vec!(value));
@@ -63,11 +66,11 @@ impl Markov {
     }
 
     //key function in this module
-    pub fn generate_sentence(self) -> String {
+    pub fn generate_sentence(&self) -> String {
         let mut rng = rand::thread_rng();
         let keys = self.map.keys().collect::<Vec<&String>>();
     
-        let mut key = initial_key(keys, self.nouns);
+        let mut key = initial_key(keys, &self.nouns);
         let topic = key.split(" ").collect::<Vec<&str>>()[0].to_string();
         //log!("Topic: {}", topic);
         let mut sentence = key.clone();
@@ -106,7 +109,7 @@ impl Markov {
 
 }
 
-fn initial_key(keys: Vec<&String>, nouns: Vec<String>) -> String {
+fn initial_key(keys: Vec<&String>, nouns: &Vec<String>) -> String {
     let mut rng = rand::thread_rng();
     //return keys.choose(&mut rng).expect("could not get random value").to_string();
 
@@ -115,7 +118,7 @@ fn initial_key(keys: Vec<&String>, nouns: Vec<String>) -> String {
     let mut valid_keys: Vec<&String> = Vec::new();
     for k in keys {
         let words = k.split(" ").collect::<Vec<&str>>();
-        for n in &nouns {
+        for n in nouns {
             if words[0] == n.as_str() {
             //if k.contains(n.as_str()) {
                 valid_keys.push(k);
@@ -155,33 +158,33 @@ pub fn tokenize(sentence: String) -> Vec<String> {
 }
 
 
-pub fn add_text(lang: &mut Markov){
+pub fn setup(lang: &mut Markov){
     //some Toki Pona sentences
-    lang.parse("ona li suli.",2);
-    lang.parse("kili li pona.",2);
-    lang.parse("sina li suli.",2);
-    lang.parse("soweli lili li suwi.",2);
-    lang.parse("mama mi li pona.",2);
-    lang.parse("jan utala li wawa.",2);
-    lang.parse("jan lili mi li suwi.",2);
-    lang.parse("soweli lili li wawa ala.",2);
-    lang.parse("meli mi li pona.",2);
-    lang.parse("mije sina li suli.",2);
-    lang.parse("soweli ale li pona.",2);
-    lang.parse("kili li moku suli.",2);
-    lang.parse("jan lili li (pana e telo lukin).",2);
-    lang.parse("ona li lukin e lipu.",2);
-    lang.parse("soweli ike li utala e meli.",2);
-    lang.parse("jan utala li moku e kili suli.",2);
-    lang.parse("soweli lili li moku e telo.",2);
-    lang.parse("mi telo e ijo suli.",2);
-    lang.parse("jan wawa li pali e tomo.",2);
-    lang.parse("jan pali li telo e kasi.",2);
-    lang.parse("jan wawa li jo e kiwen suli.",2);
-    lang.parse("waso lili li moku e pipi.",2);
-    lang.parse("meli li toki e soweli, e waso.",2);
-    lang.parse("jan pali li pona e ilo, li lukin e lipu.",2);
-    lang.parse("jan pali li pana e moku pona.",2);
+    // lang.parse("ona li suli.",2);
+    // lang.parse("kili li pona.",2);
+    // lang.parse("sina li suli.",2);
+    // lang.parse("soweli lili li suwi.",2);
+    // lang.parse("mama mi li pona.",2);
+    // lang.parse("jan utala li wawa.",2);
+    // lang.parse("jan lili mi li suwi.",2);
+    // lang.parse("soweli lili li wawa ala.",2);
+    // lang.parse("meli mi li pona.",2);
+    // lang.parse("mije sina li suli.",2);
+    // lang.parse("soweli ale li pona.",2);
+    // lang.parse("kili li moku suli.",2);
+    // lang.parse("jan lili li (pana e telo lukin).",2);
+    // lang.parse("ona li lukin e lipu.",2);
+    // lang.parse("soweli ike li utala e meli.",2);
+    // lang.parse("jan utala li moku e kili suli.",2);
+    // lang.parse("soweli lili li moku e telo.",2);
+    // lang.parse("mi telo e ijo suli.",2);
+    // lang.parse("jan wawa li pali e tomo.",2);
+    // lang.parse("jan pali li telo e kasi.",2);
+    // lang.parse("jan wawa li jo e kiwen suli.",2);
+    // lang.parse("waso lili li moku e pipi.",2);
+    // lang.parse("meli li toki e soweli, e waso.",2);
+    // lang.parse("jan pali li pona e ilo, li lukin e lipu.",2);
+    // lang.parse("jan pali li pana e moku pona.",2);
 
 
     // for s in text {
