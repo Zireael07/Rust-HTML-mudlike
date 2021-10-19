@@ -119,7 +119,7 @@ fn initial_key(keys: Vec<&String>, nouns: &Vec<String>) -> String {
     for k in keys {
         let words = k.split(" ").collect::<Vec<&str>>();
         for n in nouns {
-            if words[0] == n.as_str() {
+            if words[0] == n.as_str() && words[1].ne("e") {
             //if k.contains(n.as_str()) {
                 valid_keys.push(k);
             }
@@ -145,7 +145,7 @@ fn next_key(sentence: &str, value: &str) -> String {
 
 pub fn tokenize(sentence: String) -> Vec<String> {
     //split by specified characters
-    let words = sentence.split(|c| (c == ' ') || (c == ';') || (c == ',' ) || (c == '.') || (c == ')') || (c == '(')).collect::<Vec<&str>>();
+    let words = sentence.split(|c| (c == ' ') || (c == ';') || (c == ',' ) || (c == '.') || (c == ')') || (c == '(') || (c == '?') || (c== '!')).collect::<Vec<&str>>();
     
     //we need a Vec<String> because we'll be using it on JS side...
     let mut v = Vec::new();
@@ -159,38 +159,6 @@ pub fn tokenize(sentence: String) -> Vec<String> {
 
 
 pub fn setup(lang: &mut Markov){
-    //some Toki Pona sentences
-    // lang.parse("ona li suli.",2);
-    // lang.parse("kili li pona.",2);
-    // lang.parse("sina li suli.",2);
-    // lang.parse("soweli lili li suwi.",2);
-    // lang.parse("mama mi li pona.",2);
-    // lang.parse("jan utala li wawa.",2);
-    // lang.parse("jan lili mi li suwi.",2);
-    // lang.parse("soweli lili li wawa ala.",2);
-    // lang.parse("meli mi li pona.",2);
-    // lang.parse("mije sina li suli.",2);
-    // lang.parse("soweli ale li pona.",2);
-    // lang.parse("kili li moku suli.",2);
-    // lang.parse("jan lili li (pana e telo lukin).",2);
-    // lang.parse("ona li lukin e lipu.",2);
-    // lang.parse("soweli ike li utala e meli.",2);
-    // lang.parse("jan utala li moku e kili suli.",2);
-    // lang.parse("soweli lili li moku e telo.",2);
-    // lang.parse("mi telo e ijo suli.",2);
-    // lang.parse("jan wawa li pali e tomo.",2);
-    // lang.parse("jan pali li telo e kasi.",2);
-    // lang.parse("jan wawa li jo e kiwen suli.",2);
-    // lang.parse("waso lili li moku e pipi.",2);
-    // lang.parse("meli li toki e soweli, e waso.",2);
-    // lang.parse("jan pali li pona e ilo, li lukin e lipu.",2);
-    // lang.parse("jan pali li pana e moku pona.",2);
-
-
-    // for s in text {
-    //     lang.parse(s);
-    // }
-
     //some additional info
     lang.nouns.push("jan".to_string());
     lang.nouns.push("kili".to_string());
@@ -205,6 +173,7 @@ pub fn setup(lang: &mut Markov){
 
     //constraints
     lang.constraints.insert("kili".to_string(), vec!["telo".to_string(), "e".to_string()]);
+    lang.constraints.insert("waso".to_string(), vec!["(pona".to_string()]);
     //debug
     for (key, value) in &lang.constraints {
         log!("{}: {:?}", key, value)

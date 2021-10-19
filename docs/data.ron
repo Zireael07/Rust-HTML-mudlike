@@ -484,6 +484,46 @@
         "soweli lili li moku e telo.", "mi telo e ijo suli.",
         "jan wawa li pali e tomo.", "jan pali li telo e kasi.", "jan wawa li jo e kiwen suli.",
         "waso lili li moku e pipi.", "meli li toki e soweli, e waso.",
-        "jan pali li pona e ilo, li lukin e lipu.", "jan pali li pana e moku pona."
+        "jan pali li (pona e ilo), li lukin e lipu.", "jan pali li pana e moku pona.", //tokipona course ends here
+        "mi moku e telo.", "mi en sina li toki.", "soweli en kala en waso li pona.", //lipu lili pona
+        "mi wile e moku. taso sina jo e ona.", "ona li pana e moku tawa soweli.",
+        "ni li seme?", "toki! sina silim seme?", "jan seme li lon?", "sina tan ma seme?",
+        "sina ike mute. mi moku e sina kin.", "soweli li pona! soweli mute li lon.", //lipu - dialog
+        "ma kasi mi li suli. kasi mi li suli. mi wile weka e kasi ike.", //from a blogpost
+        "akesi li wile moku e mi!", "akesi li pana e telo moli.", "akesi pi telo moli li wile moku e mi!", //https://github.com/ttm/tokipona/blob/master/data/toki-pona_english.txt
+        "ale li jo e tenpo.", "ale li pona.", "ante li kama.", "ike li kama.", // stuff happens, life changes, etc.
+        "mi ken ala. mi moku kin.", "mi lukin kin e ona.", "pona! mi tawa kin.",
+        "ijo li lon oko mi.", "ijo li lukin e mi.",
+        "jan ala li toki.", "jan alasa pona li wawa.", "jan ale li wile tawa.", "jan ike li utala e ona mute.",
+        "jan lili en jan suli li toki.", "jan lili li ken ala moku e telo nasa.", "jan lili li lukin e jan suli.", 
+        "jan lili li sona ala e ike.", "jan lili li wile e telo kili.", "jan lili li musi.",
+        "jan li moli e waso.", "jan li suli mute. mani li (suli lili).", "jan li wile jo e ma.",
+        "sina wile ala wile moku?", //are you hungry? Toki Pona repeats for a yes/no question
+        "jan ni li pona lukin.", "jan ni li sama mi.",
+        "mi wile ala moli.", "jan pona mi li lon poka mi.",
+        "kama pona!", //welcome!
+        "kili li moku li pona.", "kili li pona, tawa mi.", "lape li pona.", "linja mi li telo.",
+        "luka mi li jaki. mi wile telo e ona.",
+        "mi jo e ilo.", "mi jo e kili.", "mi jo e tomo tawa sina. mi pana e ni tawa sina.", "mi jo e tomo tawa tu.",
+        "mi lape ala.", "mi lape la ali li pona.", "mi lawa pona e jan.",
+        "mi lon, tan seme?", "mi lon tomo.",
+        "mi lukin e ni.",
+        "mi moku e kili e telo.", "mi moku lili e kili lili.", "mi moku, lon tomo.", "mi moku mute. sina moku lili.",
+        "mi musi ala.", "mi musi taso.",
+        "mi mute o musi!", "mi mute o tawa!",
+        "mi pali mute la mi pilin ike.",
+        "mi sona e ni taso.",
+        "meli olin", "mije olin", 
+        "sina tawa ma tomo tan seme?", "sina tawa poka jan seme?", "sina toki tawa jan seme?",
+        "sina toki tawa mi anu seme?", "sina wile ala wile moku?", "sina wile e mani anu seme?",
+        "sina wile e moku anu telo?", "sina wile kama anu seme?", "sina wile moku anu seme?",
+        "sina wile pali e seme?", "sina wile tawa ma seme?",
+        "sina wile tawa telo suli.",
+        "soweli mi li kama moli.", "soweli ni li pona moku.",
+        //some more
+        "mi en ona li toki.", "soweli en kala li pona.", "soweli en waso li pona", "toki! ni li seme?",
+        "mi moku e kili.", "jan lili li moku e telo.", "soweli ike li utala e jan utala.",
+        "mi wile weka e soweli ike.", "mi wile moku mute.", "mi wile moku e kili.", "mi wile lukin e soweli ale.",
+        "mi wile lukin e kili ale.",
     ],
 )

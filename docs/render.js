@@ -5,43 +5,83 @@ var universe, g_wasm; // Can't be initialized yet because WASM is not ready
 
 //Toki Pona words
 var wordlist = {
+    "akesi": "reptile",
     "ala": "not",
+    "alasa": "hunt",
     "ale": "all, every",
+    "ante": "change(d), different",
+    "anu": "or",
     "e": "object marker", //like '(w)o' in Japanese
+    "en": "and",
+    "ike": "bad",
     "ijo": "thing",
     "ilo": "tool, device",
+    "jaki": "yucky",
     "jan": "person",
+    "jo": "have",
+    "kala": "fish",
+    "kama": "",
     "kasi": "plant(s)",
     "kili": "fruit",
+    "kin": "also",
     "kiwen": "stone, rock",
+    "lape": "sleep",
+    "lawa": "lead(er)",
     "li": "pred marker", //sort of like 'wa' in Japanese
     "lili": "small",
+    "lipu": "book, paper",
+    "linja": "line, hair",
+    "lon": "exist",
+    "luka": "hand, five",
     "lukin": "eye, to look",
+    "ma": "earth, land",
     "mama": "parent",
+    "mani": "money",
     "meli": "woman",
-    "mi": "mine",
+    "mi": "I, mine",
     "mije": "man",
     "moku": "eat, food",
+    "moli": "death, dead(ly)",
+    "musi": "fun, game",
+    "mute": "a lot",
+    "nasa": "weird, strange",
+    "ni": "this, that",
+    "nimi": "name, word",
+    "o": "[exclam[",
     "ona": "3rd person sg/pl",
     "pali": "to do/work/make",
     "pana": "give, send",
+    "pi": "of",
+    "pilim": "feeling, heart",
     "pipi": "bug(s)",
+    "poka": "next to, side",
     "pona": "good",
+    "silim": "feel", //toki pona has no 'f'
     "sina": "you",
+    "seme": "what",
     "soweli": "animal",
     "suli": "great",
     "suwi": "sweet",
+    "tan": "from, by",
+    "taso": "but",
+    "tawa": "go",
     "telo": "water, fluid",
+    "tenpo": "time",
     "toki": "talk",
-    "tomo": "house",
+    "tomo": "house, room",
+    "tu": "two",
     "utala": "fight",
     "wawa": "strong",
     "waso": "bird",
+    "wile": "want, need",
+    "weka": "remove",
     //punctuation so that it doesn't show up as undefined
     ".": "",
     ",": "",
     "(": "",
     ")": "",
+    "?": "",
+    "!": "",
 }
 
 
@@ -175,7 +215,7 @@ function npcClick(button) {
                 if (i < tokens.length-2) {
                     output += wordlist[t] + " - ";
                 } else {
-                    output += wordlist[t];
+                    output += " " + wordlist[t];
                 }
             }
             
