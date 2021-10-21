@@ -36,6 +36,10 @@ impl Markov {
 
     pub fn parse(&mut self, sentence: &str, num: usize) {
         //TODO: treat stuff in brackets in a special way (as a single block)
+        // OR some other way to do collocations (markers that are expanded?)
+
+        //TODO: maybe pre-tag the words so that it knows whether they're in a NP, VP, AP etc.
+
         //FIXME: commas should be ignored - no meaning in Toki Pona per https://github.com/ae-dschorsaanjo/lipu-lili-pi-toki-pona/blob/master/grammar.md
         
         //just basic n-gram parsing
@@ -53,6 +57,8 @@ impl Markov {
                 self.insert(key, value.to_string())
             }
         }
+
+        //TODO: make the Markov chain bi-directional (go from last to first)
     }
 
     fn insert(&mut self, key: String, value: String) {
