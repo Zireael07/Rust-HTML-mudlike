@@ -26,6 +26,10 @@ impl Universe {
         //do the rest of the setup
         language::setup(&mut self.language);
 
+        //debug
+        for (key, value) in &self.language.map {
+            log!("{}: {:?}", key, value)
+        }
 
         //setup the rooms
         for r in data.rooms {

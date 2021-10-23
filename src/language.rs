@@ -77,27 +77,48 @@ impl Markov {
         let keys = self.map.keys().collect::<Vec<&String>>();
     
         let mut key = initial_key(keys, &self.nouns);
+        //the first word in the initial key gets assigned as topic
         let topic = key.split(" ").collect::<Vec<&str>>()[0].to_string();
         //log!("Topic: {}", topic);
+        let mut topics = Vec::new();
+        topics.push(topic);
         let mut sentence = key.clone();
     
         loop {
             match self.map.get(&key) {
                 Some(values) => {
                     let mut valid = values.clone();
-                    //do we have a constraint set by topic?
-                    match self.constraints.get(&topic) {
-                        Some(constr) => {
-                            log!("We have a constraint, {:?}", constr);
-                            //filter values by topic
-                            valid.retain(|v| !constr.contains(&v));
-                            log!("Valid: {:?}", valid);
+                    for topic in &topics {
+                        //do we have a constraint set by a topic?
+                        match self.constraints.get(topic) {
+                            Some(constr) => {
+                                log!("We have a constraint, {:?}", constr);
+                                //filter values by topic
+                                valid.retain(|v| !constr.contains(&v));
+                                log!("Valid: {:?}", valid);
+                            }
+                            None => {}
                         }
-                        None => {}
                     }
+
 
                     let value = valid.choose(&mut rng).expect("could not get value");
                     //let value = values.choose(&mut rng).expect("could not get value");
+
+                    //if the last word in a sentence was li (pred marker), add the value to topic
+                    //get last 2 words in the sentence
+                    let words = sentence.split(" ").collect::<Vec<&str>>();
+                    let word_count = words.len();
+                    let last_word = words[(word_count-1)];
+                    if last_word == "li" {
+                        topics.push(value.to_string());
+                        log!("Topics: {:?}", topics);
+                    }
+                    if last_word == "e" {
+                        topics.push(value.to_string());
+                        log!("Topics: {:?}", topics);
+                    }
+
                     sentence = format!("{} {}", sentence, value);
     
                     key = next_key(&sentence, value);
@@ -179,7 +200,9 @@ pub fn setup(lang: &mut Markov){
 
     //constraints
     lang.constraints.insert("kili".to_string(), vec!["telo".to_string(), "e".to_string()]);
-    lang.constraints.insert("waso".to_string(), vec!["(pona".to_string()]);
+    lang.constraints.insert("waso".to_string(), vec!["(pona".to_string(), "sona".to_string(), "(pana".to_string()]);
+    //forbid li after e (predicate after object marker)
+    lang.constraints.insert("e".to_string(), vec!["li".to_string()]);
     //debug
     for (key, value) in &lang.constraints {
         log!("{}: {:?}", key, value)

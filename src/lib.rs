@@ -354,12 +354,6 @@ impl Universe {
     pub fn get_sentences(&self) -> JsValue {
         let sentences = self.language.generate_sentence();
 
-        //debug
-        for (key, value) in &self.language.map {
-            log!("{}: {:?}", key, value)
-        }
-
-
         return JsValue::from_serde(&sentences).unwrap();
     }
 
