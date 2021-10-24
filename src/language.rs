@@ -88,6 +88,10 @@ impl Markov {
             match self.map.get(&key) {
                 Some(values) => {
                     let mut valid = values.clone();
+
+                    //forbid anu and seme unless we specifically asked for a question
+                    valid.retain(|v| v.ne("anu") && v.ne("seme") && v.ne("seme?"));
+
                     for topic in &topics {
                         //do we have a constraint set by a topic?
                         match self.constraints.get(topic) {
@@ -101,6 +105,11 @@ impl Markov {
                         }
                     }
 
+                    //handle case where the valid list is empty!!!
+                    if valid.len() < 1 {
+                        log!("No valid continuations detected, breaking...");
+                        break
+                    }
 
                     let value = valid.choose(&mut rng).expect("could not get value");
                     //let value = values.choose(&mut rng).expect("could not get value");
@@ -203,6 +212,9 @@ pub fn setup(lang: &mut Markov){
     lang.constraints.insert("waso".to_string(), vec!["(pona".to_string(), "sona".to_string(), "(pana".to_string()]);
     //forbid li after e (predicate after object marker)
     lang.constraints.insert("e".to_string(), vec!["li".to_string()]);
+    // sina tan (you from) only happens in questions
+    lang.constraints.insert("sina".to_string(), vec!["tan".to_string()]);
+
     //debug
     for (key, value) in &lang.constraints {
         log!("{}: {:?}", key, value)
