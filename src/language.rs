@@ -208,8 +208,10 @@ pub fn setup(lang: &mut Markov){
     lang.nouns.push("sina".to_string());
 
     //constraints
+    //semantic constraints
     lang.constraints.insert("kili".to_string(), vec!["telo".to_string(), "e".to_string()]);
     lang.constraints.insert("waso".to_string(), vec!["(pona".to_string(), "sona".to_string(), "(pana".to_string()]);
+    lang.constraints.insert("moli".to_string(), vec!["mani".to_string()]);
     //forbid li after e (predicate after object marker)
     lang.constraints.insert("e".to_string(), vec!["li".to_string()]);
     // sina tan (you from) only happens in questions

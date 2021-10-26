@@ -488,7 +488,8 @@
         "sina toki e kala.", "jan pali li toki utala e tomo mi.", "ona li toki ike e jan pona mi.",
         "jan pali li (pona e ilo), li lukin e lipu.", "jan pali li pana e moku pona.", 
         "mi moku ala e soweli.", "jan pona sina li toki e ma, e telo.", "ma li jo e kasi ike.",
-        "mije mi li pali ala, li moku, li utala.", "ma mama mi li suli.",
+        "mije mi li pali ala, li moku, li utala.", //my man doesn't work, only eats and fights
+        "ma mama mi li suli.",
         "jan lili mute li lape.", "mi pakala lili.", "jan ike li pakala e ilo mi.", "mi pali e tomo ni.",
         "jan utala pona mute li awen e kulupu ni.", "moku seli li pona mute.", "jan lili lape li kalama ala.", "tomo ni li awen e seli.",
         "mi tawa tan tomo mi.", "mi lon tomo sina.", "mi tawa tomo moku.",
@@ -523,6 +524,15 @@
         "mi pali mute la mi pilim ike.",
         "mi sona e ni taso.",
         "meli olin", "mije olin", 
+        // end of jan Pije
+        "o toki ala.", //"jan pi mute seme li moli?", //how many are dead?
+        "ken la ona li moli ala.", "mi jan pi sona sin.", //I'm a journalist
+        //"ona li kama! mi ken ala ken awen lon tomo sina?", //they are coming! can I hide in your house?
+        "mi jo ala e mani.", "o pana e moku e mani!",
+        "o moli ala e mi!", "o pana e ilo moli sina.", "mi wile ala utala.", //I surrender
+        "sina moli ala e mi la mi jan pi utala sewi.", "mi ken pali e ilo pi moli mute. o moli ala e mi.",
+        "ona li tawa weka. o moli e ona!", //he's getting away, shoot!
+        //survivalist's TP phrasebook
         //some questions
         "sina tawa ma tomo tan seme?", "sina tawa poka jan seme?", "sina toki tawa jan seme?", //who are you speaking of?
         "sina toki tawa mi anu seme?", "sina wile ala wile moku?", "sina wile e mani anu seme?",
