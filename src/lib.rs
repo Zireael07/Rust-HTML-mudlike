@@ -172,8 +172,10 @@ pub enum Distance {
     Far = 2
 }
 
+
+//default of 25 C = 298 K
 struct Weather {
-    pub temp: f32, //in Kelvin
+    pub temp: f32, //in Kelvin, to avoid negatives
 }
 
 

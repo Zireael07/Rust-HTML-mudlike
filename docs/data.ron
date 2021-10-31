@@ -28,7 +28,7 @@
             name: "Alley",
             desc: "This is a narrow, cramped alleyway lit by dim, flickering neon signs. Cables swing overhead to the tune of the whistling wind.",
             known: false,
-            exits: [(South, 1), (In, 4)],
+            exits: [(South, 1), (In, 4), (In,18)],
         ),
         (
             id: 4,
@@ -127,6 +127,13 @@
             desc: "It looks like a natural hill, but as you approach closer, you realize it's a construction of rammed earth with wall-spanning windows on the southern side.",
             known: false,
             exits: [],
+        ),
+        (
+            id: 18,
+            name: "Street stall",
+            desc: "A rickety looking street stall, offering various knicknacks, from snacks to small tools, personal appliances and bits and bobs that could be useful for construction.",
+            known: false,
+            exits: [(Out,3)],
         )
     ],
     items: [
