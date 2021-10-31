@@ -28,7 +28,7 @@
             name: "Alley",
             desc: "This is a narrow, cramped alleyway lit by dim, flickering neon signs. Cables swing overhead to the tune of the whistling wind.",
             known: false,
-            exits: [(South, 1), (In, 4)],
+            exits: [(South, 1), (In, 4), (In,18)],
         ),
         (
             id: 4,
@@ -127,6 +127,13 @@
             desc: "It looks like a natural hill, but as you approach closer, you realize it's a construction of rammed earth with wall-spanning windows on the southern side.",
             known: false,
             exits: [],
+        ),
+        (
+            id: 18,
+            name: "Street stall",
+            desc: "A rickety looking street stall, offering various knicknacks, from snacks to small tools, personal appliances and bits and bobs that could be useful for construction.",
+            known: false,
+            exits: [(Out,3)],
         )
     ],
     items: [
@@ -474,5 +481,77 @@
     "Vizcaíno", "Viña", "Viñas", "Vázquez", "Vélez", "Yuste", "Yáñez",
     "Zabala", "Zabaleta", "Zamora", "Zamorano", "Zapata", "Zaragoza", "Zorrilla",
     "Zurita", "Águila", "Álamo", "Álvarez", "Álvaro", "Ángel", "Ávila"],
-    }
+    },
+    toki_pona: [
+        "ona li suli.", "kili li pona.", "sina li suli.",
+        "soweli lili li suwi.", "mama mi li pona.", "jan utala li wawa.", "jan lili mi li suwi.",
+        "soweli lili li wawa ala.", "meli mi li pona.", "mije sina li suli.", "soweli ale li pona.", "kili li moku suli.", 
+        "jan lili li (pana e telo lukin).",
+        "ona li lukin e lipu.", "soweli ike li utala e meli.", "jan utala li moku e kili suli.",
+        "soweli lili li moku e telo.", "mi telo e ijo suli.",
+        "jan wawa li pali e tomo.", "jan pali li telo e kasi.", "jan wawa li jo e kiwen suli.",
+        "telo suli li jo e kala.", "ma tomo mi li suli.",
+        "waso lili li moku e pipi.", "meli li toki e soweli, e waso.",
+        "sina toki e kala.", "jan pali li toki utala e tomo mi.", "ona li toki ike e jan pona mi.",
+        "jan pali li (pona e ilo), li lukin e lipu.", "jan pali li pana e moku pona.", 
+        "mi moku ala e soweli.", "jan pona sina li toki e ma, e telo.", "ma li jo e kasi ike.",
+        "mije mi li pali ala, li moku, li utala.", //my man doesn't work, only eats and fights
+        "ma mama mi li suli.",
+        "jan lili mute li lape.", "mi pakala lili.", "jan ike li pakala e ilo mi.", "mi pali e tomo ni.",
+        "jan utala pona mute li awen e kulupu ni.", "moku seli li pona mute.", "jan lili lape li kalama ala.", "tomo ni li awen e seli.",
+        "mi tawa tan tomo mi.", "mi lon tomo sina.", "mi tawa tomo moku.",
+        "sina pona tawa mi.", //perspective
+        //tokipona course ends here
+        "mi moku e telo.", "mi en sina li toki.", "soweli en kala en waso li pona.", //lipu lili pona
+        "mi wile e moku. taso sina jo e ona.", "ona li pana e moku tawa soweli.",
+        "ni li seme?", "jan seme li lon?", "sina tan ma seme?", //where are you from?
+        "sina ike mute. mi moku e sina kin.", "soweli li pona! soweli mute li lon.", //lipu - dialog
+        "ma kasi mi li suli. kasi mi li suli. mi wile weka e kasi ike.", //from a blogpost
+        "akesi li wile moku e mi!", "akesi li pana e telo moli.", "akesi pi telo moli li wile moku e mi!", //https://github.com/ttm/tokipona/blob/master/data/toki-pona_english.txt
+        "ale li jo e tenpo.", "ale li pona.", "ante li kama.", "ike li kama.", // stuff happens, life changes, etc.
+        "mi ken ala. mi moku kin.", "mi lukin kin e ona.", "pona! mi tawa kin.",
+        "ijo li lon oko mi.", "ijo li lukin e mi.",
+        "jan ala li toki.", "jan alasa pona li wawa.", "jan ale li wile tawa.", "jan ike li utala e ona mute.",
+        "jan lili en jan suli li toki.", "jan lili li ken ala moku e telo nasa.", "jan lili li lukin e jan suli.", 
+        "jan lili li sona ala e ike.", "jan lili li wile e telo kili.", "jan lili li musi.",
+        "jan li moli e waso.", "jan li suli mute. mani li (suli lili).", "jan li wile jo e ma.",
+        "sina wile ala wile moku?", //are you hungry? Toki Pona uses reduplication a yes/no question
+        "jan ni li pona lukin.", "jan ni li sama mi.",
+        "mi wile ala moli.", "jan pona mi li lon poka mi.",
+        "kama pona!", "toki!", //welcome!
+        "kili li moku li pona.", "kili li pona, tawa mi.", "lape li pona.", "linja mi li telo.",
+        "luka mi li jaki. mi wile telo e ona.",
+        "mi jo e ilo.", "mi jo e kili.", "mi jo e tomo tawa sina. mi pana e ni tawa sina.", "mi jo e (tomo tawa) tu.",
+        "mi lape ala.", "mi lape la ali li pona.", "mi lawa pona e jan.",
+        "mi lon, tan seme?", "mi lon tomo.",
+        "mi lukin e ni.",
+        "mi moku e kili e telo.", "mi moku lili e kili lili.", "mi moku, lon tomo.", "mi moku mute. sina moku lili.",
+        "mi musi ala.", "mi musi taso.",
+        "mi mute o musi!", "mi mute o tawa!",
+        "mi pali mute la mi pilim ike.",
+        "mi sona e ni taso.",
+        "meli olin", "mije olin", 
+        // end of jan Pije
+        "o toki ala.", //"jan pi mute seme li moli?", //how many are dead?
+        "ken la ona li moli ala.", "mi jan pi sona sin.", //I'm a journalist
+        //"ona li kama! mi ken ala ken awen lon tomo sina?", //they are coming! can I hide in your house?
+        "mi jo ala e mani.", "o pana e moku e mani!",
+        "o moli ala e mi!", "o pana e ilo moli sina.", "mi wile ala utala.", //I surrender
+        "sina moli ala e mi la mi jan pi utala sewi.", "mi ken pali e ilo pi moli mute. o moli ala e mi.",
+        "ona li tawa weka. o moli e ona!", //he's getting away, shoot!
+        //survivalist's TP phrasebook
+        //some questions
+        "sina tawa ma tomo tan seme?", "sina tawa poka jan seme?", "sina toki tawa jan seme?", //who are you speaking of?
+        "sina toki tawa mi anu seme?", "sina wile ala wile moku?", "sina wile e mani anu seme?",
+        "sina wile e moku anu telo?", "sina wile kama anu seme?", "sina wile moku anu seme?",
+        "sina wile pali e seme?", "sina wile tawa ma seme?",
+        "sina wile tawa telo suli.",
+        "soweli mi li kama moli.", "soweli ni li pona moku.",
+        //some more to round out (by yours truly)
+        "mi en ona li toki.", "soweli en kala li pona.", "soweli en waso li pona", "toki! ni li seme?",
+        "mi moku e kili.", "jan lili li moku e telo.", "soweli ike li utala e jan utala.",
+        "mi wile weka e soweli ike.", "mi wile moku mute.", "mi wile moku e kili.", "mi wile lukin e soweli ale.",
+        "mi wile lukin e kili ale.", 
+        "sina toki tawa mi.", "sina toki tawa mi ala.", "sina tan ma Mewika.", "sina tan ma Kanata.",
+    ],
 )
