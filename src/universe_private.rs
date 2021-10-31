@@ -175,10 +175,18 @@ impl Universe {
         //two parts of data aren't in a special struct - entity name and room it is in
         let pat = self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
         //randomized NPC name
-        let sel_name = Universe::randomized_NPC_name(true, data.names);
+        let sel_name = Universe::randomized_NPC_name(true, &data.names);
         let nm = self.ecs_world.insert_one(pat, NPCName{name: sel_name.to_string()});
         log!("{}", &format!("{}", sel_name.to_string()));
 
+        //spawn a second patron at the stall
+        let pat = self.ecs_world.spawn(("Patron".to_string(), 18 as usize));
+        //randomized NPC name
+        let sel_name = Universe::randomized_NPC_name(true, &data.names);
+        let nm = self.ecs_world.insert_one(pat, NPCName{name: sel_name.to_string()});
+        log!("{}", &format!("{}", sel_name.to_string()));
+
+        //spawn thug
         let th = self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
         let l_jacket = self.ecs_world.spawn((data.items[1].name.to_string(), data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
         let boots = self.ecs_world.spawn((data.items[0].name.to_string(), data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
@@ -579,7 +587,7 @@ impl Universe {
         }
     }
 
-    pub fn randomized_NPC_name(male: bool, names: HashMap<String, Vec<String>>) -> String {
+    pub fn randomized_NPC_name(male: bool, names: &HashMap<String, Vec<String>>) -> String {
         let mut rng = rand::thread_rng();
 
         //we know the key exists
