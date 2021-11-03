@@ -504,7 +504,6 @@
         //tokipona course ends here
         "mi moku e telo.", "mi en sina li toki.", "soweli en kala en waso li pona.", //lipu lili pona
         "mi wile e moku. taso sina jo e ona.", "ona li pana e moku tawa soweli.",
-        "ni li seme?", "jan seme li lon?", "sina tan ma seme?", //where are you from?
         "sina ike mute. mi moku e sina kin.", "soweli li pona! soweli mute li lon.", //lipu - dialog
         "ma kasi mi li suli. kasi mi li suli. mi wile weka e kasi ike.", //from a blogpost
         "akesi li wile moku e mi!", "akesi li pana e telo moli.", "akesi pi telo moli li wile moku e mi!", //https://github.com/ttm/tokipona/blob/master/data/toki-pona_english.txt
@@ -515,7 +514,6 @@
         "jan lili en jan suli li toki.", "jan lili li ken ala moku e telo nasa.", "jan lili li lukin e jan suli.", 
         "jan lili li sona ala e ike.", "jan lili li wile e telo kili.", "jan lili li musi.",
         "jan li moli e waso.", "jan li suli mute. mani li (suli lili).", "jan li wile jo e ma.",
-        "sina wile ala wile moku?", //are you hungry? Toki Pona uses reduplication a yes/no question
         "jan ni li pona lukin.", "jan ni li sama mi.",
         "mi wile ala moli.", "jan pona mi li lon poka mi.",
         "kama pona!", "toki!", //welcome!
@@ -540,18 +538,22 @@
         "sina moli ala e mi la mi jan pi utala sewi.", "mi ken pali e ilo pi moli mute. o moli ala e mi.",
         "ona li tawa weka. o moli e ona!", //he's getting away, shoot!
         //survivalist's TP phrasebook
-        //some questions
-        "sina tawa ma tomo tan seme?", "sina tawa poka jan seme?", "sina toki tawa jan seme?", //who are you speaking of?
-        "sina toki tawa mi anu seme?", "sina wile ala wile moku?", "sina wile e mani anu seme?",
-        "sina wile e moku anu telo?", "sina wile kama anu seme?", "sina wile moku anu seme?",
-        "sina wile pali e seme?", "sina wile tawa ma seme?",
         "sina wile tawa telo suli.",
         "soweli mi li kama moli.", "soweli ni li pona moku.",
         //some more to round out (by yours truly)
-        "mi en ona li toki.", "soweli en kala li pona.", "soweli en waso li pona", "toki! ni li seme?",
+        "mi en ona li toki.", "soweli en kala li pona.", "soweli en waso li pona", "toki! ni li seme?", //hello! how are you?
         "mi moku e kili.", "jan lili li moku e telo.", "soweli ike li utala e jan utala.",
         "mi wile weka e soweli ike.", "mi wile moku mute.", "mi wile moku e kili.", "mi wile lukin e soweli ale.",
         "mi wile lukin e kili ale.", 
         "sina toki tawa mi.", "sina toki tawa mi ala.", "sina tan ma Mewika.", "sina tan ma Kanata.",
     ],
+    toki_pona_q: [
+        "ni li seme?", "jan seme li lon?", "sina tan ma seme?", //where are you from?
+        "sina wile ala wile moku?", //are you hungry? Toki Pona uses reduplication a yes/no question
+        //some questions
+        "sina tawa ma tomo tan seme?", "sina tawa poka jan seme?", "sina toki tawa jan seme?", //who are you speaking of?
+        "sina toki tawa mi anu seme?", "sina wile ala wile moku?", "sina wile e mani anu seme?",
+        "sina wile e moku anu telo?", "sina wile kama anu seme?", "sina wile moku anu seme?",
+        "sina wile pali e seme?", "sina wile tawa ma seme?",
+    ]
 )

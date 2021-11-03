@@ -160,7 +160,8 @@ pub struct DataMaster {
     pub rooms : Vec<Room>,
     pub names : HashMap<String, Vec<String>>,
     pub items: Vec<ItemPrefab>,
-    pub toki_pona: Vec<String>
+    pub toki_pona: Vec<String>,
+    pub toki_pona_q: Vec<String>,
 }
 
 

@@ -19,6 +19,13 @@ struct SentenceState {
     pub topic: String,
 }
 
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SentenceType {
+    Sentence = 0,
+    Question = 1,
+}
+
 pub struct Markov {
     pub map: HashMap<String, Vec<String>>,
     pub nouns: Vec<String>,
