@@ -179,8 +179,8 @@ impl Universe {
         let nm = self.ecs_world.insert_one(pat, NPCName{name: sel_name.to_string()});
         log!("{}", &format!("{}", sel_name.to_string()));
 
-        //spawn a second patron at the stall
-        let pat = self.ecs_world.spawn(("Patron".to_string(), 18 as usize));
+        //spawn an NPC at the stall
+        let pat = self.ecs_world.spawn(("Seller".to_string(), 18 as usize));
         //randomized NPC name
         let sel_name = Universe::randomized_NPC_name(true, &data.names);
         let nm = self.ecs_world.insert_one(pat, NPCName{name: sel_name.to_string()});
