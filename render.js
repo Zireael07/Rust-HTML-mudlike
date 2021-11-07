@@ -204,8 +204,14 @@ function npcClick(button) {
     process("npc_interact " + i);
     
     //test generating sentences
+    var ques = false;
+    //seller can ask you questions
+    if (i == "4"){
+        ques = true;
+    }
+
     // this is a basic Rust implementation that has some simple rules in addition to Markov chain
-    var sentence = universe.get_sentences();
+    var sentence = universe.get_sentences(ques);
     //hack for now
     var sentences = [sentence]
 

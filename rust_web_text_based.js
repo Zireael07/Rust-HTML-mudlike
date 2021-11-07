@@ -315,10 +315,11 @@ export class Universe {
         return takeObject(ret);
     }
     /**
+    * @param {boolean} question
     * @returns {any}
     */
-    get_sentences() {
-        var ret = wasm.universe_get_sentences(this.ptr);
+    get_sentences(question) {
+        var ret = wasm.universe_get_sentences(this.ptr, question);
         return takeObject(ret);
     }
     /**
@@ -596,7 +597,7 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper919 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper920 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 160, __wbg_adapter_22);
         return addHeapObject(ret);
     };
