@@ -79,7 +79,7 @@ impl Markov {
     }
 
     //key function in this module
-    pub fn generate_sentence(&self) -> String {
+    pub fn generate_sentence(&self, question: bool) -> String {
         let mut rng = rand::thread_rng();
         let keys = self.map.keys().collect::<Vec<&String>>();
     

@@ -354,8 +354,8 @@ impl Universe {
         self.map[id].known = true;
     }
 
-    pub fn get_sentences(&self) -> JsValue {
-        let sentences = self.language.generate_sentence();
+    pub fn get_sentences(&self, question: bool) -> JsValue {
+        let sentences = self.language.generate_sentence(question);
 
         return JsValue::from_serde(&sentences).unwrap();
     }

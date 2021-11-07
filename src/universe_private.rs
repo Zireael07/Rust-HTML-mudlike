@@ -23,6 +23,12 @@ impl Universe {
         for s in data.toki_pona {
             self.language.parse(&s, 2);
         }
+
+        //load sentences into the generator
+        for s in data.toki_pona_q {
+            self.language.parse(&s, 2);
+        }
+
         //do the rest of the setup
         language::setup(&mut self.language);
 
