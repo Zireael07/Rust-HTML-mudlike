@@ -11,6 +11,7 @@ use super::log;
   Types
 */
 
+//TODO: expose structs to Rust
 #[derive(Clone)]
 pub enum RispExp {
   Bool(bool), 

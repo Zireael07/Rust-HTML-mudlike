@@ -96,8 +96,14 @@ impl Markov {
                 Some(values) => {
                     let mut valid = values.clone();
 
+                    //TODO: can we forbid selections which lead to empty valid list in the next step? 
+                    // check beam search algo: https://towardsdatascience.com/the-power-of-constrained-language-models-cf63b65a035d
+
                     //forbid anu and seme unless we specifically asked for a question
-                    valid.retain(|v| v.ne("anu") && v.ne("seme") && v.ne("seme?"));
+                    if !question {
+                        valid.retain(|v| v.ne("anu") && v.ne("seme") && v.ne("seme?"));
+                    }
+                    //else ensure we only ask questions
 
                     for topic in &topics {
                         //do we have a constraint set by a topic?
