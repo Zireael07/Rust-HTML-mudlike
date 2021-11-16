@@ -21,12 +21,12 @@ impl Universe {
     pub fn game_start(&mut self, data: DataMaster) {
         //load sentences into the generator
         for s in data.toki_pona {
-            self.language.parse(&s, 2);
+            self.language.parse(&s, 2, false);
         }
 
         //load sentences into the generator
         for s in data.toki_pona_q {
-            self.language.parse(&s, 2);
+            self.language.parse(&s, 2, true);
         }
 
         //do the rest of the setup

@@ -28,6 +28,7 @@ pub enum SentenceType {
 
 pub struct Markov {
     pub map: HashMap<String, Vec<String>>,
+    pub map_q: HashMap<String, Vec<String>>,
     pub nouns: Vec<String>,
     pub constraints: HashMap<String, Vec<String>>,
 }
@@ -36,12 +37,13 @@ impl Markov {
     pub fn new() -> Markov {
         Markov {
             map: HashMap::new(),
+            map_q: HashMap::new(), //for questions
             nouns: Vec::new(),
             constraints: HashMap::new(),
         }
     }
 
-    pub fn parse(&mut self, sentence: &str, num: usize) {
+    pub fn parse(&mut self, sentence: &str, num: usize, question: bool) {
         //TODO: treat stuff in brackets in a special way (as a single block)
         // OR some other way to do collocations (markers that are expanded?)
 
@@ -61,27 +63,42 @@ impl Markov {
                 //let key = format!("{} {}", words[n], words[n + 1]);
                 let value = words[n + num];
                 //log!("Parsed to: {} {} ", key, value);
-                self.insert(key, value.to_string())
+                self.insert(key, value.to_string(), question)
             }
         }
 
         //TODO: make the Markov chain bi-directional (go from last to first)
     }
 
-    fn insert(&mut self, key: String, value: String) {
-        if self.map.contains_key(&key) {
-            let current_value = self.map.get_mut(&key).unwrap();
-            //FIXME: don't add values that are already in
-            current_value.push(value);
-        } else {
-            self.map.insert(key, vec!(value));
+    fn insert(&mut self, key: String, value: String, question: bool) {
+        //TODO: is it possible to make this prettier?
+        if question {
+            if self.map_q.contains_key(&key) {
+                let current_value = self.map_q.get_mut(&key).unwrap();
+                //FIXME: don't add values that are already in
+                current_value.push(value);
+            } else {
+                self.map_q.insert(key, vec!(value));
+            }
+        }
+        else {
+            if self.map.contains_key(&key) {
+                let current_value = self.map.get_mut(&key).unwrap();
+                //FIXME: don't add values that are already in
+                current_value.push(value);
+            } else {
+                self.map.insert(key, vec!(value));
+            }
         }
     }
 
     //key function in this module
     pub fn generate_sentence(&self, question: bool) -> String {
         let mut rng = rand::thread_rng();
-        let keys = self.map.keys().collect::<Vec<&String>>();
+        let mut keys = self.map.keys().collect::<Vec<&String>>();
+        if question {
+            keys = self.map_q.keys().collect::<Vec<&String>>();
+        }
     
         let mut key = initial_key(keys, &self.nouns);
         //the first word in the initial key gets assigned as topic
@@ -92,7 +109,11 @@ impl Markov {
         let mut sentence = key.clone();
     
         loop {
-            match self.map.get(&key) {
+            //match left-hand side must be a variable!!!
+            let mut m = self.map.get(&key);
+            if question { m =  self.map_q.get(&key) }
+
+            match m {
                 Some(values) => {
                     let mut valid = values.clone();
 
