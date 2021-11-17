@@ -93,7 +93,7 @@ impl Markov {
     }
 
     //key function in this module
-    pub fn generate_sentence(&self, question: bool) -> String {
+    pub fn generate_sentence(&mut self, question: bool) -> String {
         let mut rng = rand::thread_rng();
         let mut keys = self.map.keys().collect::<Vec<&String>>();
         if question {
@@ -122,9 +122,15 @@ impl Markov {
 
                     //forbid anu and seme unless we specifically asked for a question
                     if !question {
+                        // sina tan (you from) only happens in questions
+                        self.constraints.insert("sina".to_string(), vec!["tan".to_string()]);
                         valid.retain(|v| v.ne("anu") && v.ne("seme") && v.ne("seme?"));
                     }
                     //else ensure we only ask questions
+                    else {
+                        //this constraint no longer applies
+                        self.constraints.remove("sina");
+                    }
 
                     for topic in &topics {
                         //do we have a constraint set by a topic?
@@ -248,8 +254,6 @@ pub fn setup(lang: &mut Markov){
     lang.constraints.insert("moli".to_string(), vec!["mani".to_string()]);
     //forbid li after e (predicate after object marker)
     lang.constraints.insert("e".to_string(), vec!["li".to_string()]);
-    // sina tan (you from) only happens in questions
-    lang.constraints.insert("sina".to_string(), vec!["tan".to_string()]);
 
     //debug
     for (key, value) in &lang.constraints {
