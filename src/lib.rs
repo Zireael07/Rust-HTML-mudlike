@@ -122,6 +122,7 @@ pub struct Universe {
     current_room: usize, //TODO: will likely be a property of player
     ecs_world: World,
     language: Markov,
+    env: lispy::RispEnv,
 }
 
 
@@ -252,14 +253,15 @@ impl Universe {
             current_room: 0,
             ecs_world: World::new(),
             language: Markov::new(),
+            env: lispy::RispEnv::new(),
         };
 
         //state.map.push(Room{name:"Pub".to_string(), desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), known: true, exits: vec![(Exit::Out, 1)]});
 
         //test scripting
         log!("Test scripting...");
-        let env = &mut lispy::default_env();
-        env.data.insert(
+        state.env = lispy::default_env();
+        state.env.data.insert(
             "go".to_string(), 
             RispExp::Func(
               |args: &[RispExp]| -> Result<RispExp, RispErr> {
@@ -276,7 +278,7 @@ impl Universe {
               }
             )
           );
-          env.data.insert(
+          state.env.data.insert(
             "spawn".to_string(), 
             RispExp::Func(
               |args: &[RispExp]| -> Result<RispExp, RispErr> {
@@ -300,7 +302,7 @@ impl Universe {
             )
           );
 
-        lispy::read_eval(env);
+        lispy::read_eval(&mut state.env);
 
         log!("We have a universe");
 

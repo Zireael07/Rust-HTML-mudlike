@@ -7,6 +7,7 @@ use super::{Universe, Room, Exit, Distance, DataMaster,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus
 };
 use super::language;
+use super::lispy;
 
 use hecs::Entity;
 
@@ -65,6 +66,21 @@ impl Universe {
         //proceduralize the town
         let mut end = self.map.len();
         log!("End is {}", end);
+
+        //test
+        self.env.data.insert(
+            "get_map_size".to_string(),
+            lispy::RispExp::Number(self.map.len() as f64)
+        );
+
+
+        //debug 2
+        log!("Risp env!");
+        for (key, value) in &self.env.data {
+            log!("{}:{}", key, value)
+        }
+
+
         let mut rng = rand::thread_rng();
         let more : bool = rand::random(); //generates a boolean
         let max = rng.gen_range(1,3);

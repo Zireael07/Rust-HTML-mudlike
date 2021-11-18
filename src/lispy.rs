@@ -139,6 +139,16 @@ macro_rules! ensure_tonicity {
   }};
 }
 
+//stub
+impl RispEnv {
+  pub fn new() -> RispEnv {
+    RispEnv {
+        data: HashMap::new(),
+    }
+  }
+}
+
+
 pub fn default_env() -> RispEnv {
   let mut data: HashMap<String, RispExp> = HashMap::new();
   data.insert(
