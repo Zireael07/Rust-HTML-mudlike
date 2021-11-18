@@ -151,6 +151,22 @@ impl RispEnv {
 
 pub fn default_env() -> RispEnv {
   let mut data: HashMap<String, RispExp> = HashMap::new();
+  
+  data.insert(
+    "println".to_string(),
+    RispExp::Func(
+      |args: &[RispExp]| -> Result<RispExp, RispErr> {
+        for arg in args.iter() {
+          log!("{}", format!("{}", arg));
+          //eval(&arg.clone(), env)?;
+        }
+
+        Ok(RispExp::Bool(true))
+      }
+    )
+  );
+
+  //calculations
   data.insert(
     "+".to_string(), 
     RispExp::Func(
@@ -271,6 +287,19 @@ fn eval_def_args(arg_forms: &[RispExp], env: &mut RispEnv) -> Result<RispExp, Ri
   Ok(first_form.clone())
 }
 
+fn eval_do_args(arg_forms: &[RispExp], env: &mut RispEnv) -> Result<RispExp, RispErr> {
+  if let Some((last, args)) = (&arg_forms[0..]).split_last() {
+    //log!("Eval do");
+    for arg in args.iter() {
+        eval(&arg.clone(), env);
+    }
+    eval(&last.clone(), env)
+  } else {
+      return Err(RispErr::Reason("Empty do block".to_string(),))
+  }
+}  
+
+//
 fn eval_built_in_form(
   exp: &RispExp, arg_forms: &[RispExp], env: &mut RispEnv
 ) -> Option<Result<RispExp, RispErr>> {
@@ -279,6 +308,7 @@ fn eval_built_in_form(
       match s.as_ref() {
         "if" => Some(eval_if_args(arg_forms, env)),
         "def" => Some(eval_def_args(arg_forms, env)),
+        "do" => Some(eval_do_args(arg_forms, env)),
         _ => None,
       }
     ,
@@ -345,7 +375,8 @@ fn parse_eval(expr: String, env: &mut RispEnv) -> Result<RispExp, RispErr> {
 fn slurp_expr() -> String {
   let mut expr = String::new();
   
-  expr = "{spawn {+ 2 3} \"patron\" }".to_string();
+  expr = "{do {spawn {+ 2 3} \"patron\" }
+  { println 18 } }".to_string();
 
   //io::stdin().read_line(&mut expr)
   //  .expect("Failed to read line");

@@ -289,7 +289,7 @@ impl Universe {
                       "expected second form".to_string(),
                     )
                   )?;
-                log!("{}", format!("{} {}", float, second));
+                log!("{}", format!("spawning {} {}", float, second));
 
                 //I don't know a better way to do it, this avoids having to use state
                 // based on the non-textual version's commands, which was then based on bracketlib's input handling
