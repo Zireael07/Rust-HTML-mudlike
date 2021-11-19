@@ -14,6 +14,11 @@ use std::panic;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 
+//lazy static
+#[macro_use]
+extern crate lazy_static;
+use std::sync::Mutex;
+
 //ECS
 use hecs::World;
 use hecs::Entity;
@@ -180,8 +185,10 @@ struct Weather {
     pub temp: f32, //in Kelvin, to avoid negatives
 }
 
-
-pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
+lazy_static! {
+    static ref GLOBAL_SCRIPT_OUTPUT: Mutex<Vec<Option<ScriptCommand>>> = Mutex::new(vec![]);
+}
+//pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
 
 //https://dev.to/mnivoliez/getting-started-with-rust-enum-on-steroids-8b4
 // turns out Rust enums can contain more data...
@@ -269,11 +276,13 @@ impl Universe {
                 let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
                 log!("{}", format!("{}", first));
 
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::GoRoom{id: first as usize}));
+
                 //I don't know a better way to do it, this avoids having to use state
                 // based on the non-textual version's commands, which was then based on bracketlib's input handling
-                unsafe {
-                    GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::GoRoom{id: first as usize});
-                }
+                // unsafe {
+                //     GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::GoRoom{id: first as usize});
+                // }
                 Ok(RispExp::Bool(true))
               }
             )
@@ -291,18 +300,40 @@ impl Universe {
                   )?;
                 log!("{}", format!("spawning {} {}", float, second));
 
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
+
                 //I don't know a better way to do it, this avoids having to use state
                 // based on the non-textual version's commands, which was then based on bracketlib's input handling
-                unsafe {
-                    // this monster strips quote characters from around the lispy string
-                    GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() });
-                }
+                // unsafe {
+                //     // this monster strips quote characters from around the lispy string
+                //     GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() });
+                // }
                 Ok(RispExp::Bool(true))
               }
             )
           );
 
         lispy::read_eval(&mut state.env);
+        //TODO: process all of the queued up commands from the lispy script here
+        let vec = &*GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
+        for cmd in vec {
+            match cmd.clone().unwrap() {
+                ScriptCommand::GoRoom{id} => {
+                    let new_room = id;
+                    state.current_room = new_room;
+                    //mark as known
+                    state.know_room(new_room);
+                    //log!("{}", &format!("New room {}", self.current_room));
+                    state.end_turn();
+                },
+                ScriptCommand::Spawn{room, name} => {
+                    state.ecs_world.spawn((name.trim().to_string(), room as usize));
+                }
+                _ => { log!("{}", format!("Unimplemented scripting command {:?} ", cmd)); }
+            }
+            
+
+        }
 
         log!("We have a universe");
 
@@ -435,32 +466,34 @@ impl Universe {
         self.command_handler(cmd);
 
         //handle script engine
-        unsafe {
-            if GLOBAL_SCRIPT_OUTPUT != None {
-                log!("script output {:?}", GLOBAL_SCRIPT_OUTPUT);
-                //unfortunately we need a clone here to work with non-Copy enum
-                match GLOBAL_SCRIPT_OUTPUT.clone().unwrap() {
-                    ScriptCommand::GoRoom{id} => {
-                        let new_room = id;
-                        self.current_room = new_room;
-                        //mark as known
-                        self.know_room(new_room);
-                        //log!("{}", &format!("New room {}", self.current_room));
-                        self.end_turn();
-                    },
-                    ScriptCommand::Spawn{room, name} => {
-                        self.ecs_world.spawn((name.trim().to_string(), room as usize));
-                    }
-                    _ => { log!("{}", format!("Unimplemented scripting command {:?} ", GLOBAL_SCRIPT_OUTPUT)); }
-                }
-            }
-        }
+        //temporarily disabled because 'cannot recursively acquire mutex'
+        
+        // unsafe {
+        //     if GLOBAL_SCRIPT_OUTPUT.lock().unwrap().len() == 1 && GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] != None {
+        //         log!("script output {:?}", GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0]);
+        //         //unfortunately we need a clone here to work with non-Copy enum
+        //         match GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0].clone().unwrap() {
+        //             ScriptCommand::GoRoom{id} => {
+        //                 let new_room = id;
+        //                 self.current_room = new_room;
+        //                 //mark as known
+        //                 self.know_room(new_room);
+        //                 //log!("{}", &format!("New room {}", self.current_room));
+        //                 self.end_turn();
+        //             },
+        //             ScriptCommand::Spawn{room, name} => {
+        //                 self.ecs_world.spawn((name.trim().to_string(), room as usize));
+        //             }
+        //             _ => { log!("{}", format!("Unimplemented scripting command {:?} ", GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0])); }
+        //         }
+        //     }
+        // }
 
            
 
         //clear
         unsafe {
-            GLOBAL_SCRIPT_OUTPUT = None;
+            GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] = None;
         }
     }
 }

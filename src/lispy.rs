@@ -1,5 +1,6 @@
 //based on https://gist.github.com/stopachka/22b4b06b8263687d7178f61fb22e1bf2
 //described in https://stopa.io/post/222
+//custom: implementation of do
 
 use std::collections::HashMap;
 use std::fmt;
@@ -338,6 +339,7 @@ fn eval(exp: &RispExp, env: &mut RispEnv) -> Result<RispExp, RispErr> {
         // not built-in, continue as normal
         None => {
           let first_eval = eval(first_form, env)?;
+          //log!("f:{}", first_eval);
           match first_eval {
             RispExp::Func(f) => {
               let args_eval = arg_forms
@@ -376,7 +378,7 @@ fn slurp_expr() -> String {
   let mut expr = String::new();
   
   expr = "{do {spawn {+ 2 3} \"patron\" }
-  { println 18 } }".to_string();
+  { spawn {+ 2 2} \"patron\" } }".to_string();
 
   //io::stdin().read_line(&mut expr)
   //  .expect("Failed to read line");
