@@ -168,6 +168,7 @@ pub struct DataMaster {
     pub items: Vec<ItemPrefab>,
     pub toki_pona: Vec<String>,
     pub toki_pona_q: Vec<String>,
+    pub lisp_script: String,
 }
 
 
@@ -265,8 +266,6 @@ impl Universe {
 
         //state.map.push(Room{name:"Pub".to_string(), desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), known: true, exits: vec![(Exit::Out, 1)]});
 
-        //test scripting
-        log!("Test scripting...");
         state.env = lispy::default_env();
         state.env.data.insert(
             "go".to_string(), 
@@ -274,7 +273,7 @@ impl Universe {
               |args: &[RispExp]| -> Result<RispExp, RispErr> {
                 let floats = parse_list_of_floats(args)?;
                 let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
-                log!("{}", format!("{}", first));
+                log!("go {}", format!("{}", first));
 
                 GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::GoRoom{id: first as usize}));
 
@@ -313,8 +312,9 @@ impl Universe {
             )
           );
 
-        lispy::read_eval(&mut state.env);
-        //TODO: process all of the queued up commands from the lispy script here
+        //lispy::slurp_eval(&mut state.env);
+        
+        //process all of the queued up commands from the lispy script here
         let vec = &*GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
         for cmd in vec {
             match cmd.clone().unwrap() {
@@ -334,6 +334,8 @@ impl Universe {
             
 
         }
+        //unlock the mutex
+        drop(vec);
 
         log!("We have a universe");
 
@@ -466,8 +468,6 @@ impl Universe {
         self.command_handler(cmd);
 
         //handle script engine
-        //temporarily disabled because 'cannot recursively acquire mutex'
-        
         // unsafe {
         //     if GLOBAL_SCRIPT_OUTPUT.lock().unwrap().len() == 1 && GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] != None {
         //         log!("script output {:?}", GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0]);

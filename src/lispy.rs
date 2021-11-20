@@ -387,7 +387,7 @@ fn slurp_expr() -> String {
 }
 
 //split out for ease of use
-pub fn read_eval(env: &mut RispEnv) {
+pub fn slurp_eval(env: &mut RispEnv) {
     log!("lispy >");
     let expr = slurp_expr();
     match parse_eval(expr, env) {
@@ -399,16 +399,29 @@ pub fn read_eval(env: &mut RispEnv) {
     }
 }
 
+//split out for ease of use
+pub fn read_eval(data: String, env: &mut RispEnv) {
+  log!("lispy >");
+  let expr = data;
+  match parse_eval(expr, env) {
+    //use log! and format! instead of println! to display stuff in browser
+    Ok(res) => log!("{}", format!("// 🔥 => {}", res)),
+    Err(e) => match e {
+      RispErr::Reason(msg) => log!("{}", format!("// 🙀 => {}", msg)),
+    },
+  }
+}
+
 
 fn main() {
   let env = &mut default_env();
   loop {
-    read_eval(env);
+    slurp_eval(env);
   }
 }
 
 //public function to run from main module
 pub fn run_lisp(){
     let env = &mut default_env();
-    read_eval(env);
+    slurp_eval(env);
 }

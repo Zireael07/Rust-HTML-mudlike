@@ -224,6 +224,10 @@ impl Universe {
         self.ecs_world.spawn(("Leather jacket".to_string(), 2 as usize, data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
         self.ecs_world.spawn(("Boots".to_string(), 2 as usize, data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
         self.ecs_world.spawn(("Jeans".to_string(), 2 as usize, data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
+
+        //test scripting
+        log!("Test scripting...");
+        lispy::read_eval(data.lisp_script, &mut self.env);
     }
 
     pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {
