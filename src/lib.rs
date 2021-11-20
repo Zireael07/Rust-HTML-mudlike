@@ -390,7 +390,12 @@ impl Universe {
     }
 
     pub fn get_sentences(&mut self, question: bool) -> JsValue {
-        let sentences = self.language.generate_sentence(question);
+        let mut sentences = String::new();
+        match question {
+            true => { sentences = self.language.generate_sentence_wrapper(question, "".to_string()).0; },
+            false => { sentences = self.language.generate_paragraph(); }
+        }
+
 
         return JsValue::from_serde(&sentences).unwrap();
     }

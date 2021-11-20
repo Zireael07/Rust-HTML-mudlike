@@ -92,22 +92,47 @@ impl Markov {
         }
     }
 
-    //key function in this module
-    pub fn generate_sentence(&mut self, question: bool) -> String {
-        let mut rng = rand::thread_rng();
+    pub fn generate_paragraph(&mut self) -> String {
+        let data = self.generate_sentence_wrapper(false, "".to_string());
+        let data2 = self.generate_sentence_wrapper(false, data.1);
+
+        return format!("{} {}", data.0, data2.0);
+    }
+
+    pub fn generate_sentence_wrapper(&mut self, question:bool, given_topic: String) -> (String, String) {
         let mut keys = self.map.keys().collect::<Vec<&String>>();
         if question {
             keys = self.map_q.keys().collect::<Vec<&String>>();
         }
     
-        let mut key = initial_key(keys, &self.nouns);
-        //the first word in the initial key gets assigned as topic
-        let topic = key.split(" ").collect::<Vec<&str>>()[0].to_string();
-        //log!("Topic: {}", topic);
-        let mut topics = Vec::new();
-        topics.push(topic);
-        let mut sentence = key.clone();
-    
+        if given_topic == "".to_string() {
+            let mut key = initial_key(keys, &self.nouns);
+            //the first word in the initial key gets assigned as topic
+            let topic = key.split(" ").collect::<Vec<&str>>()[0].to_string();
+            //log!("Topic: {}", topic);
+            let mut topics = Vec::new();
+            topics.push(topic.clone());
+            let mut sentence = key.clone();
+
+            (self.generate_sentence(sentence, key, topics, question), topic)
+        }
+        else {
+            log!("Generating a sentence for a given topic: {} ", given_topic);
+            let mut key = key_with(keys, &self.nouns, &given_topic);
+
+            //let topic = given_topic;
+            let mut topics = Vec::new();
+            topics.push(given_topic.clone());
+            let mut sentence = key.clone();
+
+            (self.generate_sentence(sentence, key, topics, question), given_topic)
+        }
+
+    }
+
+    //key function in this module
+    pub fn generate_sentence(&mut self, mut sentence: String, mut key: String, mut topics: Vec<String>, question: bool) -> String {
+        let mut rng = rand::thread_rng();
         loop {
             //match left-hand side must be a variable!!!
             let mut m = self.map.get(&key);
@@ -184,6 +209,43 @@ impl Markov {
     // }
 
 }
+
+//fn noun_keys(valid_keys, keys, nouns: &Vec<String) {
+//     //the initial key HAS to contain a noun
+//     //let valid_keys = keys.iter().filter(|&k| for n in self.nouns { k.contains(&n); } )
+//     let mut valid_keys: Vec<&String> = Vec::new();
+//     for k in keys {
+//         let words = k.split(" ").collect::<Vec<&str>>();
+//         for n in nouns {
+//             if words[0] == n.as_str() && words[1].ne("e") {
+//             //if k.contains(n.as_str()) {
+//                 valid_keys.push(k);
+//             }
+//         }
+//     }
+// }
+
+fn key_with(keys:Vec<&String>, nouns: &Vec<String>, filter: &String) -> String {
+    let mut rng = rand::thread_rng();
+    //the initial key HAS to contain a noun
+    let mut valid_keys: Vec<&String> = Vec::new();
+    for k in keys {
+        let words = k.split(" ").collect::<Vec<&str>>();
+        for n in nouns {
+            if words[0] == n.as_str() && words[1].ne("e") && words[0] == filter {
+            //if k.contains(n.as_str()) {
+                valid_keys.push(k);
+            }
+        }
+    }
+
+    //only retain those that match filter
+    ///valid_keys.retain(|v| v[0] == filter.as_str());
+
+    //random pick
+    return valid_keys.choose(&mut rng).expect("could not get random value").to_string();
+}
+
 
 fn initial_key(keys: Vec<&String>, nouns: &Vec<String>) -> String {
     let mut rng = rand::thread_rng();
