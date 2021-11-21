@@ -157,8 +157,11 @@
         ),
     ],
     //scripting
-    lisp_script: "{do {spawn {+ 2 3} \"patron\" }
-  { spawn {+ 2 2} \"patron\" } { go {+ 2 2} } }",
+    lisp_script: "{do {spawn 0 \"Patron\" }
+    { spawn 18 \"Seller\" }
+  { spawn {+ 2 2} \"patron\" }
+  { spawn {+ 2 3} \"patron\" }
+   { go 18 } }",
     //based on https://github.com/joke2k/faker/
     names: {
         "spanish_male": [ "Aarón", "Abel", "Abilio", "Abraham", "Adalberto",

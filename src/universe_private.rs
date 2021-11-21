@@ -4,7 +4,8 @@ use super::{Universe, Room, Exit, Distance, DataMaster,
     AI, CombatStats, NPCName, EncDistance,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
-    Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus
+    Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus,
+    ScriptCommand, GLOBAL_SCRIPT_OUTPUT
 };
 use super::language;
 use super::lispy;
@@ -37,6 +38,9 @@ impl Universe {
         for (key, value) in &self.language.map {
             log!("{}: {:?}", key, value)
         }
+
+        //load names to be scripting-accessible
+        self.names = data.names;
 
         //setup the rooms
         for r in data.rooms {
@@ -195,18 +199,6 @@ impl Universe {
         self.give_item("Medkit".to_string());
 
         //two parts of data aren't in a special struct - entity name and room it is in
-        let pat = self.ecs_world.spawn(("Patron".to_string(), 0 as usize));
-        //randomized NPC name
-        let sel_name = Universe::randomized_NPC_name(true, &data.names);
-        let nm = self.ecs_world.insert_one(pat, NPCName{name: sel_name.to_string()});
-        log!("{}", &format!("{}", sel_name.to_string()));
-
-        //spawn an NPC at the stall
-        let pat = self.ecs_world.spawn(("Seller".to_string(), 18 as usize));
-        //randomized NPC name
-        let sel_name = Universe::randomized_NPC_name(true, &data.names);
-        let nm = self.ecs_world.insert_one(pat, NPCName{name: sel_name.to_string()});
-        log!("{}", &format!("{}", sel_name.to_string()));
 
         //spawn thug
         let th = self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
@@ -228,6 +220,32 @@ impl Universe {
         //test scripting
         log!("Test scripting...");
         lispy::read_eval(data.lisp_script, &mut self.env);
+        //process all of the queued up commands from the lispy script here
+        let vec = &*GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
+        for cmd in vec {
+            match cmd.clone().unwrap() {
+                ScriptCommand::GoRoom{id} => {
+                    let new_room = id;
+                    self.current_room = new_room;
+                    //mark as known
+                    self.know_room(new_room);
+                    //log!("{}", &format!("New room {}", self.current_room));
+                    self.end_turn();
+                },
+                ScriptCommand::Spawn{room, name} => {
+                    let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize));
+                    //randomized NPC name
+                    let sel_name = Universe::randomized_NPC_name(true, &self.names);
+                    let nm = self.ecs_world.insert_one(sp, NPCName{name: sel_name.to_string()});
+                    log!("{}", &format!("{}", sel_name.to_string()));
+                }
+                _ => { log!("{}", format!("Unimplemented scripting command {:?} ", cmd)); }
+            }
+            
+
+        }
+        //unlock the mutex
+        drop(vec);
     }
 
     pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {

@@ -126,6 +126,7 @@ pub struct Universe {
     map: Vec<Room>,
     current_room: usize, //TODO: will likely be a property of player
     ecs_world: World,
+    names: HashMap<String, Vec<String>>,
     language: Markov,
     env: lispy::RispEnv,
 }
@@ -196,7 +197,7 @@ lazy_static! {
 #[derive(Debug, PartialEq, Clone)]
 pub enum ScriptCommand {
     GoRoom { id: usize },
-    Spawn { room: usize, name:String},
+    Spawn { room: usize, name:String },
 }
 
 /// Public methods, exported to JavaScript.
@@ -261,6 +262,7 @@ impl Universe {
             current_room: 0,
             ecs_world: World::new(),
             language: Markov::new(),
+            names: HashMap::new(),
             env: lispy::RispEnv::new(),
         };
 
@@ -291,7 +293,7 @@ impl Universe {
             RispExp::Func(
               |args: &[RispExp]| -> Result<RispExp, RispErr> {
                 let float = parse_single_float(args.get(0).unwrap())?; //ok_or(RispErr::Reason("expected a number".to_string())))?;
-                //let first = *float.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
+
                 let second = args.get(1).ok_or(
                     RispErr::Reason(
                       "expected second form".to_string(),
@@ -299,43 +301,16 @@ impl Universe {
                   )?;
                 log!("{}", format!("spawning {} {}", float, second));
 
+                //I don't know a better way to do it, this avoids having to use state
+                // this monster strips quote characters from around the lispy string
                 GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
 
-                //I don't know a better way to do it, this avoids having to use state
-                // based on the non-textual version's commands, which was then based on bracketlib's input handling
-                // unsafe {
-                //     // this monster strips quote characters from around the lispy string
-                //     GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() });
-                // }
                 Ok(RispExp::Bool(true))
               }
             )
           );
 
         //lispy::slurp_eval(&mut state.env);
-        
-        //process all of the queued up commands from the lispy script here
-        let vec = &*GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
-        for cmd in vec {
-            match cmd.clone().unwrap() {
-                ScriptCommand::GoRoom{id} => {
-                    let new_room = id;
-                    state.current_room = new_room;
-                    //mark as known
-                    state.know_room(new_room);
-                    //log!("{}", &format!("New room {}", self.current_room));
-                    state.end_turn();
-                },
-                ScriptCommand::Spawn{room, name} => {
-                    state.ecs_world.spawn((name.trim().to_string(), room as usize));
-                }
-                _ => { log!("{}", format!("Unimplemented scripting command {:?} ", cmd)); }
-            }
-            
-
-        }
-        //unlock the mutex
-        drop(vec);
 
         log!("We have a universe");
 
@@ -406,6 +381,7 @@ impl Universe {
     }
 
     // what it says on the tin
+    // it handles in-game commands, NOT script!
     fn command_handler(&mut self, cmd: String) {
         //split by spaces
         let v: Vec<&str> = cmd.split(' ').collect();
@@ -497,9 +473,9 @@ impl Universe {
            
 
         //clear
-        unsafe {
-            GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] = None;
-        }
+        // unsafe {
+        //     GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] = None;
+        // }
     }
 }
 
