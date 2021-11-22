@@ -198,6 +198,7 @@ lazy_static! {
 pub enum ScriptCommand {
     GoRoom { id: usize },
     Spawn { room: usize, name:String },
+    SpawnItem { room: usize, name:String },
 }
 
 /// Public methods, exported to JavaScript.
@@ -304,6 +305,27 @@ impl Universe {
                 //I don't know a better way to do it, this avoids having to use state
                 // this monster strips quote characters from around the lispy string
                 GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
+
+                Ok(RispExp::Bool(true))
+              }
+            )
+          );
+          state.env.data.insert(
+            "spawn_item".to_string(), 
+            RispExp::Func(
+              |args: &[RispExp]| -> Result<RispExp, RispErr> {
+                let float = parse_single_float(args.get(0).unwrap())?; //ok_or(RispErr::Reason("expected a number".to_string())))?;
+
+                let second = args.get(1).ok_or(
+                    RispErr::Reason(
+                      "expected second form".to_string(),
+                    )
+                  )?;
+                log!("{}", format!("spawning {} {}", float, second));
+
+                //I don't know a better way to do it, this avoids having to use state
+                // this monster strips quote characters from around the lispy string
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SpawnItem{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
 
                 Ok(RispExp::Bool(true))
               }

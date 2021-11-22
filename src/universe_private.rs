@@ -209,13 +209,13 @@ impl Universe {
         // self.ecs_world.insert_one(boots, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Feet});
         // self.ecs_world.insert_one(jeans, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Legs});
         //item
-        self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
-        self.ecs_world.spawn(("Medkit".to_string(), 2 as usize, Item{}, Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false}));
-        self.ecs_world.spawn(("Combat knife".to_string(), 1 as usize, Item{}, Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 2}, ToRemove{yes:false}));
+        // self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
+        // self.ecs_world.spawn(("Medkit".to_string(), 2 as usize, Item{}, Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false}));
+        // self.ecs_world.spawn(("Combat knife".to_string(), 1 as usize, Item{}, Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 2}, ToRemove{yes:false}));
 
-        self.ecs_world.spawn(("Leather jacket".to_string(), 2 as usize, data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
-        self.ecs_world.spawn(("Boots".to_string(), 2 as usize, data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
-        self.ecs_world.spawn(("Jeans".to_string(), 2 as usize, data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
+        // self.ecs_world.spawn(("Leather jacket".to_string(), 2 as usize, data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
+        // self.ecs_world.spawn(("Boots".to_string(), 2 as usize, data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
+        // self.ecs_world.spawn(("Jeans".to_string(), 2 as usize, data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
 
         //test scripting
         log!("Test scripting...");
@@ -254,6 +254,17 @@ impl Universe {
                         }
                     }
 
+                },
+                ScriptCommand::SpawnItem{room, name} => {
+                    let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize, Item{}));
+                    match name.as_str() {
+                        "Medkit" => { self.ecs_world.insert(sp, (Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false})); },
+                        "Combat knife" => { self.ecs_world.insert(sp, (Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 2}, ToRemove{yes:false})); },
+                        "Leather jacket" => { self.ecs_world.insert(sp, (data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); }, //ToRemove{yes:false}
+                        "Boots" => { self.ecs_world.insert(sp, (data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap())); },
+                        "Jeans" => { self.ecs_world.insert(sp, (data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap())); },
+                        _ => { }
+                    }
                 }
                 _ => { log!("{}", format!("Unimplemented scripting command {:?} ", cmd)); }
             }

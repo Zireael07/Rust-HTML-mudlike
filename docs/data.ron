@@ -160,6 +160,11 @@
     lisp_script: "{do {spawn 0 \"Patron\" }
     { spawn 18 \"Seller\" }
     { spawn 3 \"Thug\" }
+    { spawn_item 2 \"Medkit\" }
+    { spawn_item 1 \"Combat knife\" }
+    { spawn_item 2 \"Leather jacket\" }
+    { spawn_item 2 \"Boots\" }
+    { spawn_item 2 \"Jeans\" }
   { spawn {+ 2 2} \"patron\" }
   { spawn {+ 2 3} \"patron\" }
    { go 18 } }",
