@@ -159,6 +159,7 @@
     //scripting
     lisp_script: "{do {spawn 0 \"Patron\" }
     { spawn 18 \"Seller\" }
+    { spawn 3 \"Thug\" }
   { spawn {+ 2 2} \"patron\" }
   { spawn {+ 2 3} \"patron\" }
    { go 18 } }",
