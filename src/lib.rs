@@ -23,6 +23,8 @@ use std::sync::Mutex;
 use hecs::World;
 use hecs::Entity;
 
+//RNG
+use rand::Rng;
 
 mod universe_private;
 use universe_private::*;
@@ -387,10 +389,12 @@ impl Universe {
     }
 
     pub fn get_sentences(&mut self, question: bool) -> JsValue {
+        let mut rng = rand::thread_rng();
+        let max = rng.gen_range(3,4);
         let mut sentences = String::new();
         match question {
             true => { sentences = self.language.generate_sentence_wrapper(question, "".to_string()).0; },
-            false => { sentences = self.language.generate_paragraph(); }
+            false => { sentences = self.language.generate_paragraph(max); }
         }
 
 

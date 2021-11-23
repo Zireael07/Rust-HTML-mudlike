@@ -92,11 +92,17 @@ impl Markov {
         }
     }
 
-    pub fn generate_paragraph(&mut self) -> String {
+    pub fn generate_paragraph(&mut self, max:i32) -> String {
         let data = self.generate_sentence_wrapper(false, "".to_string());
-        let data2 = self.generate_sentence_wrapper(false, data.1);
+        let mut data2 = self.generate_sentence_wrapper(false, data.1);
+        let mut text = format!("{} {}", data.0, data2.0);
+        for i in 0..max-2 {
+            data2 = self.generate_sentence_wrapper(false, data2.1);
+            let sn = format!("{}", data2.0);
+            text = format!("{} {}", text, sn);
+        }
 
-        return format!("{} {}", data.0, data2.0);
+        return text
     }
 
     pub fn generate_sentence_wrapper(&mut self, question:bool, given_topic: String) -> (String, String) {
