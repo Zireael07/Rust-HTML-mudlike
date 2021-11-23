@@ -200,23 +200,6 @@ impl Universe {
 
         //two parts of data aren't in a special struct - entity name and room it is in
 
-        //spawn thug
-        // let th = self.ecs_world.spawn(("Thug".to_string(), 3 as usize, CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
-        // let l_jacket = self.ecs_world.spawn((data.items[1].name.to_string(), data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
-        // let boots = self.ecs_world.spawn((data.items[0].name.to_string(), data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
-        // let jeans = self.ecs_world.spawn((data.items[2].name.to_string(), data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
-        // self.ecs_world.insert_one(l_jacket, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Torso});
-        // self.ecs_world.insert_one(boots, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Feet});
-        // self.ecs_world.insert_one(jeans, Equipped{ owner: th.to_bits(), slot: EquipmentSlot::Legs});
-        //item
-        // self.ecs_world.spawn(("Soda can".to_string(), 0 as usize, Item{}));
-        // self.ecs_world.spawn(("Medkit".to_string(), 2 as usize, Item{}, Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false}));
-        // self.ecs_world.spawn(("Combat knife".to_string(), 1 as usize, Item{}, Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 2}, ToRemove{yes:false}));
-
-        // self.ecs_world.spawn(("Leather jacket".to_string(), 2 as usize, data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
-        // self.ecs_world.spawn(("Boots".to_string(), 2 as usize, data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
-        // self.ecs_world.spawn(("Jeans".to_string(), 2 as usize, data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
-
         //test scripting
         log!("Test scripting...");
         lispy::read_eval(data.lisp_script, &mut self.env);

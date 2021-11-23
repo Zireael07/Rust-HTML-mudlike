@@ -1,6 +1,6 @@
 //based on https://gist.github.com/stopachka/22b4b06b8263687d7178f61fb22e1bf2
 //described in https://stopa.io/post/222
-//custom: implementation of do
+//custom: implementation of do; implementation of loop (based on https://github.com/Pebaz/LambdaCore/)
 
 use std::collections::HashMap;
 use std::fmt;
@@ -300,6 +300,51 @@ fn eval_do_args(arg_forms: &[RispExp], env: &mut RispEnv) -> Result<RispExp, Ris
   }
 }  
 
+fn eval_loop_args(arg_forms: &[RispExp], env: &mut RispEnv) -> Result<RispExp, RispErr> {
+  let first_form = arg_forms.first().ok_or(
+    RispErr::Reason(
+      "expected first form".to_string(),
+    )
+  )?;
+  let first_str = match first_form {
+    RispExp::Symbol(s) => Ok(s.clone()),
+    _ => Err(RispErr::Reason(
+      "expected first form to be a symbol".to_string(),
+    ))
+  }?;
+  let second_form = arg_forms.get(1).ok_or(
+    RispErr::Reason(
+      "expected second form".to_string(),
+    )
+  )?;
+  let iters = match second_form {
+    RispExp::Number(s) => Ok(s.clone()),
+    _ => Err(RispErr::Reason(
+      "expected second form to be a number".to_string(),
+    ))
+  }?;
+  let third_form = arg_forms.get(2).ok_or(
+    RispErr::Reason(
+      "expected second form".to_string(),
+    )
+  )?;
+
+  //the meat of this function
+  for i in 0..iters as i64 {
+    //if we have a value that is our first form
+    //if RispExp::Symbol(s) == first_str {
+
+      //assign the *current* value of iters to first form
+      env.data.insert(first_str.clone(), RispExp::Number(i as f64));
+      //evaluate
+      eval(third_form, env);
+    //}
+
+  }
+  Ok(RispExp::Bool(true))
+}
+
+
 //
 fn eval_built_in_form(
   exp: &RispExp, arg_forms: &[RispExp], env: &mut RispEnv
@@ -310,6 +355,7 @@ fn eval_built_in_form(
         "if" => Some(eval_if_args(arg_forms, env)),
         "def" => Some(eval_def_args(arg_forms, env)),
         "do" => Some(eval_do_args(arg_forms, env)),
+        "loop" => Some(eval_loop_args(arg_forms, env)),
         _ => None,
       }
     ,
