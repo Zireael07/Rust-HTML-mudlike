@@ -369,6 +369,7 @@ impl Universe {
               |args: &[RispExp]| -> Result<RispExp, RispErr> {
                 let floats = parse_list_of_floats(args)?;
 
+                log!("Setting exit for id {} - {} to {}", floats[0] as usize, floats[1] as u8, floats[2] as usize);
                 GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SetExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
 
                 Ok(RispExp::Bool(true))
@@ -380,6 +381,7 @@ impl Universe {
             RispExp::Func(
               |args: &[RispExp]| -> Result<RispExp, RispErr> {
                 let floats = parse_list_of_floats(args)?;
+                log!("Appended exit for id {} - {} to {}", floats[0] as usize, floats[1] as u8, floats[2] as usize);
 
                 GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::AppendExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
 

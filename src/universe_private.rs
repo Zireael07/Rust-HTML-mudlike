@@ -50,20 +50,20 @@ impl Universe {
         //TODO: push this out to some sort of data files/scripting
 
         //now clone some capsules and place them in the hotel
-        let mut ca = self.map[5].clone();
-        self.map.push(ca);
-        let mut hallway = &mut self.map[4];
-        hallway.exits.push((Exit::West, 6));
+        //let mut ca = self.map[5].clone();
+        //self.map.push(ca);
+        //let mut hallway = &mut self.map[4];
+        //hallway.exits.push((Exit::West, 6));
         //Rust ranges are exclusive at the end!
-        for i in 0..2 {
-            let mut ca = self.map[5].clone();
-            ca.exits = vec![(Exit::West, 4)];
-            self.map.push(ca);
+        // for i in 0..2 {
+        //     let mut ca = self.map[5].clone();
+        //     ca.exits = vec![(Exit::West, 4)];
+        //     self.map.push(ca);
 
-            let mut hallway = &mut self.map[4];
-            hallway.exits.push((Exit::East, 6+i+1));
-            //log!("Created {} capsules", i);
-        }
+        //     let mut hallway = &mut self.map[4];
+        //     hallway.exits.push((Exit::East, 6+i+1));
+        //     //log!("Created {} capsules", i);
+        // }
 
         //log!("Hallway: {:?}", state.map[4].exits);
 
@@ -73,8 +73,15 @@ impl Universe {
 
         //test
         self.env.data.insert(
-            "get_map_size".to_string(),
+            "end".to_string(),
             lispy::RispExp::Number(self.map.len() as f64)
+
+            //it's a closure due to using self... :(
+            // lispy::RispExp::Func(
+            //     |args: &[lispy::RispExp]| -> Result<lispy::RispExp, lispy::RispErr> {  
+            //       Ok(lispy::RispExp::Number(self.map.len() as f64))
+            //     }
+            //   )
         );
 
 
@@ -88,108 +95,111 @@ impl Universe {
         let mut rng = rand::thread_rng();
         let more : bool = rand::random(); //generates a boolean
         let max = rng.gen_range(1,3);
+        //expose to scripting
+        self.env.data.insert("more".to_string(), lispy::RispExp::Number((more as i32) as f64));
+        log!("More: {} {}", more, ((more as i32) as f64));
 
         //finish up the starting line
-        for i in 0..1+more as i32 {
-            let mut all = self.map[3].clone();
-            let mut hov = self.map[2].clone();
-            let mut stre = self.map[1].clone();
-            all.exits = vec![(Exit::South, 1)];
-            self.map.push(all);
-            self.map.push(hov);
-        }
+        // for i in 0..1+more as i32 {
+        //     let mut all = self.map[3].clone();
+        //     let mut hov = self.map[2].clone();
+        //     let mut stre = self.map[1].clone();
+        //     all.exits = vec![(Exit::South, 1)];
+        //     self.map.push(all);
+        //     self.map.push(hov);
+        // }
 
-        //log!("Hov is {:?}", &self.map[end+1]);
-        //log!("All is {:?}", &self.map[end]);
+        // //log!("Hov is {:?}", &self.map[end+1]);
+        // //log!("All is {:?}", &self.map[end]);
 
-        let mut street = &mut self.map[1];
-        street.exits.push((Exit::North, end));
-        street.exits.push((Exit::In, end+1));
+        // let mut street = &mut self.map[1];
+        // street.exits.push((Exit::North, end));
+        // street.exits.push((Exit::In, end+1));
 
-        end = self.map.len();
+        // end = self.map.len();
 
-        match max {
-            1 => {
-                for i in 0..1+more as i32 {
-                    let mut stre = self.map[1].clone();
-                    let mut hov = self.map[13].clone();
-                    let mut all = self.map[3].clone();
-                    let mut field = self.map[6].clone();
-                    //end+1 is stre below
-                    stre.exits = vec![(Exit::West, end+3), (Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
-                    hov.exits = vec![(Exit::Out, end)];
-                    all.exits = vec![(Exit::South, end)];
-                    field.exits = vec![(Exit::East, end), (Exit::West, 11)];
-                    self.map.push(stre);
-                    self.map.push(hov);
-                    self.map.push(all);
-                    self.map.push(field);
-                    let mut tower = &mut self.map[11];
-                    tower.exits.push((Exit::East, end+3));
-                }
-                let mut alley = &mut self.map[3];
-                alley.exits.push((Exit::North, end));
-                log!("Added northern street");
-            },
-            2 => {
-                for i in 0..1+more as i32 {
-                    let mut stre = self.map[1].clone();
-                    let mut hov = self.map[18].clone();
-                    let mut all = self.map[3].clone();
-                    //end+1 is stre below
-                    stre.exits = vec![(Exit::North, 1), (Exit::South, end+2), (Exit::In, end+1)];
-                    hov.exits = vec![(Exit::Out, end)];
-                    all.exits = vec![(Exit::North, end)];
-                    self.map.push(stre);
-                    self.map.push(hov);
-                    self.map.push(all);
-                }
-                let mut street = &mut self.map[1];
-                street.exits.push((Exit::South, end));
-                log!("Added southern street")
-            },
-            3 => {
-                //add to both north and south end
-                for i in 0..1+more as i32 {
-                    let mut stre = self.map[1].clone();
-                    let mut hov = self.map[2].clone();
-                    let mut all = self.map[3].clone();
-                    let mut field = self.map[6].clone();
-                    //end+1 is stre below
-                    stre.exits = vec![(Exit::West, end+3), (Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
-                    hov.exits = vec![(Exit::Out, end)];
-                    all.exits = vec![(Exit::South, end)];
-                    field.exits = vec![(Exit::East, end), (Exit::West, 11)];
-                    self.map.push(stre);
-                    self.map.push(hov);
-                    self.map.push(all);
-                    self.map.push(field);
-                    let mut tower = &mut self.map[11];
-                    tower.exits.push((Exit::East, end+3));
-                }
-                let mut alley = &mut self.map[3];
-                alley.exits.push((Exit::North, end));
-                //south half
-                let endi = self.map.len();
+        // match max {
+        //     1 => {
+        //         for i in 0..1+more as i32 {
+        //             let mut stre = self.map[1].clone();
+        //             let mut hov = self.map[13].clone();
+        //             let mut all = self.map[3].clone();
+        //             let mut field = self.map[6].clone();
+        //             //end+1 is stre below
+        //             stre.exits = vec![(Exit::West, end+3), (Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
+        //             hov.exits = vec![(Exit::Out, end)];
+        //             all.exits = vec![(Exit::South, end)];
+        //             field.exits = vec![(Exit::East, end), (Exit::West, 11)];
+        //             self.map.push(stre);
+        //             self.map.push(hov);
+        //             self.map.push(all);
+        //             self.map.push(field);
+        //             let mut tower = &mut self.map[11];
+        //             tower.exits.push((Exit::East, end+3));
+        //         }
+        //         let mut alley = &mut self.map[3];
+        //         alley.exits.push((Exit::North, end));
+        //         log!("Added northern street");
+        //     },
+        //     2 => {
+        //         for i in 0..1+more as i32 {
+        //             let mut stre = self.map[1].clone();
+        //             let mut hov = self.map[18].clone();
+        //             let mut all = self.map[3].clone();
+        //             //end+1 is stre below
+        //             stre.exits = vec![(Exit::North, 1), (Exit::South, end+2), (Exit::In, end+1)];
+        //             hov.exits = vec![(Exit::Out, end)];
+        //             all.exits = vec![(Exit::North, end)];
+        //             self.map.push(stre);
+        //             self.map.push(hov);
+        //             self.map.push(all);
+        //         }
+        //         let mut street = &mut self.map[1];
+        //         street.exits.push((Exit::South, end));
+        //         log!("Added southern street")
+        //     },
+        //     3 => {
+        //         //add to both north and south end
+        //         for i in 0..1+more as i32 {
+        //             let mut stre = self.map[1].clone();
+        //             let mut hov = self.map[2].clone();
+        //             let mut all = self.map[3].clone();
+        //             let mut field = self.map[6].clone();
+        //             //end+1 is stre below
+        //             stre.exits = vec![(Exit::West, end+3), (Exit::South, 3), (Exit::North, end+2), (Exit::In, end+1)];
+        //             hov.exits = vec![(Exit::Out, end)];
+        //             all.exits = vec![(Exit::South, end)];
+        //             field.exits = vec![(Exit::East, end), (Exit::West, 11)];
+        //             self.map.push(stre);
+        //             self.map.push(hov);
+        //             self.map.push(all);
+        //             self.map.push(field);
+        //             let mut tower = &mut self.map[11];
+        //             tower.exits.push((Exit::East, end+3));
+        //         }
+        //         let mut alley = &mut self.map[3];
+        //         alley.exits.push((Exit::North, end));
+        //         //south half
+        //         let endi = self.map.len();
                 
-                for i in 0..1+more as i32 {
-                    let mut stre = self.map[1].clone();
-                    let mut hov = self.map[2].clone();
-                    let mut all = self.map[3].clone();
-                    //end+1 is stre below
-                    stre.exits = vec![(Exit::North, 1), (Exit::South, endi+2), (Exit::In, endi+1)];
-                    hov.exits = vec![(Exit::Out, endi)];
-                    all.exits = vec![(Exit::North, endi)];
-                    self.map.push(stre);
-                    self.map.push(hov);
-                    self.map.push(all);
-                }
-                let mut street = &mut self.map[1];
-                street.exits.push((Exit::South, endi));
-                log!("Added southern and nothern streets");
-            },
-            _ => {},
-        }
+        //         for i in 0..1+more as i32 {
+        //             let mut stre = self.map[1].clone();
+        //             let mut hov = self.map[2].clone();
+        //             let mut all = self.map[3].clone();
+        //             //end+1 is stre below
+        //             stre.exits = vec![(Exit::North, 1), (Exit::South, endi+2), (Exit::In, endi+1)];
+        //             hov.exits = vec![(Exit::Out, endi)];
+        //             all.exits = vec![(Exit::North, endi)];
+        //             self.map.push(stre);
+        //             self.map.push(hov);
+        //             self.map.push(all);
+        //         }
+        //         let mut street = &mut self.map[1];
+        //         street.exits.push((Exit::South, endi));
+        //         log!("Added southern and nothern streets");
+        //     },
+        //     _ => {},
+        // }
 
         //player dummy entity
         self.ecs_world.spawn(("Player".to_string(), Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1},  Needs{hunger:500, thirst:300},
