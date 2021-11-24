@@ -201,7 +201,27 @@ pub enum ScriptCommand {
     GoRoom { id: usize },
     Spawn { room: usize, name:String },
     SpawnItem { room: usize, name:String },
+    SpawnRoom { id: usize },
+    SetExit { id: usize, exit: u8, exit_to: usize },
+    AppendExit { id: usize, exit: u8, exit_to: usize },
 }
+
+//https://enodev.fr/posts/rusticity-convert-an-integer-to-an-enum.html
+//to convert from number back to enum
+impl Exit {
+    fn from_u8(value: u8) -> Exit {
+        match value {
+            0 => Exit::North,
+            1 => Exit::East,
+            2 => Exit::South,
+            3 => Exit::West,
+            4 => Exit::Out,
+            5 => Exit::In,
+            _ => panic!("Unknown value: {}", value),
+        }
+    }
+}
+
 
 /// Public methods, exported to JavaScript.
 #[wasm_bindgen]
@@ -282,11 +302,6 @@ impl Universe {
 
                 GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::GoRoom{id: first as usize}));
 
-                //I don't know a better way to do it, this avoids having to use state
-                // based on the non-textual version's commands, which was then based on bracketlib's input handling
-                // unsafe {
-                //     GLOBAL_SCRIPT_OUTPUT = Some(ScriptCommand::GoRoom{id: first as usize});
-                // }
                 Ok(RispExp::Bool(true))
               }
             )
@@ -328,6 +343,45 @@ impl Universe {
                 //I don't know a better way to do it, this avoids having to use state
                 // this monster strips quote characters from around the lispy string
                 GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SpawnItem{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
+
+                Ok(RispExp::Bool(true))
+              }
+            )
+          );
+          state.env.data.insert(
+            "spawn_room".to_string(), 
+            RispExp::Func(
+              |args: &[RispExp]| -> Result<RispExp, RispErr> {
+                let floats = parse_list_of_floats(args)?;
+                let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
+                log!("spawning room id {}", format!("{}", first));
+
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SpawnRoom{id: first as usize}));
+
+                Ok(RispExp::Bool(true))
+                //Ok(RispExp::Number(first)) //return the id?
+              }
+            )
+          );
+          state.env.data.insert(
+            "set_exit".to_string(), 
+            RispExp::Func(
+              |args: &[RispExp]| -> Result<RispExp, RispErr> {
+                let floats = parse_list_of_floats(args)?;
+
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SetExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
+
+                Ok(RispExp::Bool(true))
+              }
+            )
+          );
+          state.env.data.insert(
+            "append_exit".to_string(), 
+            RispExp::Func(
+              |args: &[RispExp]| -> Result<RispExp, RispErr> {
+                let floats = parse_list_of_floats(args)?;
+
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::AppendExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
 
                 Ok(RispExp::Bool(true))
               }

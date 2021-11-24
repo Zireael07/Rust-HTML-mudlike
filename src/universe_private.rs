@@ -248,6 +248,24 @@ impl Universe {
                         "Jeans" => { self.ecs_world.insert(sp, (data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap())); },
                         _ => { }
                     }
+                },
+                ScriptCommand::SpawnRoom{id} => {
+                    log!("Prev len: {}", self.map.len());
+                    let r = self.map[id].clone();
+                    log!("Spawned a room id {:?} ", r);
+                    //add to the map
+                    self.map.push(r);
+                    log!("Map len: {}", self.map.len());
+                },
+                ScriptCommand::SetExit{id, exit, exit_to} => {
+                    let mut r = &mut self.map[id];
+                    r.exits = vec![(Exit::from_u8(exit), exit_to)];
+                    log!("Set exits for room {} - {:?}", id, r.exits);
+                }
+                ScriptCommand::AppendExit{id, exit, exit_to} => {
+                    let mut r = &mut self.map[id];
+                    r.exits.push((Exit::from_u8(exit), exit_to));
+                    log!("Exits for room {} - {:?}", id, r.exits);
                 }
                 _ => { log!("{}", format!("Unimplemented scripting command {:?} ", cmd)); }
             }
