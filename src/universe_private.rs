@@ -98,6 +98,8 @@ impl Universe {
         //expose to scripting
         self.env.data.insert("more".to_string(), lispy::RispExp::Number((more as i32) as f64));
         log!("More: {} {}", more, ((more as i32) as f64));
+        self.env.data.insert("map_max".to_string(), lispy::RispExp::Number(max as f64));
+        log!("Max: {}", max);
 
         //finish up the starting line
         // for i in 0..1+more as i32 {
@@ -260,12 +262,12 @@ impl Universe {
                     }
                 },
                 ScriptCommand::SpawnRoom{id} => {
-                    log!("Prev len: {}", self.map.len());
+                    //log!("Prev len: {}", self.map.len());
                     let r = self.map[id].clone();
                     log!("Spawned a room id {:?} ", r);
                     //add to the map
                     self.map.push(r);
-                    log!("Map len: {}", self.map.len());
+                    //log!("Map len: {}", self.map.len());
                 },
                 ScriptCommand::SetExit{id, exit, exit_to} => {
                     let mut r = &mut self.map[id];
