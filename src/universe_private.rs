@@ -267,14 +267,22 @@ impl Universe {
                     log!("Spawned a room id {:?} ", r);
                     //add to the map
                     self.map.push(r);
-                    //log!("Map len: {}", self.map.len());
+                    log!("Map len: {}", self.map.len());
                 },
                 ScriptCommand::SetExit{id, exit, exit_to} => {
+                    if id >= self.map.len() {
+                        log!("Invalid id passed to set exit: {} ", id);
+                        continue
+                    }
                     let mut r = &mut self.map[id];
                     r.exits = vec![(Exit::from_u8(exit), exit_to)];
                     log!("Set exits for room {} - {:?}", id, r.exits);
                 }
                 ScriptCommand::AppendExit{id, exit, exit_to} => {
+                    if id >= self.map.len() {
+                        log!("Invalid id passed to set exit: {} ", id);
+                        continue
+                    }
                     let mut r = &mut self.map[id];
                     r.exits.push((Exit::from_u8(exit), exit_to));
                     log!("Exits for room {} - {:?}", id, r.exits);

@@ -163,27 +163,32 @@
     { loop i 2 { do {spawn_room 5 } { set_exit {+ end 1 i } 3 4 } { def end2 { + end 1 i} } { append_exit 4 1 {+ end 1 i } } } }
     { def c { + 1 more } }
     { println c }
-    { def end3 end2 }
+    { def end3 {- end2 1 } }
     { if { > c 1 }
     { do 
     { loop i c { do { spawn_room 3 } { set_exit { + end2 1 } 2 1 } { spawn_room 2 } { def end3 { + end2 1 } } { spawn_room 1 } } }
-    { println \"End is\" end3 } 
+    { println \"End3\" end3 } 
     { append_exit 1 0 {+ end3 1 } }
     { append_exit 1 5 {+ end3 2 } }
-    } { println \"First false\" } }
+    } { println \"False\" } }
     { if { < map_max 2 }
     { do
-    { println \"Added northern street\" } 
-    { def end4 {+ end3 2 } } { println \"End4 is\" end4 } {spawn_room 1} { spawn_room 13 } { spawn_room 6 } { spawn_room 11 } { append_exit {+ end4 3 } 1 {+ end4 2 }  } { append_exit 3 0 end4 } }
+    { println \"Northern\" } 
+    { def end4 {+ end3 2 } } { println \"End4\" end4 } {spawn_room 1} { spawn_room 13 } { spawn_room 6 } { spawn_room 11 } { append_exit {+ end4 3 } 1 {+ end4 2 } } { append_exit 3 0 end4 } }
     { 
         if { < map_max 3 } {
-            do { println \"Add southern street\" }
-            { def end4 {+ end3 2 } } { println \"End4 is\" end4 } {spawn_room 1} { spawn_room 18 } {spawn_room 3 } { set_exit end4 0 1 } { set_exit {+ end4 1 } 4 end4 } { set_exit {+ end4 2} 0 end4 } }
-        } { do {println \"Add both streets\" } 
-          { def end4 {+ end3 2 } } { println \"End4 is\" end4 } {spawn_room 1} { spawn_room 13 } { spawn_room 6 } { spawn_room 11 } { append_exit {+ end4 3 } 1 {+ end4 2 }  } 
-          { def end5 {+ end4 3 } } { println \"End5 is\" end5 } {spawn_room 1} { spawn_room 18 } { spawn_room 3 } { set_exit end5 0 1 } { set_exit {+ end5 1 } 4 end5 } { set_exit {+ end5 2} 0 end5 } }
+            do { println \"Southern\" }
+            { def end4 {+ end3 2 } } { println \"End4\" end4 } {spawn_room 1} { spawn_room 18 } {spawn_room 3 } { set_exit end4 0 1 } { set_exit {+ end4 1 } 4 end4 } { set_exit {+ end4 2} 0 end4 }
+            { append_exit 1 2 end4 } { append_exit end4 5 {+ end4 1} } { append_exit end4 2 {+ end4 2 }}
+            }
+        { { do {println \"Both\" } 
+          { def end4 {+ end3 2 } } { println \"End4\" end4 } {spawn_room 1} { spawn_room 13 } { spawn_room 6 } { spawn_room 11 } { append_exit {+ end4 3 } 1 {+ end4 2 } } { append_exit 3 0 end4 }  
+          { def end5 {+ end4 3 } } { println \"End5\" end5 } {spawn_room 1} { spawn_room 18 } { spawn_room 3 } { set_exit end5 0 1 } { set_exit {+ end5 1 } 4 end5 } { set_exit {+ end5 2} 0 end5 } 
+          { append_exit 1 2 end5 } { append_exit end5 5 {+ end5 1} } { append_exit end5 2 {+ end5 2 }}
           }
-     }
+        
+        }
+    }
     }
     { spawn 0 \"Patron\" }
     { spawn 18 \"Seller\" }
