@@ -319,18 +319,28 @@ fn eval_loop_args(arg_forms: &[RispExp], env: &mut RispEnv) -> Result<RispExp, R
   )?;
   let iters = match second_form {
     RispExp::Number(s) => Ok(s.clone()),
+    RispExp::Symbol(s) => { 
+      let exp = eval(second_form, env)?;
+      match exp {
+        RispExp::Number(n) => Ok(n.clone()),
+        _ => Err(RispErr::Reason("unknown symbol".to_string()))
+      }
+    },
     _ => Err(RispErr::Reason(
       "expected second form to be a number".to_string(),
     ))
   }?;
   let third_form = arg_forms.get(2).ok_or(
     RispErr::Reason(
-      "expected second form".to_string(),
+      "expected third form".to_string(),
     )
   )?;
 
+  log!("Loop eval: {} {} {}", first_str, iters, third_form);
+
   //the meat of this function
   for i in 0..iters as i64 {
+    //log!("Running the loop i {} ", i);
     //if we have a value that is our first form
     //if RispExp::Symbol(s) == first_str {
 

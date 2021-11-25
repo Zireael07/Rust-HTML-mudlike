@@ -163,6 +163,7 @@
     { loop i 2 { do {spawn_room 5 } { set_exit {+ end 1 i } 3 4 } { def end2 { + end 1 i} { append_exit 4 1 {+ end 1 i } } } } }
     { def c { + 1 more } }
     { println c }
+    { loop i c { do { println i } { spawn_room 3 } { set_exit { + end2 1 } 2 1 } { spawn_room 2 } { def end3 { + end2 1 } } { spawn_room 1 } } }
     { spawn 0 \"Patron\" }
     { spawn 18 \"Seller\" }
     { spawn 3 \"Thug\" }
