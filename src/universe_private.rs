@@ -277,7 +277,7 @@ impl Universe {
                     let mut r = &mut self.map[id];
                     r.exits = vec![(Exit::from_u8(exit), exit_to)];
                     log!("Set exits for room {} - {:?}", id, r.exits);
-                }
+                },
                 ScriptCommand::AppendExit{id, exit, exit_to} => {
                     if id >= self.map.len() {
                         log!("Invalid id passed to set exit: {} ", id);
@@ -286,6 +286,14 @@ impl Universe {
                     let mut r = &mut self.map[id];
                     r.exits.push((Exit::from_u8(exit), exit_to));
                     log!("Exits for room {} - {:?}", id, r.exits);
+                },
+                ScriptCommand::RemoveExit{id, exit} => {
+                    if id >= self.map.len() {
+                        log!("Invalid id passed to set exit: {} ", id);
+                        continue
+                    }
+                    let mut r = &mut self.map[id];
+                    r.exits.retain(|&e| e.0 != Exit::from_u8(exit));
                 }
                 _ => { log!("{}", format!("Unimplemented scripting command {:?} ", cmd)); }
             }
