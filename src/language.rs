@@ -31,6 +31,7 @@ pub struct Markov {
     pub map_q: HashMap<String, Vec<String>>,
     pub nouns: Vec<String>,
     pub constraints: HashMap<String, Vec<String>>,
+    pub substitutions: HashMap<String, String>,
 }
 
 impl Markov {
@@ -40,13 +41,11 @@ impl Markov {
             map_q: HashMap::new(), //for questions
             nouns: Vec::new(),
             constraints: HashMap::new(),
+            substitutions: HashMap::new(),
         }
     }
 
     pub fn parse(&mut self, sentence: &str, num: usize, question: bool) {
-        //TODO: treat stuff in brackets in a special way (as a single block)
-        // OR some other way to do collocations (markers that are expanded?)
-
         //TODO: maybe pre-tag the words so that it knows whether they're in a NP, VP, AP etc.
 
         //FIXME: commas should be ignored - no meaning in Toki Pona per https://github.com/ae-dschorsaanjo/lipu-lili-pi-toki-pona/blob/master/grammar.md
@@ -92,6 +91,7 @@ impl Markov {
         }
     }
 
+    // generate text
     pub fn generate_paragraph(&mut self, max:i32) -> String {
         let data = self.generate_sentence_wrapper(false, "".to_string());
         let mut data2 = self.generate_sentence_wrapper(false, data.1);
@@ -210,6 +210,21 @@ impl Markov {
         sentence
     }
 
+    //prettify the generated text
+    pub fn display_paragraph(&mut self, max:i32) -> String {
+        let text = self.generate_paragraph(max);
+
+        return string_sub_multi(text, &self.substitutions);
+    }
+
+    pub fn display_sentence(&mut self, question:bool, given_topic: String) -> String {
+        let text = self.generate_sentence_wrapper(question, given_topic);
+
+        return string_sub_multi(text.0, &self.substitutions);
+    }
+
+
+
     // pub fn debug(self) {
 
     // }
@@ -301,6 +316,41 @@ pub fn tokenize(sentence: String) -> Vec<String> {
     //return format!("{}", words);
 }
 
+// based on: https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=2ffced29e8649b5d5e67d1617eeb9af7
+// requires Rust 1.52.0+ due to use of str.split_once()
+
+//Find a substring match.
+//Push your input into the result up to the start of the match.
+//Push the replacement value into the result.
+//Update the input to only include what's past the match.
+//Repeat until there's no more input or match.
+
+pub fn string_sub_multi(inp: String, subs: &HashMap<String, String>) -> String
+{
+    //AsRef<str> we express that we want to accept all references that can be converted to &str as an argument.
+    let mut current: &str = inp.as_ref();
+    let mut result = Vec::with_capacity(32);
+    
+    while !current.is_empty() {
+        let mut found_match = false;
+        for (key, value) in subs.iter() {
+            let k: &str = key.as_ref();
+        //for (sub_find, sub_replace) in subs.iter() {
+            if let Some((before, after)) = current.split_once(k) { //key.as_ref()
+                found_match = true;
+                result.push(before);
+                result.push(value.as_ref());
+                current = after;
+            }
+        }
+        if !found_match {
+            result.push(current);
+            break;
+        }
+    }
+    result.join("")
+}
+
 
 pub fn setup(lang: &mut Markov){
     //some additional info
@@ -327,4 +377,7 @@ pub fn setup(lang: &mut Markov){
     for (key, value) in &lang.constraints {
         log!("{}: {:?}", key, value)
     }
+
+    //markers
+    lang.substitutions.insert("<cry>".to_string(), "(pana e telo lukin)".to_string());
 }

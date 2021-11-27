@@ -463,8 +463,8 @@ impl Universe {
         let max = rng.gen_range(3,4);
         let mut sentences = String::new();
         match question {
-            true => { sentences = self.language.generate_sentence_wrapper(question, "".to_string()).0; },
-            false => { sentences = self.language.generate_paragraph(max); }
+            true => { sentences = self.language.display_sentence(question, "".to_string()); },
+            false => { sentences = self.language.display_paragraph(max); }
         }
 
 
