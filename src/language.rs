@@ -159,6 +159,8 @@ impl Markov {
                     }
                     //else ensure we only ask questions
                     else {
+                        //ensure we have "sina" as an option
+                        self.nouns.push("sina".to_string());
                         //this constraint no longer applies
                         self.constraints.remove("sina");
                     }
@@ -167,10 +169,10 @@ impl Markov {
                         //do we have a constraint set by a topic?
                         match self.constraints.get(topic) {
                             Some(constr) => {
-                                log!("We have a constraint, {:?}", constr);
+                                //log!("We have a constraint, {:?}", constr);
                                 //filter values by topic
                                 valid.retain(|v| !constr.contains(&v));
-                                log!("Valid: {:?}", valid);
+                                //log!("Valid: {:?}", valid);
                             }
                             None => {}
                         }
@@ -192,11 +194,11 @@ impl Markov {
                     let last_word = words[(word_count-1)];
                     if last_word == "li" {
                         topics.push(value.to_string());
-                        log!("Topics: {:?}", topics);
+                        //log!("Topics: {:?}", topics);
                     }
                     if last_word == "e" {
                         topics.push(value.to_string());
-                        log!("Topics: {:?}", topics);
+                        //log!("Topics: {:?}", topics);
                     }
 
                     sentence = format!("{} {}", sentence, value);
@@ -223,6 +225,30 @@ impl Markov {
         return string_sub_multi(text.0, &self.substitutions);
     }
 
+    //NaNoGenMo special
+    pub fn display_block(&mut self, max: i32, max_s: i32) -> String {
+        let mut text = "".to_string();
+        for i in 0..max {
+            let p = self.display_paragraph(max_s);
+            text = format!("{} {}", text, p);
+        }
+        let s = self.display_sentence(true, "".to_string());
+        text = format!("{} \n {}", text, s);
+        return text;
+    }
+
+    pub fn display_novel(&mut self) -> String {
+        let mut rng = rand::thread_rng();
+        let mut text = "".to_string();
+        //50,000 words, 30 per block means we need 1666,6 according to my calculations
+        for i in 0..1667 {
+            let max = rng.gen_range(2,3);
+            let max_s = rng.gen_range(3,4);
+            let b = self.display_block(max, max_s);
+            text = format!("{} {}", text, b);
+        }
+        return text;
+    }
 
 
     // pub fn debug(self) {

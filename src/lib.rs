@@ -37,7 +37,7 @@ use language::{Markov};
 #[macro_export]
 macro_rules! log {
     ( $( $t:tt )* ) => {
-        web_sys::console::log_1(&format!( $( $t )* ).into());
+        web_sys::console::log_1(&format!( $( $t )* ).into())
     }
 }
 
@@ -460,11 +460,23 @@ impl Universe {
 
     pub fn get_sentences(&mut self, question: bool) -> JsValue {
         let mut rng = rand::thread_rng();
-        let max = rng.gen_range(3,4);
+        //let max = rng.gen_range(2,3);
+        let max_s = rng.gen_range(3,4);
         let mut sentences = String::new();
         match question {
             true => { sentences = self.language.display_sentence(question, "".to_string()); },
-            false => { sentences = self.language.display_paragraph(max); }
+            false => { 
+                sentences = self.language.display_paragraph(max_s); 
+
+                //NaNoGenMo output
+                log!("{}", self.language.display_novel());
+                
+                //sentences = self.language.display_block(max, max_s);
+                //let words = sentences.split(" ").collect::<Vec<&str>>();
+                //let word_count = words.len();
+                //log!("Sentences length: {}", word_count);
+                // a single block has from 30 to 50 words
+            }
         }
 
 
