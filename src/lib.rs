@@ -469,7 +469,7 @@ impl Universe {
                 sentences = self.language.display_paragraph(max_s); 
 
                 //NaNoGenMo output
-                log!("{}", self.language.display_novel());
+                //log!("{}", self.language.display_novel());
                 
                 //sentences = self.language.display_block(max, max_s);
                 //let words = sentences.split(" ").collect::<Vec<&str>>();
