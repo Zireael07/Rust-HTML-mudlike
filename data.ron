@@ -134,7 +134,22 @@
             desc: "A rickety looking street stall, offering various knicknacks, from snacks to small tools, personal appliances and bits and bobs that could be useful for construction.",
             known: false,
             exits: [(Out,3)],
-        )
+        ),
+        (
+            id: 19,
+            name: "Jungle",
+            desc: "A thick forest teeming with life. Monkeys swing overhead from trees and vines, while snakes crawl around in the grass. Venturing into the muddy waters is not a good idea either as there are alligators around.",
+            known: false,
+            exits: [],
+        ),
+        {
+            id: 20,
+            name: "Desert",
+            desc: "Sand, sand, sand as far as the eye can see, occasionally interspersed with brown, orange or red rocks. If there is any life around, it is well hidden.",
+            known: false,
+            exits: [],
+        }
+
     ],
     items: [
             (
