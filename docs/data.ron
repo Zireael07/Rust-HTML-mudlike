@@ -142,13 +142,27 @@
             known: false,
             exits: [],
         ),
-        {
+        (
             id: 20,
             name: "Desert",
             desc: "Sand, sand, sand as far as the eye can see, occasionally interspersed with brown, orange or red rocks. If there is any life around, it is well hidden.",
             known: false,
             exits: [],
-        }
+        ),
+        (
+            id: 21,
+            name: "Subway station",
+            desc: "A set of steep stairs leads down onto a platform. The edge is lined with colorful warning LEDs, but there is no physical barrier.",
+            known: false,
+            exits: []
+        ),
+        (
+            id: 22,
+            name: "Subway tunnels",
+            desc: "Concrete-lined tunnels lit up in constant intervals by artificial lighting on the ceiling and walls. There are subway tracks on the floor.",
+            known: false,
+            exits: []
+        )
 
     ],
     items: [
