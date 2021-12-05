@@ -74,8 +74,9 @@ impl Markov {
         if question {
             if self.map_q.contains_key(&key) {
                 let current_value = self.map_q.get_mut(&key).unwrap();
-                //FIXME: don't add values that are already in
-                current_value.push(value);
+                if !current_value.contains(&value) {
+                    current_value.push(value);
+                }
             } else {
                 self.map_q.insert(key, vec!(value));
             }
@@ -83,8 +84,9 @@ impl Markov {
         else {
             if self.map.contains_key(&key) {
                 let current_value = self.map.get_mut(&key).unwrap();
-                //FIXME: don't add values that are already in
-                current_value.push(value);
+                if !current_value.contains(&value) {
+                    current_value.push(value);
+                }
             } else {
                 self.map.insert(key, vec!(value));
             }

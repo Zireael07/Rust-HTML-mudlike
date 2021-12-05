@@ -255,7 +255,9 @@ impl Universe {
                     match name.as_str() {
                         "Medkit" => { self.ecs_world.insert(sp, (Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false})); },
                         "Combat knife" => { self.ecs_world.insert(sp, (Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 2}, ToRemove{yes:false})); },
+                        "Baton" => { self.ecs_world.insert(sp, (Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 1 }, ToRemove{yes:false})); },
                         "Leather jacket" => { self.ecs_world.insert(sp, (data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); }, //ToRemove{yes:false}
+                        "Camo" => { self.ecs_world.insert(sp, (data.items[3].item.unwrap(), data.items[3].equippable.unwrap(), data.items[3].defense.unwrap())); },
                         "Boots" => { self.ecs_world.insert(sp, (data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap())); },
                         "Jeans" => { self.ecs_world.insert(sp, (data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap())); },
                         _ => { }
@@ -295,6 +297,27 @@ impl Universe {
                     let mut r = &mut self.map[id];
                     r.exits.retain(|&e| e.0 != Exit::from_u8(exit));
                 }
+                ScriptCommand::EditExit{id, exit, exit_to} => {
+                    if id >= self.map.len() {
+                        log!("Invalid id passed to set exit: {} ", id);
+                        continue
+                    }
+                    let mut r = &mut self.map[id];
+                    
+                    //find our exit
+                    // find() returns a reference, so we can't edit it later
+                    let find = r.exits.iter().position(|e| e.0 == Exit::from_u8(exit));
+                    log!("Find: {:?}", find);
+                    
+                    match find {
+                        Some(i) => {r.exits[i].1 = exit_to},
+                        None => log!("No exit found: {:?} ", Exit::from_u8(exit)),
+                    }
+
+                    //log!("Found {}", find);
+
+                    log!("Exits for room {} - {:?}", id, r.exits);
+                },
                 _ => { log!("{}", format!("Unimplemented scripting command {:?} ", cmd)); }
             }
             
