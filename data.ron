@@ -142,13 +142,27 @@
             known: false,
             exits: [],
         ),
-        {
+        (
             id: 20,
             name: "Desert",
             desc: "Sand, sand, sand as far as the eye can see, occasionally interspersed with brown, orange or red rocks. If there is any life around, it is well hidden.",
             known: false,
             exits: [],
-        }
+        ),
+        (
+            id: 21,
+            name: "Subway station",
+            desc: "A set of steep stairs leads down onto a platform. The edge is lined with colorful warning LEDs, but there is no physical barrier.",
+            known: false,
+            exits: []
+        ),
+        (
+            id: 22,
+            name: "Subway tunnels",
+            desc: "Concrete-lined tunnels lit up in constant intervals by artificial lighting on the ceiling and walls. There are subway tracks on the floor.",
+            known: false,
+            exits: []
+        )
 
     ],
     items: [
@@ -163,6 +177,12 @@
             item: Item(), //unit struct
             equippable: (slot: Torso),
             defense: DefenseBonus(bonus:0.15)
+        ),
+        (
+            name: "Camo",
+            item: Item(), //unit struct
+            equippable: (slot: Torso),
+            defense: DefenseBonus(bonus:0.05)
         ),
         (
             name: "Jeans",
@@ -190,16 +210,16 @@
     { do
     { println \"Northern\" } 
     { def end4 {+ end3 2 } } { println \"End4\" end4 } {spawn_room 1} { spawn_room 13 } { spawn_room 6 } { spawn_room 11 } { append_exit {+ end4 3 } 1 {+ end4 2 } } { append_exit 3 0 end4 } 
-    { remove_exit end4 0 } { append_exit end4 2 3}}
+    { remove_exit end4 0 } { append_exit end4 2 3} { replace_exit end4 5 {+ end4 1} } { replace_exit {+ end4 1 } 4 end4} { spawn_item {+ end4 1} \"Camo\" } }
     { 
         if { < map_max 3 } {
             do { println \"Southern\" }
             { def end4 {+ end3 2 } } { println \"End4\" end4 } {spawn_room 1} { spawn_room 18 } {spawn_room 3 } { set_exit end4 0 1 } { set_exit {+ end4 1 } 4 end4 } { set_exit {+ end4 2} 0 end4 }
-            { append_exit 1 2 end4 } { append_exit end4 5 {+ end4 1} } { append_exit end4 2 {+ end4 2 }}
+            { append_exit 1 2 end4 } { edit_exit end4 5 {+ end4 1} } { append_exit end4 2 {+ end4 2 }}
             }
         { { do {println \"Both\" } 
           { def end4 {+ end3 2 } } { println \"End4\" end4 } {spawn_room 1} { spawn_room 13 } { spawn_room 6 } { spawn_room 11 } { append_exit {+ end4 3 } 1 {+ end4 2 } } { append_exit 3 0 end4 }
-          { remove_exit end4 0 } { append_exit end4 2 3}  
+          { remove_exit end4 0 } { append_exit end4 2 3 } { replace_exit end4 5 {+ end4 1} } { replace_exit {+ end4 1 } 4 end4} { spawn_item {+ end4 1} \"Camo\" }  
           { def end5 {+ end4 3 } } { println \"End5\" end5 } {spawn_room 1} { spawn_room 18 } { spawn_room 3 } { set_exit end5 0 1 } { set_exit {+ end5 1 } 4 end5 } { set_exit {+ end5 2} 0 end5 } 
           { append_exit 1 2 end5 } { append_exit end5 5 {+ end5 1} } { append_exit end5 2 {+ end5 2 }}
           }
