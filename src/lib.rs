@@ -19,6 +19,9 @@ use std::collections::HashMap;
 extern crate lazy_static;
 use std::sync::Mutex;
 
+// is trick to be able to store variables :P
+use std::sync::{Arc, RwLock};
+
 //ECS
 use hecs::World;
 use hecs::Entity;
@@ -191,6 +194,9 @@ struct Weather {
 
 lazy_static! {
     static ref GLOBAL_SCRIPT_OUTPUT: Mutex<Vec<Option<ScriptCommand>>> = Mutex::new(vec![]);
+    //based on https://github.com/WesterWest/calisp/commit/b6a18038cfed2c02aa3f9b3228b07e6846200277
+    static ref GLOBAL_SCRIPT_VARIABLES: Arc<RwLock<HashMap<String, RispExp>>> =
+    Arc::new(RwLock::new(HashMap::default()));
 }
 //pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
 
@@ -356,12 +362,36 @@ impl Universe {
               |args: &[RispExp]| -> Result<RispExp, RispErr> {
                 let floats = parse_list_of_floats(args)?;
                 let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
-                log!("spawning room id {}", format!("{}", first));
+                log!("spawning room id {}", first);
 
+                let mut num = 0;
+                
+                //MAGIC! we're automatically getting the end variable without going through state!
+                let var = get_var("end".to_string());
+                let nm = match var.unwrap() {
+                    RispExp::Number(s) => Ok(s.clone()),
+                    _ => Err(RispErr::Reason(
+                        "expected end to be a number".to_string(),
+                      ))
+                    }?; 
+                
+                num = nm as usize;
+
+                //NOTE: assumes we can always add a room!
+                //automatically calculate how many rooms we have
+                let new_end = num + 1; 
+                // reflect this in the end variable
+                register_var("end".to_string(), RispExp::Number(new_end as f64));
+
+                // using state causes this to become a closure :(
+                //state.env.data.insert("end".to_string(), num_added);
+
+                //this is the scripting command
                 GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SpawnRoom{id: first as usize}));
 
-                Ok(RispExp::Bool(true))
-                //Ok(RispExp::Number(first)) //return the id?
+                log!("Returning num: {}", new_end-1);
+                //Ok(RispExp::Bool(true))
+                Ok(RispExp::Number((new_end-1) as f64)) //return the number of the room added (one less than the end)
               }
             )
           );
@@ -613,3 +643,16 @@ pub fn start() {
     panic::set_hook(Box::new(console_error_panic_hook::hook));
     //main()
 } 
+
+//based on https://github.com/WesterWest/calisp/commit/b6a18038cfed2c02aa3f9b3228b07e6846200277
+// Register rust variable that can be set from within script
+pub fn register_var(v_name: String, v: RispExp) {
+    GLOBAL_SCRIPT_VARIABLES.write().unwrap().insert(v_name, v);
+}
+
+pub fn get_var(v_name:String) -> Result<RispExp, RispErr> {
+    match GLOBAL_SCRIPT_VARIABLES.read().unwrap().get(&v_name.clone()) {
+        Some(variable) => Ok(variable.clone()),
+        _ => Err(RispErr::Reason("rust-var not found".to_string())),    
+    }
+}

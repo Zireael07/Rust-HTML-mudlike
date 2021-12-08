@@ -5,7 +5,7 @@ use super::{Universe, Room, Exit, Distance, DataMaster,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus,
-    ScriptCommand, GLOBAL_SCRIPT_OUTPUT
+    ScriptCommand, GLOBAL_SCRIPT_OUTPUT, register_var
 };
 use super::language;
 use super::lispy;
@@ -71,6 +71,11 @@ impl Universe {
         let mut end = self.map.len();
         log!("End is {}", end);
 
+        //store the end globally so that it can be accessed from both Rust and script
+        register_var("end".to_string(), lispy::RispExp::Number(self.map.len() as f64));
+
+
+
         //test
         self.env.data.insert(
             "end".to_string(),
@@ -82,6 +87,7 @@ impl Universe {
             //       Ok(lispy::RispExp::Number(self.map.len() as f64))
             //     }
             //   )
+        
         );
 
 
