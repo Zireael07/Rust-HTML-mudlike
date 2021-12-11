@@ -4,7 +4,7 @@ use super::{Universe, Room, Exit, Distance, DataMaster,
     AI, CombatStats, NPCName, EncDistance,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
-    Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus,
+    Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus, Ranged,
     ScriptCommand, GLOBAL_SCRIPT_OUTPUT, register_var
 };
 use super::language;
@@ -246,7 +246,18 @@ impl Universe {
                             self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                             self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                             self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
-                        }
+                        },
+                        "Shooter" => {
+                            self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
+                            let l_jacket = self.ecs_world.spawn((data.items[1].name.to_string(), data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
+                            let boots = self.ecs_world.spawn((data.items[0].name.to_string(), data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
+                            let jeans = self.ecs_world.spawn((data.items[2].name.to_string(), data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
+                            self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
+                            self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
+                            self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
+                            let pistol = self.ecs_world.spawn((Item{}, Equippable{ slot: EquipmentSlot::Melee }, Ranged{}, ToRemove{yes:false}));
+                            self.ecs_world.insert_one(pistol, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Melee});
+                        },
                         _ => {
                             //randomized NPC name
                             let sel_name = Universe::randomized_NPC_name(true, &self.names);
@@ -262,6 +273,7 @@ impl Universe {
                         "Medkit" => { self.ecs_world.insert(sp, (Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false})); },
                         "Combat knife" => { self.ecs_world.insert(sp, (Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 2}, ToRemove{yes:false})); },
                         "Baton" => { self.ecs_world.insert(sp, (Equippable{ slot: EquipmentSlot::Melee }, MeleeBonus{ bonus: 1 }, ToRemove{yes:false})); },
+                        "Pistol" => { self.ecs_world.insert(sp, (Equippable{ slot: EquipmentSlot::Melee }, ToRemove{yes:false})); },
                         "Leather jacket" => { self.ecs_world.insert(sp, (data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); }, //ToRemove{yes:false}
                         "Camo" => { self.ecs_world.insert(sp, (data.items[3].item.unwrap(), data.items[3].equippable.unwrap(), data.items[3].defense.unwrap())); },
                         "Boots" => { self.ecs_world.insert(sp, (data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap())); },

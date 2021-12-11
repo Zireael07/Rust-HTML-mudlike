@@ -116,6 +116,10 @@ pub struct MeleeBonus {
 pub struct DefenseBonus {
     pub bonus : f32
 }
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Ranged {}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct EncDistance {
     pub dist: Distance
