@@ -162,6 +162,20 @@
             desc: "Concrete-lined tunnels lit up in constant intervals by artificial lighting on the ceiling and walls. There are subway tracks on the floor.",
             known: false,
             exits: []
+        ),
+        (
+            id: 23,
+            name: "Pleasure house",
+            desc: "A large hall lit up in garish shades of pink and red, with multiple doors leading to much more discreet booths. Women and men of all shapes and sizes line the walls and the floors. Some of them in various states of undress.",
+            known: false,
+            exits: [],
+        ),
+        (
+            id: 24,
+            name: "Booth",
+            desc "This is a tiny capsule, roughly a person's height across. At least long enough so one can lay down comfortably. It's wide enough for two people to fit and the locker contains an array of.. toys, you could call it.",
+            known: false,
+            exits: [],
         )
 
     ],

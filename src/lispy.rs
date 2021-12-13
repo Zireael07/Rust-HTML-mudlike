@@ -59,6 +59,7 @@ pub struct RispEnv {
   (manually to avoid pulling in a big dependency such as nom or combine)
 */
 
+//this is very simple, based on Peter Norvig's Lispy
 fn tokenize(expr: String) -> Vec<String> {
   expr
     .replace("{", " ( ") //is trick! we use brackets not parens
@@ -68,6 +69,7 @@ fn tokenize(expr: String) -> Vec<String> {
     .collect()
 }
 
+//TODO: implement comments
 fn parse<'a>(tokens: &'a [String]) -> Result<(RispExp, &'a [String]), RispErr> {
   let (token, rest) = tokens.split_first()
     .ok_or(
@@ -153,6 +155,7 @@ impl RispEnv {
 pub fn default_env() -> RispEnv {
   let mut data: HashMap<String, RispExp> = HashMap::new();
   
+  //FIXME: works poorly with multi-word strings
   data.insert(
     "println".to_string(),
     RispExp::Func(
