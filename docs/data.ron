@@ -173,7 +173,14 @@
         (
             id: 24,
             name: "Booth",
-            desc "This is a tiny capsule, roughly a person's height across. At least long enough so one can lay down comfortably. It's wide enough for two people to fit and the locker contains an array of.. toys, you could call it.",
+            desc: "This is a tiny capsule, roughly a person's height across. At least long enough so one can lay down comfortably. It's wide enough for two people to fit and the locker contains an array of.. toys, you could call it.",
+            known: false,
+            exits: [],
+        ),
+        (
+            id: 25,
+            name: "Club",
+            desc: "This small building is basically a single large room, filled with neon lights and with tables and chairs surrounding a relatively large open space - a dancefloor.",
             known: false,
             exits: [],
         )
