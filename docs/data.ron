@@ -183,6 +183,13 @@
             desc: "This small building is basically a single large room, filled with neon lights and with tables and chairs surrounding a relatively large open space - a dancefloor.",
             known: false,
             exits: [],
+        ),
+        (
+            id: 26,
+            name: "VR Lounge",
+            desc: "This building is basically one large room, filled with regularly spaced plush sofas, all cocooned in comforting semi-darkness.",
+            known: false,
+            exits: [],
         )
 
     ],
@@ -248,6 +255,7 @@
         }
     }
     }
+    { go 18 }
     { spawn 0 \"Patron\" }
     { spawn 18 \"Seller\" }
     { spawn 3 \"Thug\" }
@@ -259,7 +267,9 @@
     { spawn_item 5 \"Pistol\" }
   { spawn {+ 2 2} \"patron\" }
   { spawn {+ 2 3} \"patron\" }
-   { go 18 }
+
+   { def test { spawn_room 18 } } 
+   { println \"Test\" test }
    
    }",
     //based on https://github.com/joke2k/faker/
