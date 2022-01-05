@@ -65,5 +65,10 @@ div .ham {
 .map {
     position: fixed;
     top: 50px;
-    left: 0; 
+    left: 0;
+    display: none; 
+}
+
+.map.visible {
+    display: block;
 }

@@ -293,6 +293,23 @@ function draw() {
     addHandlers(inv);
 }
 
+function showMap() {
+    console.log("Toggle map");
+    if (!document.querySelector(".map").classList.contains('visible')) {
+        document.querySelector(".map").classList.toggle('visible', true)
+        //update the current node's name
+        var n = document.getElementById("node1");
+        //console.log(n.childNodes);
+        n.childNodes[0].textContent = universe.get_current_map().name;
+        n.childNodes[4].textContent = universe.get_current_map().name;
+        //n.setAttributeNS(null, "text", universe.get_current_map().name);
+    } else {
+        document.querySelector(".map").classList.toggle('visible', false);
+    }
+    
+}
+
+
 function addHandlers(inv){
         // interactivity!
         var buttons = document.querySelectorAll(".exit_button");
@@ -334,6 +351,11 @@ function addHandlers(inv){
             use_button.onclick = function(e) { useClick(e.target); }
         }
         
+        //map handler
+        var map_button = document.querySelector(".nav");
+        if (map_button) {
+            map_button.onclick = function(e) { showMap(); }
+        }
 }
 
 //logic shuffled to Rust (see load_datafiles())
