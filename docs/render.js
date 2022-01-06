@@ -312,6 +312,7 @@ function showMap() {
         for (var i=0; i<others.length; i++){
             addNode(i+2, others[i].name);
         }
+        updateMapSize(others.length);
     } else {
         document.querySelector(".map").classList.toggle('visible', false);
 
@@ -364,6 +365,22 @@ function addNode(i, name) {
     g.appendChild(tex);
 }
 
+function updateMapSize(length) {
+    var svg = document.querySelector("#svg");
+    var svgNS = svg.namespaceURI;
+    var size = 100;
+    
+    if (length > 0) {
+        // 80 is the size of the ellipse, roughly
+        size = 80*length;
+    }
+
+    svg.setAttributeNS(null, "width", size);
+    //svg.setAttributeNS(null, "viewBox", "0.00 0.00 100.00 "+ size +".00");
+    var bg = svg.querySelector("polygon");
+    bg.setAttributeNS(null, "points", "-4,4 -4,-100 "+ size+",-100 "+size+",4 -4,4");
+
+}
 
 
 function addHandlers(inv){
