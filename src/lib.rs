@@ -506,6 +506,17 @@ impl Universe {
         self.map[id].known = true;
     }
 
+    pub fn get_known_exits(&self) -> JsValue {
+        let room = &self.map[self.current_room];
+        let mut known_ex = Vec::new();
+        for e in &room.exits {
+            if self.map[e.1].known {
+                known_ex.push(&self.map[e.1]);
+            }
+        }
+        return JsValue::from_serde(&known_ex).unwrap();
+    }
+
     pub fn get_sentences(&mut self, question: bool) -> JsValue {
         let mut rng = rand::thread_rng();
         //let max = rng.gen_range(2,3);
