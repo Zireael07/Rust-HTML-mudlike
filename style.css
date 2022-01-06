@@ -18,6 +18,7 @@ html, body, #wrapper {
     background: #002b36; /* Solarized base03 #002b36 */
     color:#fdf6e3; /* Solarized base3; default - can be overwritten */
     margin: 2px;
+    margin-left: 35px; /* Because of the new hamburger */
     padding: 0.5em 1em; /*1 em seems to be 12.8px*/
     text-align: left;
 }    
@@ -46,4 +47,28 @@ button {
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {
     #game { font-size: 24px;}
+}
+
+div .ham {
+    width: 35px;
+    height: 5px;
+    background-color: black;
+    margin: 6px 0;
+}
+
+.nav {
+    position: fixed; /* Stay in place on scroll */
+    top: 0;
+    left: 0;
+}
+
+.map {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    display: none; 
+}
+
+.map.visible {
+    display: block;
 }

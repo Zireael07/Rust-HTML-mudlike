@@ -293,6 +293,96 @@ function draw() {
     addHandlers(inv);
 }
 
+//--------------------------------
+// SVG map toggle
+function showMap() {
+    console.log("Toggle map");
+    if (!document.querySelector(".map").classList.contains('visible')) {
+        document.querySelector(".map").classList.toggle('visible', true)
+        //update the current node's name
+        var n = document.getElementById("node1");
+        //console.log(n.childNodes);
+        n.childNodes[0].textContent = universe.get_current_map().name;
+        n.childNodes[4].textContent = universe.get_current_map().name;
+        //n.setAttributeNS(null, "text", universe.get_current_map().name);
+
+        // display known exit rooms
+        var others = universe.get_known_exits();
+        //console.log(others);
+        for (var i=0; i<others.length; i++){
+            addNode(i+2, others[i].name);
+        }
+        updateMapSize(others.length);
+    } else {
+        document.querySelector(".map").classList.toggle('visible', false);
+
+        //remove all children of "graph" that are not "node1"
+        //getElementsByTagName returns a HTML collection
+        var collection = document.querySelector(".graph").getElementsByTagName("g");
+        var graph_els = Array.from(collection);
+        console.log(graph_els);
+        graph_els.shift(); //we remove the first entry in the list, which should be node1
+
+        for (var i=0; i<graph_els.length; i++) {
+            if (graph_els[i].id.indexOf("node") != -1) {
+                graph_els[i].remove() //nuke the element altogether
+            }
+        }
+    }
+    
+}
+
+// i is 2 for the first one, because "node1" is the current room
+function addNode(i, name) {
+    var svg = document.querySelector("#svg");
+    var svgNS = svg.namespaceURI;
+    var g = document.createElementNS(svgNS, 'g');
+    g.setAttributeNS(null, "id", "node"+i);
+    g.setAttributeNS(null, "class", "node");
+    var t = document.createElementNS(svgNS, 'title');
+    t.textContent = name;
+    var ell = document.createElementNS(svgNS,'ellipse');
+    ell.setAttributeNS(null, "rx", 35);
+    ell.setAttributeNS(null, "ry", 18);
+    ell.setAttributeNS(null, "style", "fill:none;stroke:black;");
+    //positioning
+    //36 for first, 36+35*2 = 36+70 for second, etc
+    var x = 36+72*(i-2);
+    ell.setAttributeNS(null, "cx", x);
+    ell.setAttributeNS(null, "cy", -20);
+    var tex = document.createElementNS(svgNS, 'text');
+    tex.setAttributeNS(null, "text-anchor", 'middle');
+    tex.setAttributeNS(null, 'style', "font-family:Times New Roman;font-size:14.00;");
+    tex.textContent = name;
+    //positioning
+    tex.setAttributeNS(null, "x", x);
+    tex.setAttributeNS(null, "y", -15); //+5 compared to ellipse
+    //add to tree
+    var graph = document.querySelector("#graph0");
+    graph.appendChild(g);
+    g.appendChild(t);
+    g.appendChild(ell);
+    g.appendChild(tex);
+}
+
+function updateMapSize(length) {
+    var svg = document.querySelector("#svg");
+    var svgNS = svg.namespaceURI;
+    var size = 100;
+    
+    if (length > 0) {
+        // 80 is the size of the ellipse, roughly
+        size = 80*length;
+    }
+
+    svg.setAttributeNS(null, "width", size);
+    //svg.setAttributeNS(null, "viewBox", "0.00 0.00 100.00 "+ size +".00");
+    var bg = svg.querySelector("polygon");
+    bg.setAttributeNS(null, "points", "-4,4 -4,-100 "+ size+",-100 "+size+",4 -4,4");
+
+}
+
+
 function addHandlers(inv){
         // interactivity!
         var buttons = document.querySelectorAll(".exit_button");
@@ -334,6 +424,11 @@ function addHandlers(inv){
             use_button.onclick = function(e) { useClick(e.target); }
         }
         
+        //map handler
+        var map_button = document.querySelector(".nav");
+        if (map_button) {
+            map_button.onclick = function(e) { showMap(); }
+        }
 }
 
 //logic shuffled to Rust (see load_datafiles())
