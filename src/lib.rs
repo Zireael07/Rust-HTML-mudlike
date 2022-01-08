@@ -517,6 +517,31 @@ impl Universe {
         return JsValue::from_serde(&known_ex).unwrap();
     }
 
+    pub fn get_more_known(&self) -> JsValue {
+        let mut known_ex = Vec::new();
+        
+        //get all known exits
+        let room = &self.map[self.current_room];
+        let mut rooms = Vec::new();
+        for e in &room.exits {
+            if self.map[e.1].known {
+                rooms.push(&self.map[e.1]);
+            }
+        }
+
+        for r in rooms {
+            for e in &r.exits {
+                //if exit known and not current room
+                if self.map[e.1].known && e.1 != self.current_room {
+                    known_ex.push(&self.map[e.1]);
+                    break; //we only need the first one for each room
+                }
+            }
+        }
+        return JsValue::from_serde(&known_ex).unwrap();
+    }
+
+
     pub fn get_sentences(&mut self, question: bool) -> JsValue {
         let mut rng = rand::thread_rng();
         //let max = rng.gen_range(2,3);

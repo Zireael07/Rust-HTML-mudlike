@@ -308,11 +308,19 @@ function showMap() {
 
         // display known exit rooms
         var others = universe.get_known_exits();
+        var more = universe.get_more_known();
         //console.log(others);
         for (var i=0; i<others.length; i++){
-            addNode(i+2, others[i].name);
+            addNode(i+2, others[i].name, 1, others.length);
         }
-        updateMapSize(others.length);
+
+        console.log(more);
+        for (var i=0; i<more.length; i++){
+            addNode(others.length+2+i, more[i].name, 2, others.length);
+        }
+        
+
+        updateMapSize(others.length, more.length);
     } else {
         document.querySelector(".map").classList.toggle('visible', false);
 
@@ -333,7 +341,7 @@ function showMap() {
 }
 
 // i is 2 for the first one, because "node1" is the current room
-function addNode(i, name) {
+function addNode(i, name, level, max_row) {
     var svg = document.querySelector("#svg");
     var svgNS = svg.namespaceURI;
     var g = document.createElementNS(svgNS, 'g');
@@ -347,16 +355,32 @@ function addNode(i, name) {
     ell.setAttributeNS(null, "style", "fill:none;stroke:black;");
     //positioning
     //36 for first, 36+35*2 = 36+70 for second, etc
+    //subtract 2 because we start from 2
     var x = 36+72*(i-2);
+    // positioning for next level
+    //FIXME: position next level entry below the room that leads to it
+    if (i > max_row+1) {
+        x = 36+72*(i-2-max_row);
+    }
     ell.setAttributeNS(null, "cx", x);
-    ell.setAttributeNS(null, "cy", -20);
+    if (level == 1) {
+        ell.setAttributeNS(null, "cy", -20);
+    } else {
+        ell.setAttributeNS(null, "cy", 20);
+    }
+
     var tex = document.createElementNS(svgNS, 'text');
     tex.setAttributeNS(null, "text-anchor", 'middle');
     tex.setAttributeNS(null, 'style', "font-family:Times New Roman;font-size:14.00;");
     tex.textContent = name;
     //positioning
     tex.setAttributeNS(null, "x", x);
-    tex.setAttributeNS(null, "y", -15); //+5 compared to ellipse
+    if (level == 1) {
+        tex.setAttributeNS(null, "y", -15); //+5 compared to ellipse
+    } else {
+        tex.setAttributeNS(null, "y", 25); //+5 compared to ellipse
+    }
+
     //add to tree
     var graph = document.querySelector("#graph0");
     graph.appendChild(g);
@@ -365,20 +389,39 @@ function addNode(i, name) {
     g.appendChild(tex);
 }
 
-function updateMapSize(length) {
+function updateMapSize(length, more) {
     var svg = document.querySelector("#svg");
     var svgNS = svg.namespaceURI;
     var size = 100;
+    var height = 100;
     
     if (length > 0) {
         // 80 is the size of the ellipse, roughly
         size = 80*length;
     }
+    if (more >0) {
+        height = 200;
+    }
+
+    if (height > 100) {
+        svg.setAttributeNS(null, "height", 200);
+    }
 
     svg.setAttributeNS(null, "width", size);
     //svg.setAttributeNS(null, "viewBox", "0.00 0.00 100.00 "+ size +".00");
     var bg = svg.querySelector("polygon");
-    bg.setAttributeNS(null, "points", "-4,4 -4,-100 "+ size+",-100 "+size+",4 -4,4");
+    bg.setAttributeNS(null, "points", "-4,4 -4,-"+height+" "+ size+",-"+height+" "+size+",4 -4,4");
+    if (height > 100) {
+        var graph = svg.querySelector("#graph0")
+        graph.setAttributeNS(null, "transform", "scale(1 1) rotate(0) translate(4 200)");
+        //transform all the nodes up
+        var nodes = svg.querySelectorAll(".node");
+        //console.log(nodes);
+        for (var i=0; i < nodes.length; i++) {
+            nodes[i].setAttributeNS(null, "transform", "translate(0,-50)");
+        }
+
+    }
 
 }
 
