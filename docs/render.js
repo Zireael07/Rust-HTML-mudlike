@@ -311,12 +311,12 @@ function showMap() {
         var more = universe.get_more_known();
         //console.log(others);
         for (var i=0; i<others.length; i++){
-            addNode(i+2, others[i].name, 1, others.length);
+            addNode(i+2, others[i].name);
         }
 
         console.log(more);
         for (var i=0; i<more.length; i++){
-            addNode(others.length+2+i, more[i].name, 2, others.length);
+            addNodeMore(others.length+2+i, more[i]);
         }
         
 
@@ -340,8 +340,7 @@ function showMap() {
     
 }
 
-// i is 2 for the first one, because "node1" is the current room
-function addNode(i, name, level, max_row) {
+function setupSVGNode(i,name) {
     var svg = document.querySelector("#svg");
     var svgNS = svg.namespaceURI;
     var g = document.createElementNS(svgNS, 'g');
@@ -353,38 +352,59 @@ function addNode(i, name, level, max_row) {
     ell.setAttributeNS(null, "rx", 35);
     ell.setAttributeNS(null, "ry", 18);
     ell.setAttributeNS(null, "style", "fill:none;stroke:black;");
-    //positioning
-    //36 for first, 36+35*2 = 36+70 for second, etc
-    //subtract 2 because we start from 2
-    var x = 36+72*(i-2);
-    // positioning for next level
-    //FIXME: position next level entry below the room that leads to it
-    if (i > max_row+1) {
-        x = 36+72*(i-2-max_row);
-    }
-    ell.setAttributeNS(null, "cx", x);
-    if (level == 1) {
-        ell.setAttributeNS(null, "cy", -20);
-    } else {
-        ell.setAttributeNS(null, "cy", 20);
-    }
-
     var tex = document.createElementNS(svgNS, 'text');
     tex.setAttributeNS(null, "text-anchor", 'middle');
     tex.setAttributeNS(null, 'style', "font-family:Times New Roman;font-size:14.00;");
     tex.textContent = name;
+    return [ell, tex, g, t];
+}
+
+// i is 2 for the first one, because "node1" is the current room
+function addNode(i, name) {
+    var elements = setupSVGNode(i, name);
+    var ell = elements[0];
+    //positioning
+    //36 for first, 36+35*2 = 36+70 for second, etc
+    //subtract 2 because we start from 2
+    var x = 36+72*(i-2);
+    ell.setAttributeNS(null, "cx", x);
+    ell.setAttributeNS(null, "cy", -20);
+    var tex = elements[1];
     //positioning
     tex.setAttributeNS(null, "x", x);
-    if (level == 1) {
-        tex.setAttributeNS(null, "y", -15); //+5 compared to ellipse
-    } else {
-        tex.setAttributeNS(null, "y", 25); //+5 compared to ellipse
-    }
+    tex.setAttributeNS(null, "y", -15); //+5 compared to ellipse
 
     //add to tree
     var graph = document.querySelector("#graph0");
+    var g = elements[2];
     graph.appendChild(g);
-    g.appendChild(t);
+    g.appendChild(elements[3]);
+    g.appendChild(ell);
+    g.appendChild(tex);
+}
+
+// for adding the second row of rooms
+function addNodeMore(i, entry) {
+    // entry is [index of exit room (i.e. the one above), room]
+    var name = entry[1].name;
+    var elements = setupSVGNode(i, name);
+    var ell = elements[0];
+    //positioning
+    //position below the room that led to it
+    //36 for first, 36+35*2 = 36+70 for second, etc
+    var x = 36+72*(entry[0]);
+    ell.setAttributeNS(null, "cx", x);
+    ell.setAttributeNS(null, "cy", 20);
+    var tex = elements[1];
+    //positioning
+    tex.setAttributeNS(null, "x", x);
+    tex.setAttributeNS(null, "y", 25); //+5 compared to ellipse
+
+    //add to tree
+    var graph = document.querySelector("#graph0");
+    var g = elements[2];
+    graph.appendChild(g);
+    g.appendChild(elements[3]);
     g.appendChild(ell);
     g.appendChild(tex);
 }

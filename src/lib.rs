@@ -529,11 +529,11 @@ impl Universe {
             }
         }
 
-        for r in rooms {
+        for (idx, r) in rooms.iter().enumerate() {
             for e in &r.exits {
                 //if exit known and not current room
                 if self.map[e.1].known && e.1 != self.current_room {
-                    known_ex.push(&self.map[e.1]);
+                    known_ex.push((idx, &self.map[e.1]));
                     break; //we only need the first one for each room
                 }
             }
