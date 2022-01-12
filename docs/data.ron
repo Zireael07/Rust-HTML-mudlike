@@ -190,7 +190,13 @@
             desc: "This building is basically one large room, filled with regularly spaced plush sofas, all cocooned in comforting semi-darkness.",
             known: false,
             exits: [],
-        )
+        ),
+        (
+            id: 27,
+            name: "Gas station",
+            desc: "This seems to be an abandoned gas station. The pumps are broken or outright missing, but the building is still stocked in food, drink and candy.",
+            exits: [],
+        ),
 
     ],
     items: [
@@ -243,7 +249,7 @@
         if { < map_max 3 } {
             do { println \"Southern\" }
             { def end4 {+ end3 2 } } { println \"End4\" end4 } {spawn_room 1} { spawn_room 18 } {spawn_room 3 } { set_exit end4 0 1 } { set_exit {+ end4 1 } 4 end4 } { set_exit {+ end4 2} 0 end4 }
-            { append_exit 1 2 end4 } { edit_exit end4 5 {+ end4 1} } { append_exit end4 2 {+ end4 2 }}
+            { append_exit 1 2 end4 } { edit_exit end4 5 {+ end4 1} } { append_exit end4 2 {+ end4 2 } } { spawn {+ end4 2 } \"Bum\" }
             }
         { { do {println \"Both\" } 
           { def end4 {+ end3 2 } } { println \"End4\" end4 } {spawn_room 1} { spawn_room 13 } { spawn_room 6 } { spawn_room 11 } { append_exit {+ end4 3 } 1 {+ end4 2 } } { append_exit 3 0 end4 }
