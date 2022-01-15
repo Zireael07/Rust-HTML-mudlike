@@ -195,6 +195,7 @@
             id: 27,
             name: "Gas station",
             desc: "This seems to be an abandoned gas station. The pumps are broken or outright missing, but the building is still stocked in food, drink and candy.",
+            known: false,
             exits: [],
         ),
 

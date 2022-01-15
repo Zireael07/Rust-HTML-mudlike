@@ -582,6 +582,29 @@ impl Universe {
 
     }
 
+    //test: a number of positive + negative tokens, select one
+    fn make_test(&self, skill: u32) -> bool {
+        let mut toks = Vec::new();
+        for i in 1..=skill {
+            //first three tokens are positive (think of it like rolling under 3 or over 17 on a i-sized die)
+            if i <= 3 {
+                toks.push(1); //positive tokens
+            }
+            else {
+                toks.push(-1); //negative tokens
+            }
+        }
+
+        let mut rng = rand::thread_rng();
+        let sel = rng.gen_range(0, toks.len());
+
+        if toks[sel] == 1 {
+            return true; //succeeded
+        } else {
+            return false;
+        }
+
+    }
 
     //a very simple test, akin to flipping a coin or throwing a d2
     fn make_test_d2(&self, skill: u32) -> Vec<bool> {
@@ -593,11 +616,14 @@ impl Universe {
     }
 
     pub fn attack(&self, target: &Entity) {
-        let res = self.make_test_d2(1);
-        let sum = res.iter().filter(|&&b| b).count(); //iter returns references and filter works with references too - double indirection
+        //let res = self.make_test_d2(1);
+        //let sum = res.iter().filter(|&&b| b).count(); //iter returns references and filter works with references too - double indirection
         //game_message(&format!("Test: {} sum: {{g{}", Rolls(res), sum));
 
-        if sum >= 5 {
+        let res = self.make_test(6);
+
+        if res {
+        //if sum >= 5 {
             //game_message(&format!("Attack hits!"));
 
             //item bonuses
