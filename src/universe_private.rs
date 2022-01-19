@@ -1,6 +1,6 @@
 use super::log;
 use super::{Universe, Room, Exit, Distance, DataMaster, 
-    Player, GameMessages, Needs,
+    Player, GameMessages, Needs, Attributes, Attribute,
     AI, CombatStats, NPCName, EncDistance,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
@@ -210,8 +210,11 @@ impl Universe {
         // }
 
         //player dummy entity
+        // 15, 14, 13, 12, 10, 8 aka elite array
         self.ecs_world.spawn(("Player".to_string(), Player{}, 0 as usize, CombatStats{hp:20, max_hp: 20, defense:1, power:1},  Needs{hunger:500, thirst:300},
-         GameMessages{entries:vec![]}));
+         GameMessages{entries:vec![]},
+         Attributes{strength:Attribute{base:2, bonus:0}, dexterity:Attribute{base:1, bonus:0}, constitution:Attribute{base:2, bonus:0}, intelligence:Attribute{base:1,bonus:0}, wisdom:Attribute{base:-1,bonus:0}, charisma:Attribute{base:0,bonus:0}}
+        ));
         //starting inventory
         self.give_item("Protein shake".to_string());
         self.give_item("Medkit".to_string());

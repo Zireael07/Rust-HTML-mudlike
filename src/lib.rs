@@ -54,6 +54,22 @@ pub struct Needs{
     pub thirst: i32,
 }
 
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+pub struct Attribute {
+    pub base : i32, // equal to what would've been the modifier in d20
+    pub bonus : i32
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+pub struct Attributes {
+    pub strength : Attribute,
+    pub dexterity : Attribute,
+    pub constitution : Attribute,
+    pub intelligence : Attribute,
+    pub wisdom : Attribute,
+    pub charisma : Attribute,
+}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct AI {}
 
