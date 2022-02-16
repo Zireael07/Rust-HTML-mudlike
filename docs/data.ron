@@ -198,6 +198,13 @@
             known: false,
             exits: [],
         ),
+        (
+            id: 28,
+            name: "Luxury hotel",
+            desc: "This seems to be a luxury hotel. Rooms several times the size of capsules, and floors covered with either mats or carpets (both equally colorful, soft and ornate) even in the corridors.",
+            known: false,
+            exits: []
+        ),
 
     ],
     items: [
