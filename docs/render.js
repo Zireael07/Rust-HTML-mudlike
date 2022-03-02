@@ -242,6 +242,20 @@ function npcClick(button) {
     addHandlers(inv);
 }
 
+function examineClick() {
+    //append to game view
+    var output = document.getElementById("game").innerHTML;
+    output += '\n\n ';
+
+    var examine = universe.examine();
+    output += examine;
+
+    document.getElementById("game").innerHTML = output;
+    
+    let inv = universe.display_inventory();
+    addHandlers(inv);
+}
+
 
 function draw() {
     var map = universe.get_current_map();
@@ -287,6 +301,8 @@ function draw() {
     if (inv.length > 0) {
         output = output +  `<button class="inv_button" id=inventory>Inventory</button>`;
     }
+
+    output = output + `<button class="exa_button" id=examine>Examine</button>`;
 
     document.getElementById("game").innerHTML = output;
 
@@ -485,6 +501,11 @@ function addHandlers(inv){
         var use_button = document.querySelector(".inv_use_button");
         if (use_button) {
             use_button.onclick = function(e) { useClick(e.target); }
+        }
+
+        var exa_button = document.querySelector(".exa_button");
+        if (exa_button) {
+            exa_button.onclick = function(e) { examineClick(); }
         }
         
         //map handler

@@ -518,6 +518,11 @@ impl Universe {
         return JsValue::from_serde(&messages).unwrap();
     }
 
+    pub fn examine(&self) -> JsValue {
+        let stats = self.get_stats();
+        return JsValue::from_str(&stats);
+    }
+
     fn know_room(&mut self, id: usize) {
         self.map[id].known = true;
     }

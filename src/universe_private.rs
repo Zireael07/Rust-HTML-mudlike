@@ -435,6 +435,15 @@ impl Universe {
         return msg;
     }
 
+    pub fn get_stats(&self) -> String {
+        let player = self.get_player();
+        if player.is_some() {
+            let stats = self.ecs_world.get::<Attributes>(player.unwrap()).unwrap();
+            return format!("Player stats: {:?}", *stats);
+        }
+        return "".to_string();
+    }
+
     pub fn give_item(&mut self, name: String) {
         //let current_room = self.current_room;
 
