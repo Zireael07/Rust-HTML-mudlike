@@ -468,6 +468,7 @@ impl Universe {
             )
           );
 
+
         //lispy::slurp_eval(&mut state.env);
 
         log!("We have a universe");
@@ -654,6 +655,11 @@ impl Universe {
         }
     }
 
+    pub fn console_input(&mut self, input:String) {
+        log!("Rust console input: {}", input);
+        
+        self.debug_console_core(input);
+    }
 
     // main game process
     pub fn process(&mut self, cmd: String) {
@@ -662,32 +668,66 @@ impl Universe {
         self.command_handler(cmd);
 
         //handle script engine
-        // unsafe {
-        //     if GLOBAL_SCRIPT_OUTPUT.lock().unwrap().len() == 1 && GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] != None {
-        //         log!("script output {:?}", GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0]);
-        //         //unfortunately we need a clone here to work with non-Copy enum
-        //         match GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0].clone().unwrap() {
-        //             ScriptCommand::GoRoom{id} => {
-        //                 let new_room = id;
-        //                 self.current_room = new_room;
-        //                 //mark as known
-        //                 self.know_room(new_room);
-        //                 //log!("{}", &format!("New room {}", self.current_room));
-        //                 self.end_turn();
-        //             },
-        //             ScriptCommand::Spawn{room, name} => {
-        //                 self.ecs_world.spawn((name.trim().to_string(), room as usize));
-        //             }
-        //             _ => { log!("{}", format!("Unimplemented scripting command {:?} ", GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0])); }
-        //         }
-        //     }
-        // }
+        unsafe {
+            //debug
+            //don't use let here because it makes problems, see universe_private l.350...
+            //let vec = &*GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
+            for cmd in &mut *GLOBAL_SCRIPT_OUTPUT.lock().unwrap() {
+                log!("cmd: {:?}", cmd);
+                match cmd.clone().unwrap() {
+                    ScriptCommand::GoRoom{id} => {
+                        let new_room = id;
+                        self.current_room = new_room;
+                        //mark as known
+                        self.know_room(new_room);
+                        //log!("{}", &format!("New room {}", self.current_room));
+                        self.end_turn();
+                    },
+                    ScriptCommand::Spawn{room, name} => {
+                        let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize));
+                        //we can't match Strings :(
+                        match name.as_str() {
+                            // "Thug" => {
+                            //     self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
+                            //     let l_jacket = self.ecs_world.spawn((data.items[1].name.to_string(), data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
+                            //     let boots = self.ecs_world.spawn((data.items[0].name.to_string(), data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
+                            //     let jeans = self.ecs_world.spawn((data.items[2].name.to_string(), data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
+                            //     self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
+                            //     self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
+                            //     self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
+                            // },
+                            // "Shooter" => {
+                            //     self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
+                            //     let l_jacket = self.ecs_world.spawn((data.items[1].name.to_string(), data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
+                            //     let boots = self.ecs_world.spawn((data.items[0].name.to_string(), data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
+                            //     let jeans = self.ecs_world.spawn((data.items[2].name.to_string(), data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
+                            //     self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
+                            //     self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
+                            //     self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
+                            //     let pistol = self.ecs_world.spawn((Item{}, Equippable{ slot: EquipmentSlot::Melee }, Ranged{}, ToRemove{yes:false}));
+                            //     self.ecs_world.insert_one(pistol, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Melee});
+                            // },
+                            _ => {
+                                //randomized NPC name
+                                let sel_name = Universe::randomized_NPC_name(true, &self.names);
+                                let nm = self.ecs_world.insert_one(sp, NPCName{name: sel_name.to_string()});
+                                log!("{}", &format!("{}", sel_name.to_string()));
+                            }
+                        }
+                    }
+                    _ => { log!("{}", format!("Unimplemented scripting command {:?} ", cmd)); }
+                } //match ends
 
-           
+            }
+            GLOBAL_SCRIPT_OUTPUT.lock().unwrap().clear();
+        }
 
         //clear
         // unsafe {
-        //     GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] = None;
+        //     if GLOBAL_SCRIPT_OUTPUT.lock().unwrap().len() == 1 {
+        //         GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] = None;
+        //     }
+            
         // }
     }
 }

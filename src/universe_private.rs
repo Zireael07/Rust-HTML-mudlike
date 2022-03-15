@@ -225,8 +225,8 @@ impl Universe {
         log!("Test scripting...");
         lispy::read_eval(data.lisp_script, &mut self.env);
         //process all of the queued up commands from the lispy script here
-        let vec = &*GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
-        for cmd in vec {
+        //let mut vec = &mut *GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
+        for cmd in &mut *GLOBAL_SCRIPT_OUTPUT.lock().unwrap() {
             match cmd.clone().unwrap() {
                 ScriptCommand::GoRoom{id} => {
                     let new_room = id;
@@ -345,7 +345,12 @@ impl Universe {
 
         }
         //unlock the mutex
-        drop(vec);
+        //drop(vec);
+        //test (wtf is this not dropped?!)
+        //log!("{:?}", vec);
+
+        GLOBAL_SCRIPT_OUTPUT.lock().unwrap().clear();
+
     }
 
     pub fn get_entities_in_room(&self, rid: usize) -> Vec<u64> {
@@ -791,4 +796,14 @@ impl Universe {
         }
     }
 
-}
+    pub fn debug_console_core(&mut self, input:String) {
+        //split by spaces
+        //let v: Vec<&str> = input.split(' ').collect();
+        //debug
+        log!("{}", &format!("{:?}", input));
+
+        lispy::read_eval(input, &mut self.env);
+        self.process("".to_string()); //dummy
+    }
+
+} // end of Universe impl
