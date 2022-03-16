@@ -117,7 +117,7 @@ pub struct Equipped {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Consumable{} //in the sense that it is limited use only
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct ProvidesHealing {
     pub heal_amount : i32
 }
@@ -722,7 +722,7 @@ impl Universe {
                     }
                     ScriptCommand::DebugEntity{id} => {
                         let entity = hecs::Entity::from_bits(id.try_into().unwrap()); //restore
-                        log!("{:?} {:?}", entity, format_entity(self.ecs_world.entity(entity).unwrap()));
+                        log!("{:?} {:?} {:?}", entity, format_entity(self.ecs_world.entity(entity).unwrap()), self.print_components(entity));
                     },
                     ScriptCommand::Spawn{room, name} => {
                         let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize));

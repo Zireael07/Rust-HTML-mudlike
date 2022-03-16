@@ -796,6 +796,40 @@ impl Universe {
         }
     }
 
+    // -------------
+    pub fn print_components(&self, entity: Entity) -> String {
+        let mut desc = "".to_string();
+        if self.ecs_world.get::<CombatStats>(entity).is_ok() {
+            let tmp = format!("{:?}", *self.ecs_world.get::<CombatStats>(entity).unwrap());
+            desc = format!("{} {}", desc, tmp);
+        }
+        if self.ecs_world.get::<Item>(entity).is_ok(){
+            let tmp = format!("{:?}", *self.ecs_world.get::<Item>(entity).unwrap());
+            desc = format!("{} {}", desc, tmp);
+        }
+        if self.ecs_world.get::<DefenseBonus>(entity).is_ok(){
+            let tmp = format!("{:?}", *self.ecs_world.get::<DefenseBonus>(entity).unwrap());
+            desc = format!("{} {}", desc, tmp);
+        }
+        if self.ecs_world.get::<ProvidesHealing>(entity).is_ok(){
+            let tmp = format!("{:?}", *self.ecs_world.get::<ProvidesHealing>(entity).unwrap());
+            desc = format!("{} {}", desc, tmp);
+        }
+
+        if self.ecs_world.get::<Equippable>(entity).is_ok() {
+            let tmp = format!("{:?}", *self.ecs_world.get::<Equippable>(entity).unwrap());
+            desc = format!("{} {}", desc, tmp);
+        }
+
+        if self.ecs_world.get::<Equipped>(entity).is_ok() {
+            let tmp = format!("{:?}", *self.ecs_world.get::<Equipped>(entity).unwrap());
+            desc = format!("{} {}", desc, tmp);
+        }
+
+        return desc
+    }
+
+
     pub fn debug_console_core(&mut self, input:String) {
         //split by spaces
         //let v: Vec<&str> = input.split(' ').collect();
