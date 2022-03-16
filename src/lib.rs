@@ -22,6 +22,9 @@ use std::sync::Mutex;
 // is trick to be able to store variables :P
 use std::sync::{Arc, RwLock};
 
+//tin
+use std::convert::TryInto;
+
 //ECS
 use hecs::World;
 use hecs::Entity;
@@ -232,6 +235,8 @@ pub enum ScriptCommand {
     AppendExit { id: usize, exit: u8, exit_to: usize },
     RemoveExit { id: usize, exit: u8 },
     EditExit { id: usize, exit: u8, exit_to: usize },
+    DebugList,
+    DebugEntity { id: usize },
 }
 
 //https://enodev.fr/posts/rusticity-convert-an-integer-to-an-enum.html
@@ -467,7 +472,34 @@ impl Universe {
               }
             )
           );
+          state.env.data.insert(
+            "debug_list".to_string(), 
+            RispExp::Func(
+              |args: &[RispExp]| -> Result<RispExp, RispErr> {
+                //let floats = parse_list_of_floats(args)?;
+                //let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
+                log!("debug");
 
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::DebugList));
+
+                Ok(RispExp::Bool(true))
+              }
+            )
+          );
+          state.env.data.insert(
+            "debug".to_string(), 
+            RispExp::Func(
+              |args: &[RispExp]| -> Result<RispExp, RispErr> {
+                let floats = parse_list_of_floats(args)?;
+                let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
+                log!("debug {}", format!("{}", first));
+
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::DebugEntity{id: floats[0] as usize}));
+
+                Ok(RispExp::Bool(true))
+              }
+            )
+          );
 
         //lispy::slurp_eval(&mut state.env);
 
@@ -683,10 +715,21 @@ impl Universe {
                         //log!("{}", &format!("New room {}", self.current_room));
                         self.end_turn();
                     },
+                    ScriptCommand::DebugList => {
+                        for (id, (room_id)) in &mut self.ecs_world.query::<&usize>() {
+                            log!("{:?} {:?}", id.to_bits(), format_entity(self.ecs_world.entity(id).unwrap()));
+                        }
+                    }
+                    ScriptCommand::DebugEntity{id} => {
+                        let entity = hecs::Entity::from_bits(id.try_into().unwrap()); //restore
+                        log!("{:?} {:?}", entity, format_entity(self.ecs_world.entity(entity).unwrap()));
+                    },
                     ScriptCommand::Spawn{room, name} => {
                         let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize));
                         //we can't match Strings :(
                         match name.as_str() {
+                            //FIXME: can't access data here for some reason?
+
                             // "Thug" => {
                             //     self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
                             //     let l_jacket = self.ecs_world.spawn((data.items[1].name.to_string(), data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
@@ -757,3 +800,33 @@ pub fn get_var(v_name:String) -> Result<RispExp, RispErr> {
         _ => Err(RispErr::Reason("rust-var not found".to_string())),    
     }
 }
+
+    //hecs examples/format.rs
+    pub fn format_entity(entity: hecs::EntityRef<'_>) -> String {
+        fn fmt<T: hecs::Component + std::fmt::Display>(entity: hecs::EntityRef<'_>) -> Option<String> {
+            Some(entity.get::<T>()?.to_string())
+        }
+    
+        const FUNCTIONS: &[&dyn Fn(hecs::EntityRef<'_>) -> Option<String>] =
+            //types we want printed (so far, just those which are guaranteed to exist)
+            &[&fmt::<String>, &fmt::<usize>];
+    
+        let mut out = String::new();
+
+        for f in FUNCTIONS {
+            if let Some(x) = f(entity) {
+                if out.is_empty() {
+                    out.push_str("[");
+                } else {
+                    out.push_str(", ");
+                }
+                out.push_str(&x);
+            }
+        }
+        if out.is_empty() {
+            out.push_str(&"[]");
+        } else {
+            out.push(']');
+        }
+        out
+    }
