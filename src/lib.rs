@@ -200,6 +200,9 @@ pub struct DataMaster {
     pub lisp_script: String,
 }
 
+pub struct DataGlobal {
+    pub items: Vec<ItemPrefab>,
+}
 
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
@@ -220,6 +223,9 @@ lazy_static! {
     //based on https://github.com/WesterWest/calisp/commit/b6a18038cfed2c02aa3f9b3228b07e6846200277
     static ref GLOBAL_SCRIPT_VARIABLES: Arc<RwLock<HashMap<String, RispExp>>> =
     Arc::new(RwLock::new(HashMap::default()));
+    //need it to be global to be able to access it from script
+    //RWLock allows one writer and multiple readers, therefore avoiding a mutex deadlock in scripting processing
+    static ref DATA: Arc<RwLock<DataGlobal>> = Arc::new(RwLock::new(DataGlobal::new()));
 }
 //pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
 
@@ -255,6 +261,15 @@ impl Exit {
     }
 }
 
+//the part of DataMaster that can be safely opened to all of the game
+// DataMaster itself doesn't need a new() since it's built from RON
+impl DataGlobal {
+    pub fn new() -> DataGlobal {
+        DataGlobal {
+            items: Vec::new(),
+        }
+    }
+}
 
 /// Public methods, exported to JavaScript.
 #[wasm_bindgen]
@@ -304,7 +319,8 @@ pub async fn load_datafile(mut state: Universe) -> Universe {
     // for s in &data.toki_pona {
     //     log!("{}", s);
     // }
-
+    
+    //game_start() deals with everything else we may need data for (including making part of it global)
     state.game_start(data);
 
     return state
@@ -701,11 +717,13 @@ impl Universe {
 
         //handle script engine
         unsafe {
-            //debug
+
             //don't use let here because it makes problems, see universe_private l.350...
             //let vec = &*GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
             for cmd in &mut *GLOBAL_SCRIPT_OUTPUT.lock().unwrap() {
+                //debug
                 log!("cmd: {:?}", cmd);
+                //TODO: deduplicate/reuse code for script commands processing from universe_private.rs (l.235)
                 match cmd.clone().unwrap() {
                     ScriptCommand::GoRoom{id} => {
                         let new_room = id;
@@ -728,28 +746,28 @@ impl Universe {
                         let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize));
                         //we can't match Strings :(
                         match name.as_str() {
-                            //FIXME: can't access data here for some reason?
+                            //made DATA global for the sole reason of being able to use it here
 
-                            // "Thug" => {
-                            //     self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
-                            //     let l_jacket = self.ecs_world.spawn((data.items[1].name.to_string(), data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
-                            //     let boots = self.ecs_world.spawn((data.items[0].name.to_string(), data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
-                            //     let jeans = self.ecs_world.spawn((data.items[2].name.to_string(), data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
-                            //     self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
-                            //     self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
-                            //     self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
-                            // },
-                            // "Shooter" => {
-                            //     self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
-                            //     let l_jacket = self.ecs_world.spawn((data.items[1].name.to_string(), data.items[1].item.unwrap(), data.items[1].equippable.unwrap(), data.items[1].defense.unwrap())); //ToRemove{yes:false}
-                            //     let boots = self.ecs_world.spawn((data.items[0].name.to_string(), data.items[0].item.unwrap(), data.items[0].equippable.unwrap(), data.items[0].defense.unwrap()));
-                            //     let jeans = self.ecs_world.spawn((data.items[2].name.to_string(), data.items[2].item.unwrap(), data.items[2].equippable.unwrap(), data.items[2].defense.unwrap()));
-                            //     self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
-                            //     self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
-                            //     self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
-                            //     let pistol = self.ecs_world.spawn((Item{}, Equippable{ slot: EquipmentSlot::Melee }, Ranged{}, ToRemove{yes:false}));
-                            //     self.ecs_world.insert_one(pistol, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Melee});
-                            // },
+                            "Thug" => {
+                                self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
+                                let l_jacket = self.ecs_world.spawn((DATA.read().unwrap().items[1].name.to_string(), DATA.read().unwrap().items[1].item.unwrap(), DATA.read().unwrap().items[1].equippable.unwrap(), DATA.read().unwrap().items[1].defense.unwrap())); //ToRemove{yes:false}
+                                let boots = self.ecs_world.spawn((DATA.read().unwrap().items[0].name.to_string(), DATA.read().unwrap().items[0].item.unwrap(), DATA.read().unwrap().items[0].equippable.unwrap(), DATA.read().unwrap().items[0].defense.unwrap()));
+                                let jeans = self.ecs_world.spawn((DATA.read().unwrap().items[2].name.to_string(), DATA.read().unwrap().items[2].item.unwrap(), DATA.read().unwrap().items[2].equippable.unwrap(), DATA.read().unwrap().items[2].defense.unwrap()));
+                                self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
+                                self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
+                                self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
+                            },
+                            "Shooter" => {
+                                self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
+                                let l_jacket = self.ecs_world.spawn((DATA.read().unwrap().items[1].name.to_string(), DATA.read().unwrap().items[1].item.unwrap(), DATA.read().unwrap().items[1].equippable.unwrap(), DATA.read().unwrap().items[1].defense.unwrap())); //ToRemove{yes:false}
+                                let boots = self.ecs_world.spawn((DATA.read().unwrap().items[0].name.to_string(), DATA.read().unwrap().items[0].item.unwrap(), DATA.read().unwrap().items[0].equippable.unwrap(), DATA.read().unwrap().items[0].defense.unwrap()));
+                                let jeans = self.ecs_world.spawn((DATA.read().unwrap().items[2].name.to_string(), DATA.read().unwrap().items[2].item.unwrap(), DATA.read().unwrap().items[2].equippable.unwrap(), DATA.read().unwrap().items[2].defense.unwrap()));
+                                self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
+                                self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
+                                self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
+                                let pistol = self.ecs_world.spawn((Item{}, Equippable{ slot: EquipmentSlot::Melee }, Ranged{}, ToRemove{yes:false}));
+                                self.ecs_world.insert_one(pistol, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Melee});
+                            },
                             _ => {
                                 //randomized NPC name
                                 let sel_name = Universe::randomized_NPC_name(true, &self.names);
