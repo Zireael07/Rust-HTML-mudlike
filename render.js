@@ -242,6 +242,20 @@ function npcClick(button) {
     addHandlers(inv);
 }
 
+function examineClick() {
+    //append to game view
+    var output = document.getElementById("game").innerHTML;
+    output += '\n\n ';
+
+    var examine = universe.examine();
+    output += examine;
+
+    document.getElementById("game").innerHTML = output;
+    
+    let inv = universe.display_inventory();
+    addHandlers(inv);
+}
+
 
 function draw() {
     var map = universe.get_current_map();
@@ -287,6 +301,8 @@ function draw() {
     if (inv.length > 0) {
         output = output +  `<button class="inv_button" id=inventory>Inventory</button>`;
     }
+
+    output = output + `<button class="exa_button" id=examine>Examine</button>`;
 
     document.getElementById("game").innerHTML = output;
 
@@ -486,6 +502,11 @@ function addHandlers(inv){
         if (use_button) {
             use_button.onclick = function(e) { useClick(e.target); }
         }
+
+        var exa_button = document.querySelector(".exa_button");
+        if (exa_button) {
+            exa_button.onclick = function(e) { examineClick(); }
+        }
         
         //map handler
         var map_button = document.querySelector(".nav");
@@ -503,6 +524,24 @@ async function initGame(wasm) {
     universe = await rust.load_datafile(universe);
 
     initRenderer(wasm);
+
+    //hidden console
+    document.getElementById("console-input").addEventListener('keyup', e => {
+        //console.log("Keyup:", e.target.value);
+        e.stopPropagation();
+    });
+    document.getElementById("console-input").addEventListener('keydown', e => {
+        //console.log("Keydown:", e.target.value);
+        e.stopPropagation();
+    });
+    //only fires when the value is committed
+    document.getElementById("console-input").addEventListener('change', e => {
+        //console.log("Console input", e.target.value);
+        universe.console_input(e.target.value);
+        e.target.value = null //empty the input after accepting it
+        //redraw the game
+        draw();
+    });
 }
 
 function initRenderer(wasm) {
