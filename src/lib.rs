@@ -27,7 +27,7 @@ use std::convert::TryInto;
 
 //ECS
 use hecs::World;
-use hecs::Entity;
+use hecs::{Entity, EntityBuilder};
 
 //RNG
 use rand::Rng;
@@ -750,18 +750,18 @@ impl Universe {
 
                             "Thug" => {
                                 self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
-                                let l_jacket = self.ecs_world.spawn((DATA.read().unwrap().items[1].name.to_string(), DATA.read().unwrap().items[1].item.unwrap(), DATA.read().unwrap().items[1].equippable.unwrap(), DATA.read().unwrap().items[1].defense.unwrap())); //ToRemove{yes:false}
-                                let boots = self.ecs_world.spawn((DATA.read().unwrap().items[0].name.to_string(), DATA.read().unwrap().items[0].item.unwrap(), DATA.read().unwrap().items[0].equippable.unwrap(), DATA.read().unwrap().items[0].defense.unwrap()));
-                                let jeans = self.ecs_world.spawn((DATA.read().unwrap().items[2].name.to_string(), DATA.read().unwrap().items[2].item.unwrap(), DATA.read().unwrap().items[2].equippable.unwrap(), DATA.read().unwrap().items[2].defense.unwrap()));
+                                let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[1]).build());
+                                let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[0]).build());
+                                let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[2]).build());
                                 self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                                 self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                                 self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
                             },
                             "Shooter" => {
                                 self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
-                                let l_jacket = self.ecs_world.spawn((DATA.read().unwrap().items[1].name.to_string(), DATA.read().unwrap().items[1].item.unwrap(), DATA.read().unwrap().items[1].equippable.unwrap(), DATA.read().unwrap().items[1].defense.unwrap())); //ToRemove{yes:false}
-                                let boots = self.ecs_world.spawn((DATA.read().unwrap().items[0].name.to_string(), DATA.read().unwrap().items[0].item.unwrap(), DATA.read().unwrap().items[0].equippable.unwrap(), DATA.read().unwrap().items[0].defense.unwrap()));
-                                let jeans = self.ecs_world.spawn((DATA.read().unwrap().items[2].name.to_string(), DATA.read().unwrap().items[2].item.unwrap(), DATA.read().unwrap().items[2].equippable.unwrap(), DATA.read().unwrap().items[2].defense.unwrap()));
+                                let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[1]).build());
+                                let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[0]).build());
+                                let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[2]).build());
                                 self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                                 self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                                 self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
