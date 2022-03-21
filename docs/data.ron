@@ -221,16 +221,30 @@
             defense: DefenseBonus(bonus:0.15)
         ),
         (
+            name: "Jeans",
+            item: Item(), //unit struct
+            equippable: (slot: Legs),
+            defense: DefenseBonus(bonus:0.1),
+        ),
+        (
             name: "Camo",
             item: Item(), //unit struct
             equippable: (slot: Torso),
             defense: DefenseBonus(bonus:0.05)
         ),
         (
-            name: "Jeans",
+            name: "Combat knife",
             item: Item(), //unit struct
-            equippable: (slot: Legs),
-            defense: DefenseBonus(bonus:0.1),
+            equippable: (slot: Melee),
+            melee: MeleeBonus(bonus:2),
+            rem: ToRemove(yes: false),
+        ),
+        (
+            name: "Baton",
+            item: Item(), //unit struct
+            equippable: (slot: Melee),
+            melee: MeleeBonus(bonus:1),
+            rem: ToRemove(yes: false),
         ),
     ],
     //scripting
@@ -274,8 +288,8 @@
     { spawn 18 \"Seller\" }
     { spawn 3 \"Thug\" }
     { spawn_item 2 \"Medkit\" }
-    { spawn_item 1 \"Combat knife\" }
-    { spawn_item 2 \"Leather jacket\" }
+    { spawn_item 1 \"Combat_knife\" }
+    { spawn_item 2 \"Leather_jacket\" }
     { spawn_item 2 \"Boots\" }
     { spawn_item 2 \"Jeans\" }
     { spawn_item 5 \"Pistol\" }

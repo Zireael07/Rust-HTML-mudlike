@@ -101,6 +101,7 @@ pub struct WantsToDropItem {
     pub item : Entity
 }
 // tells the engine to nuke us
+#[derive(Copy, Clone, Serialize, Deserialize)] //temporarily while I figure out something better
 pub struct ToRemove {pub yes: bool} //bool is temporary while we can't modify entities when iterating
 
 #[derive(Debug, PartialEq, Copy, Clone, Serialize, Deserialize)]
@@ -187,6 +188,8 @@ pub struct ItemPrefab {
     pub item: Option<Item>,
     pub equippable: Option<Equippable>,
     pub defense: Option<DefenseBonus>,
+    pub melee: Option<MeleeBonus>,
+    pub rem: Option<ToRemove>,
 }
 
 //what it says
