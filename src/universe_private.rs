@@ -42,8 +42,12 @@ impl From<&ItemPrefab> for hecs::EntityBuilder {
 impl Universe {
     //moved because of //https://github.com/rustwasm/wasm-bindgen/issues/111 preventing using our data
     pub fn game_start(&mut self, data: DataMaster) {
-        //write the global data
+        //setup the global data
+        for (i,item) in data.items.iter().enumerate() {
+            DATA.write().unwrap().item_index.insert(item.name.clone(), i);
+        }
         DATA.write().unwrap().items = data.items;
+        
 
         //NOTE: trying to use &data throws weird errors here
         //load sentences into the generator
@@ -73,6 +77,7 @@ impl Universe {
         }
 
         // OBSOLETE: map now generated via scripting
+        //TODO: identify rooms definitions by hashmap and strings instead of vector and indices
 
         //now clone some capsules and place them in the hotel
         //let mut ca = self.map[5].clone();
@@ -131,6 +136,8 @@ impl Universe {
         log!("More: {} {}", more, ((more as i32) as f64));
         self.env.data.insert("map_max".to_string(), lispy::RispExp::Number(max as f64));
         log!("Max: {}", max);
+
+        // OBSOLETE: map now generated via scripting
 
         //finish up the starting line
         // for i in 0..1+more as i32 {
@@ -265,24 +272,24 @@ impl Universe {
                 ScriptCommand::Spawn{room, name} => {
                     let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize));
 
-                    //TODO: Hashmap and strings instead of vector and indices
                     //we can't match Strings :(
                     match name.as_str() {
                         "Thug" => {
                             self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
                             //let l_jacket = self.ecs_world.spawn((DATA.read().unwrap().items[1].name.to_string(), DATA.read().unwrap().items[1].item.unwrap(), DATA.read().unwrap().items[1].equippable.unwrap(), DATA.read().unwrap().items[1].defense.unwrap())); //ToRemove{yes:false}
-                            let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[1]).build());
-                            let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[0]).build());
-                            let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[2]).build());
+                            //let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[1]).build());
+                            let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build());
+                            let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build());
+                            let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Jeans"]]).build());
                             self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                             self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                             self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
                         },
                         "Shooter" => {
                             self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
-                            let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[1]).build());
-                            let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[0]).build());
-                            let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[2]).build());
+                            let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build());
+                            let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build());
+                            let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Jeans"]]).build());
                             self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                             self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                             self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
@@ -302,13 +309,13 @@ impl Universe {
                     let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize, Item{}));
                     match name.as_str() {
                         "Medkit" => { self.ecs_world.insert(sp, (Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false})); },
-                        "Combat_knife" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[4]).build()); },
-                        "Baton" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[5]).build()); },
+                        "Combat_knife" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Combat knife"]]).build()); },
+                        "Baton" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Baton"]]).build()); },
                         "Pistol" => { self.ecs_world.insert(sp, (Equippable{ slot: EquipmentSlot::Melee }, ToRemove{yes:false})); },
-                        "Leather_jacket" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[1]).build()); }, //ToRemove{yes:false}
-                        "Camo" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[3]).build()); },
-                        "Boots" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[0]).build()); },
-                        "Jeans" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[2]).build()); },
+                        "Leather_jacket" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build()); }, //ToRemove{yes:false}
+                        "Camo" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Camo"]]).build()); },
+                        "Boots" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build()); },
+                        "Jeans" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Jeans"]]).build()); },
                         _ => { }
                     }
                 },

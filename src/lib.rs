@@ -205,6 +205,7 @@ pub struct DataMaster {
 
 pub struct DataGlobal {
     pub items: Vec<ItemPrefab>,
+    pub item_index: HashMap<String, usize>,
 }
 
 #[repr(u8)]
@@ -270,6 +271,7 @@ impl DataGlobal {
     pub fn new() -> DataGlobal {
         DataGlobal {
             items: Vec::new(),
+            item_index : HashMap::new(),
         }
     }
 }
@@ -753,18 +755,18 @@ impl Universe {
 
                             "Thug" => {
                                 self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
-                                let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[1]).build());
-                                let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[0]).build());
-                                let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[2]).build());
+                                let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build());
+                                let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build());
+                                let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Jeans"]]).build());
                                 self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                                 self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                                 self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
                             },
                             "Shooter" => {
                                 self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
-                                let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[1]).build());
-                                let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[0]).build());
-                                let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[2]).build());
+                                let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build());
+                                let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build());
+                                let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Jeans"]]).build());
                                 self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                                 self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                                 self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
