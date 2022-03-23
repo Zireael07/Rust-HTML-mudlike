@@ -206,6 +206,7 @@ pub struct DataMaster {
 pub struct DataGlobal {
     pub items: Vec<ItemPrefab>,
     pub item_index: HashMap<String, usize>,
+    pub room_index: HashMap<String, usize>,
 }
 
 #[repr(u8)]
@@ -240,7 +241,7 @@ pub enum ScriptCommand {
     GoRoom { id: usize },
     Spawn { room: usize, name:String },
     SpawnItem { room: usize, name:String },
-    SpawnRoom { id: usize },
+    SpawnRoom { name: String },
     SetExit { id: usize, exit: u8, exit_to: usize },
     AppendExit { id: usize, exit: u8, exit_to: usize },
     RemoveExit { id: usize, exit: u8 },
@@ -272,6 +273,7 @@ impl DataGlobal {
         DataGlobal {
             items: Vec::new(),
             item_index : HashMap::new(),
+            room_index: HashMap::new(),
         }
     }
 }
@@ -406,9 +408,19 @@ impl Universe {
             "spawn_room".to_string(), 
             RispExp::Func(
               |args: &[RispExp]| -> Result<RispExp, RispErr> {
-                let floats = parse_list_of_floats(args)?;
-                let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
-                log!("spawning room id {}", first);
+                //let floats = parse_list_of_floats(args)?;
+                //let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
+                let first = args.get(0).ok_or(
+                    RispErr::Reason(
+                      "expected first form".to_string(),
+                    )
+                  )?;
+                
+
+                //do all necessary replacements/stripping
+                let key = &first.to_string().strip_suffix("\"").unwrap_or(&format!("Error {}", &first.to_string())).strip_prefix("\"").unwrap_or(&format!("Error {}", first.to_string())).to_string().replace("_", " ");
+                
+                //log!("spawning room id {}", id);
 
                 let mut num = 0;
                 
@@ -433,7 +445,7 @@ impl Universe {
                 //state.env.data.insert("end".to_string(), num_added);
 
                 //this is the scripting command
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SpawnRoom{id: first as usize}));
+                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SpawnRoom{name: key.to_string()}));
 
                 log!("Returning num: {}", new_end-1);
                 //Ok(RispExp::Bool(true))

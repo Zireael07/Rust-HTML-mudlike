@@ -46,6 +46,15 @@ impl Universe {
         for (i,item) in data.items.iter().enumerate() {
             DATA.write().unwrap().item_index.insert(item.name.clone(), i);
         }
+        for (i, room) in data.rooms.iter().enumerate() {
+            DATA.write().unwrap().room_index.insert(room.name.clone(), i);
+        }
+
+        //debug
+        for (key, value) in &DATA.read().unwrap().room_index {
+            log!("{}: {:?}", key, value);
+        }
+
         DATA.write().unwrap().items = data.items;
         
 
@@ -319,13 +328,23 @@ impl Universe {
                         _ => { }
                     }
                 },
-                ScriptCommand::SpawnRoom{id} => {
-                    //log!("Prev len: {}", self.map.len());
-                    let r = self.map[id].clone();
-                    log!("Spawned a room id {:?} ", r);
-                    //add to the map
-                    self.map.push(r);
-                    log!("Map len: {}", self.map.len());
+                ScriptCommand::SpawnRoom{name} => {
+                    //lookup the string
+                    //let id = DATA.read().unwrap().room_index[&first.to_string()];
+                    match DATA.read().unwrap().room_index.get(&name) {
+                        Some(id) => { 
+                            log!("{}:{}", name, id);
+                            // do the spawning
+                            //log!("Prev len: {}", self.map.len());
+                            let r = self.map[*id].clone();
+                            log!("Spawned a room id {:?} ", r);
+                            //add to the map
+                            self.map.push(r);
+                            log!("Map len: {}", self.map.len());
+                    },
+                        None => log!("{} doesn't exist.", name)
+                    }
+
                 },
                 ScriptCommand::SetExit{id, exit, exit_to} => {
                     if id >= self.map.len() {
