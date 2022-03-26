@@ -189,7 +189,10 @@ pub struct ItemPrefab {
     pub equippable: Option<Equippable>,
     pub defense: Option<DefenseBonus>,
     pub melee: Option<MeleeBonus>,
-    pub rem: Option<ToRemove>,
+    pub consumable: Option<Consumable>,
+    pub heal: Option<ProvidesHealing>,
+    pub ranged: Option<Ranged>,
+    pub rem: Option<ToRemove>, //temporarily while I figure out what to do
 }
 
 //what it says
@@ -782,7 +785,7 @@ impl Universe {
                                 self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                                 self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                                 self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
-                                let pistol = self.ecs_world.spawn((Item{}, Equippable{ slot: EquipmentSlot::Melee }, Ranged{}, ToRemove{yes:false}));
+                                let pistol = self.ecs_world.spawn((EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Pistol"]]).build()));
                                 self.ecs_world.insert_one(pistol, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Melee});
                             },
                             _ => {

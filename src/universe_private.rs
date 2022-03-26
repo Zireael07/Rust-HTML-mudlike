@@ -31,6 +31,15 @@ impl From<&ItemPrefab> for hecs::EntityBuilder {
         if prefab.melee.is_some() {
             builder.add(prefab.melee.unwrap());
         }
+        if prefab.ranged.is_some() {
+            builder.add(prefab.ranged.unwrap());
+        }
+        if prefab.consumable.is_some(){
+            builder.add(prefab.consumable.unwrap());
+        }
+        if prefab.heal.is_some(){
+            builder.add(prefab.heal.unwrap());
+        }
         if prefab.rem.is_some() {
             builder.add(prefab.rem.unwrap());
         }
@@ -302,7 +311,7 @@ impl Universe {
                             self.ecs_world.insert_one(l_jacket, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Torso});
                             self.ecs_world.insert_one(boots, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Feet});
                             self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
-                            let pistol = self.ecs_world.spawn((Item{}, Equippable{ slot: EquipmentSlot::Melee }, Ranged{}, ToRemove{yes:false}));
+                            let pistol = self.ecs_world.spawn((EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Pistol"]]).build()));
                             self.ecs_world.insert_one(pistol, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Melee});
                         },
                         _ => {
@@ -317,10 +326,10 @@ impl Universe {
                 ScriptCommand::SpawnItem{room, name} => {
                     let sp = self.ecs_world.spawn((name.trim().to_string(), room as usize, Item{}));
                     match name.as_str() {
-                        "Medkit" => { self.ecs_world.insert(sp, (Consumable{}, ProvidesHealing{heal_amount:5}, ToRemove{yes:false})); },
+                        "Medkit" => { self.ecs_world.insert(sp, (EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Pistol"]]).build())); },
                         "Combat_knife" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Combat knife"]]).build()); },
                         "Baton" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Baton"]]).build()); },
-                        "Pistol" => { self.ecs_world.insert(sp, (Equippable{ slot: EquipmentSlot::Melee }, ToRemove{yes:false})); },
+                        "Pistol" => { self.ecs_world.insert(sp, (EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Pistol"]]).build())); },
                         "Leather_jacket" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build()); }, //ToRemove{yes:false}
                         "Camo" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Camo"]]).build()); },
                         "Boots" => { self.ecs_world.insert(sp, EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build()); },

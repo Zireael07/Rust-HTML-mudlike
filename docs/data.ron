@@ -246,6 +246,20 @@
             melee: MeleeBonus(bonus:1),
             rem: ToRemove(yes: false),
         ),
+        (
+            name: "Pistol",
+            item: Item(), //unit struct
+            equippable: (slot: Melee),
+            ranged: Ranged(), //unit struct
+            rem: ToRemove(yes: false),
+        ),
+        (
+            name: "Medkit",
+            item: Item(), //unit struct
+            consumable: Consumable(),
+            heal: ProvidesHealing(heal_amount:5),
+            rem: ToRemove(yes: false),
+        ),
     ],
     //scripting
     lisp_script: "{do 
