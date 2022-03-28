@@ -293,7 +293,7 @@ impl Universe {
                     //we can't match Strings :(
                     match name.as_str() {
                         "Thug" => {
-                            self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
+                            self.ecs_world.insert(sp, (AI{}, CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
                             //let l_jacket = self.ecs_world.spawn((DATA.read().unwrap().items[1].name.to_string(), DATA.read().unwrap().items[1].item.unwrap(), DATA.read().unwrap().items[1].equippable.unwrap(), DATA.read().unwrap().items[1].defense.unwrap())); //ToRemove{yes:false}
                             //let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[1]).build());
                             let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build());
@@ -304,7 +304,7 @@ impl Universe {
                             self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
                         },
                         "Shooter" => {
-                            self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
+                            self.ecs_world.insert(sp, (AI{}, CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
                             let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build());
                             let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build());
                             let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Jeans"]]).build());
@@ -695,7 +695,7 @@ impl Universe {
         return rolls
     }
 
-    pub fn attack(&self, target: &Entity) {
+    pub fn attack(&self, attacker: &Entity, target: &Entity) {
         //let res = self.make_test_d2(1);
         //let sum = res.iter().filter(|&&b| b).count(); //iter returns references and filter works with references too - double indirection
         //game_message(&format!("Test: {} sum: {{g{}", Rolls(res), sum));
@@ -720,7 +720,7 @@ impl Universe {
             
             let player = self.get_player();
             let mut log = self.ecs_world.get_mut::<GameMessages>(player.unwrap()).unwrap();
-            log.entries.push(format!("Dealt {} damage", 2+offensive_bonus));
+            log.entries.push(format!("{} dealt {} damage", self.ecs_world.get::<String>(*attacker).unwrap().to_string(), 2+offensive_bonus));
             
             //can't remove dead here due to borrow checker
         } else {
@@ -742,14 +742,15 @@ impl Universe {
         .iter()
         {
             if *room_id == self.current_room {
+                log!("AI {} found in current room", self.ecs_world.get::<String>(id).unwrap().to_string());
                 //get player entity
                 let mut play: Option<Entity> = None;
-                for (id, (player)) in self.ecs_world.query::<(&Player)>().iter() {
-                    play = Some(id);
+                for (p_id, (player)) in self.ecs_world.query::<(&Player)>().iter() {
+                    play = Some(p_id);
                 }
                 match play {
                     Some(entity) => {
-                        self.attack(&entity);
+                        self.attack(&id, &entity);
                         let mut log = self.ecs_world.get_mut::<GameMessages>(entity).unwrap();
                         log.entries.push(format!("AI {} kicked at the player", self.ecs_world.get::<String>(id).unwrap().to_string()));
                     },

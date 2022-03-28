@@ -712,9 +712,12 @@ impl Universe {
                 let entity = hecs::Entity::from_bits(id); //restore
                 if self.ecs_world.get::<CombatStats>(entity).is_ok() {
                     log!("This is an enemy, attack");
-                    self.attack(&entity);                    
-                    //enemy turn
-                    self.end_turn();
+                    let player = self.get_player();
+                    if player.is_some(){
+                        self.attack(&player.unwrap(), &entity);                    
+                        //enemy turn
+                        self.end_turn();
+                    }
                 }
                 //language is handled in get_sentences() above
             },
@@ -769,7 +772,7 @@ impl Universe {
                             //made DATA global for the sole reason of being able to use it here
 
                             "Thug" => {
-                                self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
+                                self.ecs_world.insert(sp, (AI{}, CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Near}));
                                 let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build());
                                 let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build());
                                 let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Jeans"]]).build());
@@ -778,7 +781,7 @@ impl Universe {
                                 self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
                             },
                             "Shooter" => {
-                                self.ecs_world.insert(sp, (CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
+                                self.ecs_world.insert(sp, (AI{}, CombatStats{hp:10, max_hp:10, defense:1, power:1}, EncDistance{dist: Distance::Far}));
                                 let l_jacket = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Leather jacket"]]).build());
                                 let boots = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Boots"]]).build());
                                 let jeans = self.ecs_world.spawn(EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Jeans"]]).build());
