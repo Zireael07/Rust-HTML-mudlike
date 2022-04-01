@@ -39,6 +39,8 @@ use lispy::{RispExp, RispErr, parse_list_of_floats, parse_single_float};
 mod language;
 use language::{Markov};
 
+mod saveload;
+
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 #[macro_export]
 macro_rules! log {
@@ -730,6 +732,15 @@ impl Universe {
         log!("Rust console input: {}", input);
         
         self.debug_console_core(input);
+    }
+
+    pub fn save_game(&self) -> String {
+        log!("Saving game...");
+        return saveload::save_game(self);
+    }
+
+    pub fn load_save(&mut self, data: String) {
+        saveload::load_save(self, data);
     }
 
     // main game process
