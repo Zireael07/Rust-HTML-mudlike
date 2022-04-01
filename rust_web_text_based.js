@@ -419,6 +419,10 @@ async function init(input) {
         var ret = Universe.__wrap(arg0);
         return addHeapObject(ret);
     };
+    imports.wbg.__wbindgen_json_parse = function(arg0, arg1) {
+        var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
+        return addHeapObject(ret);
+    };
     imports.wbg.__wbindgen_cb_drop = function(arg0) {
         const obj = takeObject(arg0).original;
         if (obj.cnt-- == 1) {
@@ -427,10 +431,6 @@ async function init(input) {
         }
         var ret = false;
         return ret;
-    };
-    imports.wbg.__wbindgen_json_parse = function(arg0, arg1) {
-        var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
-        return addHeapObject(ret);
     };
     imports.wbg.__wbg_self_86b4b13392c7af56 = handleError(function() {
         var ret = self.self;
@@ -626,7 +626,7 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1060 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper1062 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 208, __wbg_adapter_22);
         return addHeapObject(ret);
     };
