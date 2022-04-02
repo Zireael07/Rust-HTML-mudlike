@@ -304,6 +304,8 @@ function draw() {
 
     output = output + `<button class="exa_button" id=examine>Examine</button>`;
 
+    output = output + `<button class="save_button" id=save>Save</button>`;
+
     document.getElementById("game").innerHTML = output;
 
     addHandlers(inv);
@@ -461,6 +463,26 @@ function updateMapSize(length, more) {
 
 }
 
+function saveGame(){
+    let save = universe.save_game();
+    // unfortunately we're using 0.0.6...
+    let storage = new Sifrr.Storage();
+    let data = {'save': save};
+    storage.set(data).then(() => {
+        console.log("Saved game to browser...");
+    }) ;
+}
+
+function loadGame(){
+    cmd = rust.Command.SaveGame; //dummy
+    let storage = new Sifrr.Storage(); //with the same (default) options, we access the same storage
+    storage.get('save').then(value => {
+        console.log("Loaded game: ", value)
+        //pass to Rust
+        universe.load_save(value.save);
+    });
+}
+
 
 function addHandlers(inv){
         // interactivity!
@@ -512,6 +534,11 @@ function addHandlers(inv){
         var map_button = document.querySelector(".nav");
         if (map_button) {
             map_button.onclick = function(e) { showMap(); }
+        }
+
+        var save_button = document.querySelector(".save_button");
+        if (save_button) {
+            save_button.onclick = function(e) { saveGame(); }
         }
 }
 
