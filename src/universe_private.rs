@@ -507,7 +507,8 @@ impl Universe {
         let player = self.get_player();
         if player.is_some() {
             let stats = self.ecs_world.get::<Attributes>(player.unwrap()).unwrap();
-            return format!("Player stats: {:?}", *stats);
+            let combat_stats = self.ecs_world.get_mut::<CombatStats>(player.unwrap()).unwrap();
+            return format!("Player: {:?} stats: {:?} ", *combat_stats, *stats);
         }
         return "".to_string();
     }

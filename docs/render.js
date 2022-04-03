@@ -304,6 +304,7 @@ function draw() {
 
     output = output + `<button class="exa_button" id=examine>Examine</button>`;
 
+    output = output + '\n\n';
     output = output + `<button class="save_button" id=save>Save</button>`;
 
     document.getElementById("game").innerHTML = output;
