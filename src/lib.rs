@@ -563,6 +563,11 @@ impl Universe {
         return JsValue::from_serde(room).unwrap();
     }
 
+    pub fn num_entities(&self) -> JsValue {
+        let entities = self.get_entities_in_room(self.current_room);
+        return JsValue::from_serde(&entities.len()).unwrap();
+    }
+
     pub fn display_entities_in_room(&self) -> JsValue {
         //let room = &self.map[self.current_room];
         let entities = self.get_entities_in_room(self.current_room);
@@ -589,9 +594,25 @@ impl Universe {
         return JsValue::from_serde(&messages).unwrap();
     }
 
-    pub fn examine(&self) -> JsValue {
-        let stats = self.get_stats();
-        return JsValue::from_str(&stats);
+    // works for both player, NPCs and items
+    pub fn examine(&self, idx: usize) -> JsValue {
+        let mut txt = "".to_string();
+        // we start from 0, it's the player
+        if idx == 0 {
+            let stats = self.get_stats();
+            txt = stats;
+        } else {
+            let entities = self.get_entities_in_room(self.current_room);
+            //paranoia
+            if idx-1 <= entities.len() {
+                //because they're indexed from 0, and 0 is the player
+                let ent = hecs::Entity::from_bits(entities[idx-1]);
+                let name = self.ecs_world.get::<String>(ent).unwrap().to_string();
+                txt = " carefully the ".to_string() + &name;
+            }
+        }
+
+        return JsValue::from_str(&txt);
     }
 
     fn know_room(&mut self, id: usize) {
