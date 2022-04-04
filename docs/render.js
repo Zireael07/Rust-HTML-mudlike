@@ -243,17 +243,23 @@ function npcClick(button) {
 }
 
 function examineClick() {
-    //append to game view
+    var str = 'You see: ';
     var output = document.getElementById("game").innerHTML;
-    output += '\n\n ';
+    var is_open = output.indexOf(str);
 
-    var examine = universe.examine();
-    output += examine;
+    //don't append if already open
+    if (is_open == -1) {
+        //append to game view
+        output += '\n\n ' + str;
 
-    document.getElementById("game").innerHTML = output;
+        var examine = universe.examine();
+        output += examine;
+
+        document.getElementById("game").innerHTML = output;
     
-    let inv = universe.display_inventory();
-    addHandlers(inv);
+        let inv = universe.display_inventory();
+        addHandlers(inv);
+    }
 }
 
 
