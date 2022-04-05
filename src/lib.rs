@@ -608,7 +608,12 @@ impl Universe {
                 //because they're indexed from 0, and 0 is the player
                 let ent = hecs::Entity::from_bits(entities[idx-1]);
                 let name = self.ecs_world.get::<String>(ent).unwrap().to_string();
-                txt = " carefully the ".to_string() + &name;
+                txt = " carefully the ".to_string() + &name + ".";
+                let cmb = self.ecs_world.get::<CombatStats>(ent);
+                // non-combat NPCs don't have combat stats
+                if cmb.is_ok() {
+                    txt += &format!(" They are hostile. {:?} ", *cmb.unwrap());
+                }
             }
         }
 
