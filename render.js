@@ -3,6 +3,8 @@ import * as rust from './rust_web_text_based.js';
 
 var universe, g_wasm; // Can't be initialized yet because WASM is not ready
 
+var index = 0; var done = false; //needs to be global
+
 //Toki Pona words
 var wordlist = {
     "akesi": "reptile",
@@ -243,17 +245,35 @@ function npcClick(button) {
 }
 
 function examineClick() {
-    //append to game view
+    var str = 'You examine ';
     var output = document.getElementById("game").innerHTML;
-    output += '\n\n ';
+    var is_open = output.indexOf(str);
+    //cycle if already open - cycle between player, NPCs and items
+    if (is_open != -1) {
+        index = index + 1;
+        // wrap around
+        if (index > universe.num_entities()){
+            console.log("Wrap...");
+            index = 0;
+        }
+        console.log("Trying to examine index", index);
+    }
 
-    var examine = universe.examine();
-    output += examine;
+    if ((index == 0 && is_open == -1) || (index != 0 && is_open != -1 && index > done)) {
+        //append to game view
+        output += '\n\n ' + str;
 
-    document.getElementById("game").innerHTML = output;
+        done = index;
+
+        var examine = universe.examine(index);
+        output += examine;
+
+        document.getElementById("game").innerHTML = output;
     
-    let inv = universe.display_inventory();
-    addHandlers(inv);
+        let inv = universe.display_inventory();
+        addHandlers(inv);
+    }
+
 }
 
 
@@ -310,6 +330,9 @@ function draw() {
     document.getElementById("game").innerHTML = output;
 
     addHandlers(inv);
+
+    //reset our examine globals
+    done = false; index = 0;
 }
 
 //--------------------------------
