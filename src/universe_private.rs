@@ -513,6 +513,28 @@ impl Universe {
         return "".to_string();
     }
 
+    pub fn examine_inner(&self, ent_id: u64) -> String {
+        let ent = hecs::Entity::from_bits(ent_id);
+        let name = self.ecs_world.get::<String>(ent).unwrap().to_string();
+        let mut txt = " carefully the ".to_string() + &name + ".";
+        let cmb = self.ecs_world.get::<CombatStats>(ent);
+        // non-combat NPCs don't have combat stats
+        if cmb.is_ok() {
+            txt += &format!(" They are hostile. {:?} ", *cmb.unwrap());
+        }
+        //describe items
+        let heal = self.ecs_world.get::<ProvidesHealing>(ent);
+        if heal.is_ok() {
+            txt += &format!(" Can be used to heal {:?} points", heal.unwrap().heal_amount);
+        }
+        let food = self.ecs_world.get::<ProvidesFood>(ent);
+        if food.is_ok() {
+            txt += &format!(" Can be eaten");
+        }
+        return txt;
+    }
+
+
     pub fn give_item(&mut self, name: String) {
         //let current_room = self.current_room;
 

@@ -594,6 +594,13 @@ impl Universe {
         return JsValue::from_serde(&messages).unwrap();
     }
 
+
+    pub fn examine_inventory(&self, ent_id: u64) -> JsValue {
+        let mut txt = "".to_string();
+        txt = txt + &self.examine_inner(ent_id);
+        return JsValue::from_str(&txt);
+    }
+
     // works for both player, NPCs and items
     pub fn examine(&self, idx: usize) -> JsValue {
         let mut txt = "".to_string();
@@ -606,23 +613,7 @@ impl Universe {
             //paranoia
             if idx-1 <= entities.len() {
                 //because they're indexed from 0, and 0 is the player
-                let ent = hecs::Entity::from_bits(entities[idx-1]);
-                let name = self.ecs_world.get::<String>(ent).unwrap().to_string();
-                txt = " carefully the ".to_string() + &name + ".";
-                let cmb = self.ecs_world.get::<CombatStats>(ent);
-                // non-combat NPCs don't have combat stats
-                if cmb.is_ok() {
-                    txt += &format!(" They are hostile. {:?} ", *cmb.unwrap());
-                }
-                //describe items
-                let heal = self.ecs_world.get::<ProvidesHealing>(ent);
-                if heal.is_ok() {
-                    txt += &format!(" Can be used to heal {:?} points", heal.unwrap().heal_amount);
-                }
-                let food = self.ecs_world.get::<ProvidesFood>(ent);
-                if food.is_ok() {
-                    txt += &format!(" Can be eaten");
-                }
+                txt = txt + &self.examine_inner(entities[idx-1]);
             }
         }
 
