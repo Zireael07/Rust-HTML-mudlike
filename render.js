@@ -132,7 +132,7 @@ function itemBackpackClick(button) {
     var output = document.getElementById("game").innerHTML;
     output += "\n\n";
     //TODO: only display use button if item is usable
-    output += `<button class="inv_use_button" id=ent-${id}>Use</button>` + " " + `<button class="inv_drop_button" id=ent-${id}>Drop</button>`
+    output += `<button class="inv_use_button" id=ent-${id}>Use</button>` + `<button class="inv_exa_button" id=ent-${id}>Examine</button>` + " " + `<button class="inv_drop_button" id=ent-${id}>Drop</button>`
 
     document.getElementById("game").innerHTML = output;
 
@@ -276,11 +276,32 @@ function examineClick() {
 
 }
 
+function examineinvClick(button) {
+    //extract id from item id
+    var id = button.id;
+    var reg = id.match(/(\d+)/); 
+    var i = reg[0];
+    console.log("Examining inventory item ", i);
+
+    var str = 'You examine ';
+    var output = document.getElementById("game").innerHTML;
+
+    output += '\n\n ' + str;
+    var examine = universe.examine_inventory(i);
+    output += examine;
+
+    document.getElementById("game").innerHTML = output;
+
+    let inv = universe.display_inventory();
+    addHandlers(inv);
+}
+
 
 function draw() {
     var map = universe.get_current_map();
     var entities = universe.display_entities_in_room();
     let inv = universe.display_inventory();
+    //FIXME: clear messages when changing rooms
     let messages = universe.display_messages();
 
     var output = map.desc + '\n\n';
@@ -543,11 +564,16 @@ function addHandlers(inv){
             drop_button.onclick = function(e) { dropClick(e.target); }
         }
             
-
         var use_button = document.querySelector(".inv_use_button");
         if (use_button) {
             use_button.onclick = function(e) { useClick(e.target); }
         }
+
+        var exa_inv_button = document.querySelector(".inv_exa_button");
+        if (exa_inv_button) {
+            exa_inv_button.onclick = function(e) { examineinvClick(e.target); }
+        }
+
 
         var exa_button = document.querySelector(".exa_button");
         if (exa_button) {
