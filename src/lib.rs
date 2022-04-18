@@ -614,6 +614,15 @@ impl Universe {
                 if cmb.is_ok() {
                     txt += &format!(" They are hostile. {:?} ", *cmb.unwrap());
                 }
+                //describe items
+                let heal = self.ecs_world.get::<ProvidesHealing>(ent);
+                if heal.is_ok() {
+                    txt += &format!(" Can be used to heal {:?} points", heal.unwrap().heal_amount);
+                }
+                let food = self.ecs_world.get::<ProvidesFood>(ent);
+                if food.is_ok() {
+                    txt += &format!(" Can be eaten");
+                }
             }
         }
 
