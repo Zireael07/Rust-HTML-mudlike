@@ -83,6 +83,11 @@ pub struct NPCName {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct Vendor {
+    //pub categories : Vec<String>
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct CombatStats {
     pub max_hp : i32,
     pub hp : i32,
@@ -659,6 +664,13 @@ impl Universe {
         return JsValue::from_serde(&known_ex).unwrap();
     }
 
+    pub fn is_vendor(&self, ent_id: u64) -> JsValue {
+        let ent = hecs::Entity::from_bits(ent_id); //restore
+        if self.ecs_world.get::<Vendor>(ent).is_ok() {
+            return JsValue::from_serde(&true).unwrap();
+        }
+        return JsValue::from_serde(&false).unwrap();
+    }
 
     pub fn get_sentences(&mut self, question: bool) -> JsValue {
         let mut rng = rand::thread_rng();
@@ -827,6 +839,13 @@ impl Universe {
                                 self.ecs_world.insert_one(jeans, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Legs});
                                 let pistol = self.ecs_world.spawn((EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Pistol"]]).build()));
                                 self.ecs_world.insert_one(pistol, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Melee});
+                            },
+                            "Seller" => {
+                                self.ecs_world.insert_one(sp, Vendor{});
+                                //randomized NPC name
+                                let sel_name = Universe::randomized_NPC_name(true, &self.names);
+                                let nm = self.ecs_world.insert_one(sp, NPCName{name: sel_name.to_string()});
+                                log!("{}", &format!("{}", sel_name.to_string()));                            
                             },
                             _ => {
                                 //randomized NPC name

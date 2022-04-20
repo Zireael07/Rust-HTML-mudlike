@@ -208,7 +208,7 @@ function npcClick(button) {
     //test generating sentences
     var ques = false;
     //seller can ask you questions
-    if (i == "4"){
+    if (universe.is_vendor(i)){
         ques = true;
     }
 

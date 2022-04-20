@@ -1,7 +1,7 @@
 use super::log;
 use super::{Universe, Room, Exit, Distance, DataMaster, ItemPrefab,
     Player, GameMessages, Needs, Attributes, Attribute,
-    AI, CombatStats, NPCName, EncDistance,
+    AI, CombatStats, NPCName, EncDistance, Vendor,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus, Ranged,
@@ -314,6 +314,13 @@ impl Universe {
                             let pistol = self.ecs_world.spawn((EntityBuilder::from(&DATA.read().unwrap().items[DATA.read().unwrap().item_index["Pistol"]]).build()));
                             self.ecs_world.insert_one(pistol, Equipped{ owner: sp.to_bits(), slot: EquipmentSlot::Melee});
                         },
+                        "Seller" => {
+                            self.ecs_world.insert_one(sp, Vendor{});
+                            //randomized NPC name
+                            let sel_name = Universe::randomized_NPC_name(true, &self.names);
+                            let nm = self.ecs_world.insert_one(sp, NPCName{name: sel_name.to_string()});
+                            log!("{}", &format!("{}", sel_name.to_string()));                            
+                        },
                         _ => {
                             //randomized NPC name
                             let sel_name = Universe::randomized_NPC_name(true, &self.names);
@@ -521,6 +528,10 @@ impl Universe {
         // non-combat NPCs don't have combat stats
         if cmb.is_ok() {
             txt += &format!(" They are hostile. {:?} ", *cmb.unwrap());
+        }
+        let vend = self.ecs_world.get::<Vendor>(ent);
+        if vend.is_ok() {
+            txt += &format!( "They are a vendor.");
         }
         //describe items
         let heal = self.ecs_world.get::<ProvidesHealing>(ent);
