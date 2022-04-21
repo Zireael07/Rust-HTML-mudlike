@@ -208,7 +208,7 @@ function npcClick(button) {
     //test generating sentences
     var ques = false;
     //seller can ask you questions
-    if (i == "4"){
+    if (universe.is_vendor(i)){
         ques = true;
     }
 
@@ -237,6 +237,13 @@ function npcClick(button) {
             
         }
     }
+
+    if (ques) {
+        output += '\n\n ';
+        // those are backticks, not straight quotes!
+        output = output + `<button class="ans_button" id=answ-y-${i}>Yes</button> ` + `<button class="ans_button" id=answ-n-${i}>No</button> `;
+    }
+
 
     document.getElementById("game").innerHTML = output;
 
@@ -294,6 +301,45 @@ function examineinvClick(button) {
 
     let inv = universe.display_inventory();
     addHandlers(inv);
+}
+
+function answerClick(button) {
+    //extract id from item id
+    var id = button.id;
+    var reg = id.match(/(\d+)/); 
+    var i = reg[0];
+    console.log("Answering NPC ", i);
+
+    // this is a basic Rust implementation that has some simple rules in addition to Markov chain
+    var sentence = universe.get_sentences(false);
+    //hack for now
+    var sentences = [sentence]
+
+    //append to game view
+    var output = document.getElementById("game").innerHTML;
+    output += '\n\n ';
+    for (var i=0; i < sentences.length;i++) {
+        var s = sentences[i];
+        output += s + '\n';
+        //gloss
+        var tokens = universe.get_tokens(s);
+        for (var i=0; i<tokens.length;i++){
+            var t = tokens[i];
+            if (t != "") {
+                if (i < tokens.length-2) {
+                    output += wordlist[t] + " - ";
+                } else {
+                    output += " " + wordlist[t];
+                }
+            }
+            
+        }
+    }
+
+    document.getElementById("game").innerHTML = output;
+
+    let inv = universe.display_inventory();
+    addHandlers(inv);    
 }
 
 
@@ -399,8 +445,7 @@ function showMap() {
                 graph_els[i].remove() //nuke the element altogether
             }
         }
-    }
-    
+    }   
 }
 
 function setupSVGNode(i,name) {
@@ -574,10 +619,16 @@ function addHandlers(inv){
             exa_inv_button.onclick = function(e) { examineinvClick(e.target); }
         }
 
-
         var exa_button = document.querySelector(".exa_button");
         if (exa_button) {
             exa_button.onclick = function(e) { examineClick(); }
+        }
+
+        var ans_buttons = document.querySelectorAll(".ans_button");
+        if (ans_buttons) {
+            for (var i=0; i < ans_buttons.length; i++){
+                ans_buttons[i].onclick = function(e) { answerClick(e.target); }
+            }
         }
         
         //map handler
