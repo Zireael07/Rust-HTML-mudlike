@@ -704,6 +704,8 @@
         "mi wile weka e soweli ike.", "mi wile moku mute.", "mi wile moku e kili.", "mi wile lukin e soweli ale.",
         "mi wile lukin e kili ale.", 
         "sina toki tawa mi.", "sina toki tawa mi ala.", "sina tan ma Mewika.", "sina tan ma Kanata.",
+        "sina wile esun e ilo...", //you want to buy a thing
+        "(sina pona o!)", //thanks!
     ],
     toki_pona_q: [
         "ni li seme?", "jan seme li lon?", "sina tan ma seme?", //where are you from?

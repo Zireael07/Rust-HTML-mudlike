@@ -15,6 +15,8 @@ use std::collections::HashMap;
 use rand::{Rng, thread_rng};
 use rand::prelude::SliceRandom;
 
+//TODO: dialogue (text-reply)
+
 struct SentenceState {
     pub topic: String,
 }
@@ -54,6 +56,8 @@ impl Markov {
         let words = sentence.split(" ").collect::<Vec<&str>>();
         let word_count = words.len();
     
+        //FIXME: doesn't grab things of size equal to num (e.g. 2 word phrases for num 2)
+
         for n in 0..word_count {
             if n + num < word_count {
                 //slice to vector
@@ -126,7 +130,19 @@ impl Markov {
         }
         else {
             log!("Generating a sentence for a given topic: {} ", given_topic);
-            let mut key = key_with(keys, &self.nouns, &given_topic);
+            //let mut key = key_with(&keys, &self.nouns, &given_topic);
+            let mut key = "".to_string();
+            //hack
+            if given_topic == "esun" {
+                key = key_with(&keys, &vec!["sina".to_string()], &vec![&"sina".to_string(), &"wile".to_string()]);
+            }
+            else if given_topic == "(sina" {
+                key = key_with(&keys, &vec!["(sina".to_string()], &vec![&given_topic]);
+            }
+            else {
+                key = key_with(&keys, &self.nouns, &vec![&given_topic]);
+            }
+
 
             //let topic = given_topic;
             let mut topics = Vec::new();
@@ -274,20 +290,29 @@ impl Markov {
 //     }
 // }
 
-fn key_with(keys:Vec<&String>, nouns: &Vec<String>, filter: &String) -> String {
+fn key_with(keys:&Vec<&String>, nouns: &Vec<String>, filter: &Vec<&String>) -> String {
     let mut rng = rand::thread_rng();
     //the initial key HAS to contain a noun
     let mut valid_keys: Vec<&String> = Vec::new();
     for k in keys {
         let words = k.split(" ").collect::<Vec<&str>>();
-        for n in nouns {
-            if words[0] == n.as_str() && words[1].ne("e") && words[0] == filter {
-            //if k.contains(n.as_str()) {
+        //log!("Words: {:?}", words);
+        if filter.len() == 1 {
+            for n in nouns {
+                if words[0] == n.as_str() && words[1].ne("e") && words[0] == filter[0] {
+                //if k.contains(n.as_str()) {
+                    valid_keys.push(k);
+                }
+            }
+        } else {
+            if words[0] == filter[0] && words[1] == filter[1] {
                 valid_keys.push(k);
             }
         }
+
     }
 
+    log!("Keys found for topic: {:?} {:?}", filter, valid_keys);
     //only retain those that match filter
     ///valid_keys.retain(|v| v[0] == filter.as_str());
 
@@ -400,6 +425,8 @@ pub fn setup(lang: &mut Markov){
     lang.constraints.insert("moli".to_string(), vec!["mani".to_string()]);
     //forbid li after e (predicate after object marker)
     lang.constraints.insert("e".to_string(), vec!["li".to_string()]);
+
+    lang.constraints.insert("esun".to_string(), vec!["tawa".to_string()]);
 
     //debug
     for (key, value) in &lang.constraints {

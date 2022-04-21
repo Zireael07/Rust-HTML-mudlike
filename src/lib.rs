@@ -672,7 +672,7 @@ impl Universe {
         return JsValue::from_serde(&false).unwrap();
     }
 
-    pub fn get_sentences(&mut self, question: bool) -> JsValue {
+    pub fn get_sentences(&mut self, question: bool, topic: String) -> JsValue {
         let mut rng = rand::thread_rng();
         //let max = rng.gen_range(2,3);
         let max_s = rng.gen_range(3,4);
@@ -680,7 +680,12 @@ impl Universe {
         match question {
             true => { sentences = self.language.display_sentence(question, "".to_string()); },
             false => { 
-                sentences = self.language.display_paragraph(max_s); 
+                if topic == "".to_string() {
+                    sentences = self.language.display_paragraph(max_s); 
+                } else {
+                    sentences = self.language.display_sentence(question, topic);
+                }
+                
 
                 //NaNoGenMo output
                 //log!("{}", self.language.display_novel());

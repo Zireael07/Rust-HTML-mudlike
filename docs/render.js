@@ -16,6 +16,7 @@ var wordlist = {
     "awen": "keep, stay",
     "e": "object marker", //like '(w)o' in Japanese
     "en": "and",
+    "esun": "buy",
     "ike": "bad",
     "ijo": "thing",
     "ilo": "tool, device",
@@ -213,7 +214,7 @@ function npcClick(button) {
     }
 
     // this is a basic Rust implementation that has some simple rules in addition to Markov chain
-    var sentence = universe.get_sentences(ques);
+    var sentence = universe.get_sentences(ques, "");
     //hack for now
     var sentences = [sentence]
 
@@ -308,10 +309,16 @@ function answerClick(button) {
     var id = button.id;
     var reg = id.match(/(\d+)/); 
     var i = reg[0];
-    console.log("Answering NPC ", i);
+    var answer = id[5];
+    console.log("Answering NPC ", i, " answer: ", answer);
 
+    //give the topic
+    var topic = "(sina";
+    if (answer == "y") {
+        topic = "esun"
+    }
     // this is a basic Rust implementation that has some simple rules in addition to Markov chain
-    var sentence = universe.get_sentences(false);
+    var sentence = universe.get_sentences(false, topic);
     //hack for now
     var sentences = [sentence]
 
