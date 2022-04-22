@@ -208,13 +208,21 @@ function npcClick(button) {
     
     //test generating sentences
     var ques = false;
-    //seller can ask you questions
+    //seller special case
+    var vend = false;
     if (universe.is_vendor(i)){
-        ques = true;
+        vend = true;
+        //ques = true;
     }
 
     // this is a basic Rust implementation that has some simple rules in addition to Markov chain
     var sentence = universe.get_sentences(ques, "");
+
+    //hack (force a certain sentence)
+    if (vend) {
+        sentence = "sina wile ala wile esun?";
+    }
+
     //hack for now
     var sentences = [sentence]
 
@@ -239,7 +247,7 @@ function npcClick(button) {
         }
     }
 
-    if (ques) {
+    if (ques || vend) {
         output += '\n\n ';
         // those are backticks, not straight quotes!
         output = output + `<button class="ans_button" id=answ-y-${i}>Yes</button> ` + `<button class="ans_button" id=answ-n-${i}>No</button> `;
