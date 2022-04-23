@@ -97,6 +97,79 @@ impl Markov {
         }
     }
 
+    //graph search algo
+    //it can switch between the best-first search and breadth-first search 
+    // k is the number of tokens/nodes taken under consideration at each step (also known as beam width)
+    // if beam width is very high, it becomes BFS (breadth-first search)
+    fn beam_search(&self, k: usize, keys: &Vec<&String>, nouns: &Vec<String>) -> Vec<Path> {
+        //data struct (results so far, number of nodes traversed)
+        let mut paths_so_far: Vec<Path> = Vec::new(); 
+        paths_so_far.push(Path{nodes:Vec::new(), dist:0});
+
+        let mut step = 0;
+        let steps_num = 4;
+        for mut step in 0..steps_num {
+            //get all the options at each step
+            let mut path_candidates: Vec<Path> = Vec::new();
+            //follow each path
+            for i in 0..paths_so_far.len() {
+                // options depend on previous steps...
+                let mut options: Vec<&String> = Vec::new();
+                //match would've been nicer but doesn't want to compile
+                //match step {
+                if step == 0 { 
+                    //step 0: all the nouns
+                    options = valid_initial_keys(keys, nouns); 
+                } else { //_ => { 
+                    //others - get options based on sentence so far
+                    //let sentence: Vec<&str> = paths_so_far[i].nodes.iter().map(|s| s as &str).collect(); //collect::<Vec<&str>>();
+                    let sentence = format!("{}", paths_so_far[i].nodes.join(" "));
+                    log!("sentence: {}", sentence);
+                    //wants &str
+                    let key = next_key(&sentence);
+                    let m = self.map.get(&key);
+                    //let m = self.map.get(&paths_so_far[i].nodes[step-1]);
+                    match m {
+                        Some(values) => {
+                            //values are a Vec<String> (see hashmap definitions at the top)
+                            //need to convert to Vec<&String>
+                            // based on https://stackoverflow.com/questions/33216514/how-do-i-convert-a-vecstring-to-vecstr?noredirect=1&lq=1
+                            options = values.iter().map(|s| s).collect();
+                        },
+                        None => {},
+                    }
+                }
+
+                // now expand k candidates
+                for key in &options {
+                    // we assume all distances are 1 (all phrases are equally likely as long as they're valid)
+                    let mut p = &mut paths_so_far[i];
+                    ///p.nodes.push(key.to_string());
+                    //concatenate vecs instead of pushing
+                    //p.nodes.clone().append(&mut vec![key.to_string()]);
+                    //https://stackoverflow.com/a/69578632
+                    let new_nodes = [p.nodes.clone().as_slice(), &[key.to_string()]].concat();
+                    //can't find a way to avoid clone here
+                    let new_path = Path{nodes:new_nodes, dist:p.dist + 1};
+                    path_candidates.push(new_path);
+                }
+            }
+            //sort paths by length
+            path_candidates.sort_by(|a,b| a.dist.cmp(&b.dist));
+            log!("Path candidates: {:?}", path_candidates);
+            //keep best k paths
+            path_candidates.truncate(k);
+            log!("Kept paths: {:?}", path_candidates);
+            paths_so_far = path_candidates;
+
+            //increment counter
+            step = step +1;
+        }
+
+        return paths_so_far
+    }
+
+
     // generate text
     pub fn generate_paragraph(&mut self, max:i32) -> String {
         let data = self.generate_sentence_wrapper(false, "".to_string());
@@ -118,7 +191,11 @@ impl Markov {
         }
     
         if given_topic == "".to_string() {
-            let mut key = initial_key(keys, &self.nouns);
+            //needs to be a function of self because we need self.map
+            let beam = self.beam_search(3, &keys, &self.nouns);
+            log!("Beam search: {:?}", beam);
+
+            let mut key = initial_key(&keys, &self.nouns);
             //the first word in the initial key gets assigned as topic
             let topic = key.split(" ").collect::<Vec<&str>>()[0].to_string();
             //log!("Topic: {}", topic);
@@ -221,7 +298,7 @@ impl Markov {
 
                     sentence = format!("{} {}", sentence, value);
     
-                    key = next_key(&sentence, value);
+                    key = next_key(&sentence);
                 }
                 None => break
             }
@@ -273,6 +350,13 @@ impl Markov {
 
     // }
 
+} //end impl
+
+//-------------------------------------------
+#[derive(Debug)]
+struct Path {
+    nodes: Vec<String>, //because in our case the "path" is a sentence
+    dist: usize
 }
 
 //fn noun_keys(valid_keys, keys, nouns: &Vec<String) {
@@ -320,7 +404,7 @@ fn key_with(keys:&Vec<&String>, nouns: &Vec<String>, filter: &Vec<&String>) -> S
     return valid_keys.choose(&mut rng).expect("could not get random value").to_string();
 }
 
-fn valid_initial_keys<'a>(keys: Vec<&'a String>, nouns: &'a Vec<String>) -> Vec<&'a String> {
+fn valid_initial_keys<'a>(keys: &Vec<&'a String>, nouns: &'a Vec<String>) -> Vec<&'a String> {
     //let valid_keys = keys.iter().filter(|&k| for n in self.nouns { k.contains(&n); } )
     let mut valid_keys: Vec<&String> = Vec::new();
     for k in keys {
@@ -337,7 +421,7 @@ fn valid_initial_keys<'a>(keys: Vec<&'a String>, nouns: &'a Vec<String>) -> Vec<
 
 
 // this selects a single initial key
-fn initial_key(keys: Vec<&String>, nouns: &Vec<String>) -> String {
+fn initial_key(keys: &Vec<&String>, nouns: &Vec<String>) -> String {
     let mut rng = rand::thread_rng();
     //return keys.choose(&mut rng).expect("could not get random value").to_string();
 
@@ -347,7 +431,7 @@ fn initial_key(keys: Vec<&String>, nouns: &Vec<String>) -> String {
     return valid_keys.choose(&mut rng).expect("could not get random value").to_string();
 }
 
-fn next_key(sentence: &str, value: &str) -> String {
+fn next_key(sentence: &str) -> String {
     //get last 2 words in the sentence
     let words = sentence.split(" ").collect::<Vec<&str>>();
     let word_count = words.len();
