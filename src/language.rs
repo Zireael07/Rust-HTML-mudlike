@@ -292,7 +292,7 @@ impl Markov {
 
 fn key_with(keys:&Vec<&String>, nouns: &Vec<String>, filter: &Vec<&String>) -> String {
     let mut rng = rand::thread_rng();
-    //the initial key HAS to contain a noun
+    //the initial key HAS to contain a noun and fit our filter
     let mut valid_keys: Vec<&String> = Vec::new();
     for k in keys {
         let words = k.split(" ").collect::<Vec<&str>>();
@@ -320,12 +320,7 @@ fn key_with(keys:&Vec<&String>, nouns: &Vec<String>, filter: &Vec<&String>) -> S
     return valid_keys.choose(&mut rng).expect("could not get random value").to_string();
 }
 
-
-fn initial_key(keys: Vec<&String>, nouns: &Vec<String>) -> String {
-    let mut rng = rand::thread_rng();
-    //return keys.choose(&mut rng).expect("could not get random value").to_string();
-
-    //the initial key HAS to contain a noun
+fn valid_initial_keys<'a>(keys: Vec<&'a String>, nouns: &'a Vec<String>) -> Vec<&'a String> {
     //let valid_keys = keys.iter().filter(|&k| for n in self.nouns { k.contains(&n); } )
     let mut valid_keys: Vec<&String> = Vec::new();
     for k in keys {
@@ -337,7 +332,17 @@ fn initial_key(keys: Vec<&String>, nouns: &Vec<String>) -> String {
             }
         }
     }
+    return valid_keys;
+}
 
+
+// this selects a single initial key
+fn initial_key(keys: Vec<&String>, nouns: &Vec<String>) -> String {
+    let mut rng = rand::thread_rng();
+    //return keys.choose(&mut rng).expect("could not get random value").to_string();
+
+    //the initial key HAS to contain a noun
+    let valid_keys = valid_initial_keys(keys, nouns);
 
     return valid_keys.choose(&mut rng).expect("could not get random value").to_string();
 }
