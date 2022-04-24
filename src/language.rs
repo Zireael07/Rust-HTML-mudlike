@@ -101,10 +101,13 @@ impl Markov {
     //it can switch between the best-first search and breadth-first search 
     // k is the number of tokens/nodes taken under consideration at each step (also known as beam width)
     // if beam width is very high, it becomes BFS (breadth-first search)
+    // https://towardsdatascience.com/the-power-of-constrained-language-models-cf63b65a035d
     fn beam_search(&self, k: usize, keys: &Vec<&String>, nouns: &Vec<String>) -> Vec<Path> {
         //data struct (results so far, number of nodes traversed)
         let mut paths_so_far: Vec<Path> = Vec::new(); 
-        paths_so_far.push(Path{nodes:Vec::new(), dist:0});
+        paths_so_far.push(Path{nodes:Vec::new(), topics:Vec::new(), dist:0});
+
+        //let mut topics = Vec::new();
 
         let mut step = 0;
         let steps_num = 4;
@@ -121,20 +124,38 @@ impl Markov {
                     //step 0: all the nouns
                     options = valid_initial_keys(keys, nouns); 
                 } else { //_ => { 
+                    if step == 1 {
+                        //the first word gets assigned as topic
+                        //nodes[0] is two words long, so we need to split
+                        let topic = paths_so_far[i].nodes[0].split(" ").collect::<Vec<&str>>()[0].to_string();
+                        paths_so_far[i].topics.push(topic.clone());
+                    }
                     //others - get options based on sentence so far
-                    //let sentence: Vec<&str> = paths_so_far[i].nodes.iter().map(|s| s as &str).collect(); //collect::<Vec<&str>>();
                     let sentence = format!("{}", paths_so_far[i].nodes.join(" "));
                     log!("sentence: {}", sentence);
                     //wants &str
                     let key = next_key(&sentence);
                     let m = self.map.get(&key);
-                    //let m = self.map.get(&paths_so_far[i].nodes[step-1]);
+
                     match m {
                         Some(values) => {
                             //values are a Vec<String> (see hashmap definitions at the top)
                             //need to convert to Vec<&String>
                             // based on https://stackoverflow.com/questions/33216514/how-do-i-convert-a-vecstring-to-vecstr?noredirect=1&lq=1
                             options = values.iter().map(|s| s).collect();
+
+                            for topic in &paths_so_far[i].topics {
+                                //do we have a constraint set by a topic?
+                                match self.constraints.get(topic) {
+                                    Some(constr) => {
+                                        //log!("We have a constraint, {:?}", constr);
+                                        //filter values by topic
+                                        options.retain(|v| !constr.contains(&v));
+                                        log!("Valid: {:?}", options);
+                                    }
+                                    None => {}
+                                }
+                            }
                         },
                         None => {},
                     }
@@ -150,7 +171,9 @@ impl Markov {
                     //https://stackoverflow.com/a/69578632
                     let new_nodes = [p.nodes.clone().as_slice(), &[key.to_string()]].concat();
                     //can't find a way to avoid clone here
-                    let new_path = Path{nodes:new_nodes, dist:p.dist + 1};
+                    //save the topics
+                    let new_topics = p.topics.clone();
+                    let new_path = Path{nodes:new_nodes, topics:new_topics, dist:p.dist + 1};
                     path_candidates.push(new_path);
                 }
             }
@@ -244,7 +267,6 @@ impl Markov {
                     let mut valid = values.clone();
 
                     //TODO: can we forbid selections which lead to empty valid list in the next step? 
-                    // check beam search algo: https://towardsdatascience.com/the-power-of-constrained-language-models-cf63b65a035d
 
                     //forbid anu and seme unless we specifically asked for a question
                     if !question {
@@ -356,23 +378,10 @@ impl Markov {
 #[derive(Debug)]
 struct Path {
     nodes: Vec<String>, //because in our case the "path" is a sentence
+    topics: Vec<String>, //because we need to store the topic per sentence
     dist: usize
 }
 
-//fn noun_keys(valid_keys, keys, nouns: &Vec<String) {
-//     //the initial key HAS to contain a noun
-//     //let valid_keys = keys.iter().filter(|&k| for n in self.nouns { k.contains(&n); } )
-//     let mut valid_keys: Vec<&String> = Vec::new();
-//     for k in keys {
-//         let words = k.split(" ").collect::<Vec<&str>>();
-//         for n in nouns {
-//             if words[0] == n.as_str() && words[1].ne("e") {
-//             //if k.contains(n.as_str()) {
-//                 valid_keys.push(k);
-//             }
-//         }
-//     }
-// }
 
 fn key_with(keys:&Vec<&String>, nouns: &Vec<String>, filter: &Vec<&String>) -> String {
     let mut rng = rand::thread_rng();
