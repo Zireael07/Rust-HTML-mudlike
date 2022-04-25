@@ -97,23 +97,24 @@ impl Markov {
         }
     }
 
-    //graph search algo
+    //beam search as such is a graph search algo
     //it can switch between the best-first search and breadth-first search 
     // k is the number of tokens/nodes taken under consideration at each step (also known as beam width)
     // if beam width is very high, it becomes BFS (breadth-first search)
-    // https://towardsdatascience.com/the-power-of-constrained-language-models-cf63b65a035d
-    fn beam_search(&self, k: usize, keys: &Vec<&String>, nouns: &Vec<String>) -> Vec<Path> {
+    // often used in NLP: https://towardsdatascience.com/the-power-of-constrained-language-models-cf63b65a035d
+    fn nlp_beam_search(&self, k: usize, keys: &Vec<&String>, nouns: &Vec<String>) -> Vec<Beam> {
         //data struct (results so far, number of nodes traversed)
-        let mut paths_so_far: Vec<Path> = Vec::new(); 
-        paths_so_far.push(Path{nodes:Vec::new(), topics:Vec::new(), dist:0});
+        let mut paths_so_far: Vec<Beam> = Vec::new(); 
+        paths_so_far.push(Beam{nodes:Vec::new(), topics:Vec::new(), dist:0});
 
         //let mut topics = Vec::new();
-
+        //TODO: implement questions flag
         let mut step = 0;
         let steps_num = 4;
+        //TODO: loop - break on steps_num OR finding a node with a dot
         for mut step in 0..steps_num {
             //get all the options at each step
-            let mut path_candidates: Vec<Path> = Vec::new();
+            let mut candidates: Vec<Beam> = Vec::new();
             //follow each path
             for i in 0..paths_so_far.len() {
                 // options depend on previous steps...
@@ -121,6 +122,7 @@ impl Markov {
                 //match would've been nicer but doesn't want to compile
                 //match step {
                 if step == 0 { 
+                    //TODO: filter initial keys for a given topic
                     //step 0: all the nouns
                     options = valid_initial_keys(keys, nouns); 
                 } else { //_ => { 
@@ -130,6 +132,7 @@ impl Markov {
                         let topic = paths_so_far[i].nodes[0].split(" ").collect::<Vec<&str>>()[0].to_string();
                         paths_so_far[i].topics.push(topic.clone());
                     }
+                    //TODO: forbid anu and seme unless we specifically asked for a question
                     //others - get options based on sentence so far
                     let sentence = format!("{}", paths_so_far[i].nodes.join(" "));
                     log!("sentence: {}", sentence);
@@ -173,17 +176,19 @@ impl Markov {
                     //can't find a way to avoid clone here
                     //save the topics
                     let new_topics = p.topics.clone();
-                    let new_path = Path{nodes:new_nodes, topics:new_topics, dist:p.dist + 1};
-                    path_candidates.push(new_path);
+                    let new_beam = Beam{nodes:new_nodes, topics:new_topics, dist:p.dist + 1};
+                    candidates.push(new_beam);
                 }
             }
-            //sort paths by length
-            path_candidates.sort_by(|a,b| a.dist.cmp(&b.dist));
-            log!("Path candidates: {:?}", path_candidates);
-            //keep best k paths
-            path_candidates.truncate(k);
-            log!("Kept paths: {:?}", path_candidates);
-            paths_so_far = path_candidates;
+            //sort beams by length (this effectively rejects any incomplete paths)
+            candidates.sort_by(|a,b| a.dist.cmp(&b.dist));
+            log!("Candidates: {:?}", candidates);
+            //FIXME: currently the kept paths are always the same, shuffle them somehow?
+            //literally rng.shuffle(path_candidates) should work
+            //keep best k beams
+            candidates.truncate(k);
+            log!("Kept beams: {:?}", candidates);
+            paths_so_far = candidates;
 
             //increment counter
             step = step +1;
@@ -215,7 +220,7 @@ impl Markov {
     
         if given_topic == "".to_string() {
             //needs to be a function of self because we need self.map
-            let beam = self.beam_search(3, &keys, &self.nouns);
+            let beam = self.nlp_beam_search(3, &keys, &self.nouns);
             log!("Beam search: {:?}", beam);
 
             let mut key = initial_key(&keys, &self.nouns);
@@ -376,7 +381,7 @@ impl Markov {
 
 //-------------------------------------------
 #[derive(Debug)]
-struct Path {
+struct Beam {
     nodes: Vec<String>, //because in our case the "path" is a sentence
     topics: Vec<String>, //because we need to store the topic per sentence
     dist: usize
