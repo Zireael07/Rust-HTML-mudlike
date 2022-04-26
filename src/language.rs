@@ -102,12 +102,11 @@ impl Markov {
     // k is the number of tokens/nodes taken under consideration at each step (also known as beam width)
     // if beam width is very high, it becomes BFS (breadth-first search)
     // often used in NLP: https://towardsdatascience.com/the-power-of-constrained-language-models-cf63b65a035d
-    fn nlp_beam_search(&self, k: usize, keys: &Vec<&String>, nouns: &Vec<String>) -> Vec<Beam> {
+    fn nlp_beam_search(&self, k: usize, keys: &Vec<&String>, nouns: &Vec<String>, given_topic: String) -> Vec<Beam> {
         //data struct (results so far, number of nodes traversed)
         let mut paths_so_far: Vec<Beam> = Vec::new(); 
         paths_so_far.push(Beam{nodes:Vec::new(), topics:Vec::new(), dist:0});
 
-        //let mut topics = Vec::new();
         //TODO: implement questions flag
         let mut step = 0;
         let steps_num = 4;
@@ -119,12 +118,28 @@ impl Markov {
             for i in 0..paths_so_far.len() {
                 // options depend on previous steps...
                 let mut options: Vec<&String> = Vec::new();
+
+                //needs to be here otherwise Rust complains it's dropped while borrowed
+                //array to slice
+                let mut filter = &[&given_topic];
+
                 //match would've been nicer but doesn't want to compile
                 //match step {
                 if step == 0 { 
-                    //TODO: filter initial keys for a given topic
-                    //step 0: all the nouns
+                    if given_topic == "".to_string() {
+                        //step 0: all the nouns
+                        options = valid_initial_keys(keys, nouns); 
                     options = valid_initial_keys(keys, nouns); 
+                        options = valid_initial_keys(keys, nouns); 
+                    options = valid_initial_keys(keys, nouns); 
+                        options = valid_initial_keys(keys, nouns); 
+                    } else {
+                        //filter initial keys for a given topic
+                        //filter = &[&given_topic];
+                        options = valid_keys_topic(keys, nouns, filter);
+                    }
+                        
+
                 } else { //_ => { 
                     if step == 1 {
                         //the first word gets assigned as topic
@@ -220,7 +235,7 @@ impl Markov {
     
         if given_topic == "".to_string() {
             //needs to be a function of self because we need self.map
-            let beam = self.nlp_beam_search(3, &keys, &self.nouns);
+            let beam = self.nlp_beam_search(3, &keys, &self.nouns, "jan".to_string());
             log!("Beam search: {:?}", beam);
 
             let mut key = initial_key(&keys, &self.nouns);
@@ -387,9 +402,8 @@ struct Beam {
     dist: usize
 }
 
-
-fn key_with(keys:&Vec<&String>, nouns: &Vec<String>, filter: &Vec<&String>) -> String {
-    let mut rng = rand::thread_rng();
+//https://stackoverflow.com/a/24104029 If you don't need to add or remove elements from the vector, use slice (&[T]) or mutable slice (&mut [T])
+fn valid_keys_topic<'a>(keys:&'a Vec<&String>, nouns: &'a Vec<String>, filter: &'a [&String]) -> Vec<&'a String> {
     //the initial key HAS to contain a noun and fit our filter
     let mut valid_keys: Vec<&String> = Vec::new();
     for k in keys {
@@ -413,6 +427,13 @@ fn key_with(keys:&Vec<&String>, nouns: &Vec<String>, filter: &Vec<&String>) -> S
     log!("Keys found for topic: {:?} {:?}", filter, valid_keys);
     //only retain those that match filter
     ///valid_keys.retain(|v| v[0] == filter.as_str());
+    return valid_keys;
+}
+
+fn key_with(keys:&Vec<&String>, nouns: &Vec<String>, filter: &Vec<&String>) -> String {
+    let mut rng = rand::thread_rng();
+   
+    let valid_keys = valid_keys_topic(keys, nouns, filter);
 
     //random pick
     return valid_keys.choose(&mut rng).expect("could not get random value").to_string();
