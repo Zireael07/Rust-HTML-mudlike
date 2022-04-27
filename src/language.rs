@@ -28,6 +28,11 @@ pub enum SentenceType {
     Question = 1,
 }
 
+pub struct TopicData{
+    step: usize,
+    topic: String,
+}
+
 pub struct Markov {
     pub map: HashMap<String, Vec<String>>,
     pub map_q: HashMap<String, Vec<String>>,
@@ -102,10 +107,15 @@ impl Markov {
     // k is the number of tokens/nodes taken under consideration at each step (also known as beam width)
     // if beam width is very high, it becomes BFS (breadth-first search)
     // often used in NLP: https://towardsdatascience.com/the-power-of-constrained-language-models-cf63b65a035d
-    fn nlp_beam_search(&self, k: usize, keys: &Vec<&String>, nouns: &Vec<String>, given_topic: String) -> Vec<Beam> {
+    fn nlp_beam_search(&self, mut k: usize, keys: &Vec<&String>, nouns: &Vec<String>, given_topic: String, further_topic: Option<TopicData>) -> Vec<Beam> {
         //data struct (results so far, number of nodes traversed)
         let mut paths_so_far: Vec<Beam> = Vec::new(); 
         paths_so_far.push(Beam{nodes:Vec::new(), topics:Vec::new(), dist:0});
+
+        //hack
+        if further_topic.is_some() {
+            k = 40; //big enough to cover everything, effectively turning into BFS
+        }
 
         //TODO: implement questions flag
         let mut step = 0;
@@ -147,12 +157,13 @@ impl Markov {
                         let topic = paths_so_far[i].nodes[0].split(" ").collect::<Vec<&str>>()[0].to_string();
                         paths_so_far[i].topics.push(topic.clone());
                     }
-                    //TODO: forbid anu and seme unless we specifically asked for a question
+
                     //others - get options based on sentence so far
                     let sentence = format!("{}", paths_so_far[i].nodes.join(" "));
                     log!("sentence: {}", sentence);
                     //wants &str
                     let key = next_key(&sentence);
+                    //TODO: forbid anu and seme unless we specifically asked for a question
                     let m = self.map.get(&key);
 
                     match m {
@@ -162,6 +173,25 @@ impl Markov {
                             // based on https://stackoverflow.com/questions/33216514/how-do-i-convert-a-vecstring-to-vecstr?noredirect=1&lq=1
                             options = values.iter().map(|s| s).collect();
 
+                            //filtering for further steps
+                            match further_topic {
+                                Some(ref topic) => {
+                                    //TODO: can we do this somehow without specifying step?
+                                    //otherwise do nothing as it means it's too early/late to apply it
+                                    if topic.step == step && topic.topic.ne("") {
+                                        // if we have it as an option, keep only it
+                                        //if options.contains(&&topic.topic) {
+                                        options.retain(|v| v == &&topic.topic);
+                                        //}
+
+                                        log!("Valid for further topic: {:?}", options);
+                                    }
+
+                                },
+                                None => {},
+                            }
+
+                            //initial topic constraints
                             for topic in &paths_so_far[i].topics {
                                 //do we have a constraint set by a topic?
                                 match self.constraints.get(topic) {
@@ -235,7 +265,7 @@ impl Markov {
     
         if given_topic == "".to_string() {
             //needs to be a function of self because we need self.map
-            let beam = self.nlp_beam_search(3, &keys, &self.nouns, "jan".to_string());
+            let beam = self.nlp_beam_search(3, &keys, &self.nouns, "sina".to_string(), Some(TopicData{step:1, topic:"esun".to_string()}) );
             log!("Beam search: {:?}", beam);
 
             let mut key = initial_key(&keys, &self.nouns);
