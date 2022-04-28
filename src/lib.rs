@@ -234,7 +234,11 @@ struct Weather {
 }
 
 lazy_static! {
-    static ref GLOBAL_SCRIPT_OUTPUT: Mutex<Vec<Option<ScriptCommand>>> = Mutex::new(vec![]);
+    //TODO: this is basically almost but not quite a VM - make it a proper VM
+    //Python VM ref: https://csl.name/post/vm/
+    // simplest Rust bytecode VM I can find https://github.com/ezekiiel/lust/blob/main/lust/src/bytecode.rs
+
+    static ref GLOBAL_SCRIPT_COMMANDS: Mutex<Vec<Option<ScriptCommand>>> = Mutex::new(vec![]);
     //based on https://github.com/WesterWest/calisp/commit/b6a18038cfed2c02aa3f9b3228b07e6846200277
     static ref GLOBAL_SCRIPT_VARIABLES: Arc<RwLock<HashMap<String, RispExp>>> =
     Arc::new(RwLock::new(HashMap::default()));
@@ -242,7 +246,7 @@ lazy_static! {
     //RWLock allows one writer and multiple readers, therefore avoiding a mutex deadlock in scripting processing
     static ref DATA: Arc<RwLock<DataGlobal>> = Arc::new(RwLock::new(DataGlobal::new()));
 }
-//pub static mut GLOBAL_SCRIPT_OUTPUT: Option<ScriptCommand> = None;
+//pub static mut GLOBAL_SCRIPT_COMMANDS: Option<ScriptCommand> = None;
 
 //https://dev.to/mnivoliez/getting-started-with-rust-enum-on-steroids-8b4
 // turns out Rust enums can contain more data...
@@ -366,7 +370,7 @@ impl Universe {
                 let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
                 log!("go {}", format!("{}", first));
 
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::GoRoom{id: first as usize}));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::GoRoom{id: first as usize}));
 
                 Ok(RispExp::Bool(true))
               }
@@ -387,7 +391,7 @@ impl Universe {
 
                 //I don't know a better way to do it, this avoids having to use state
                 // this monster strips quote characters from around the lispy string
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::Spawn{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
 
                 Ok(RispExp::Bool(true))
               }
@@ -408,7 +412,7 @@ impl Universe {
 
                 //I don't know a better way to do it, this avoids having to use state
                 // this monster strips quote characters from around the lispy string
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SpawnItem{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::SpawnItem{room: float as usize, name: second.to_string().strip_suffix("\"").unwrap().strip_prefix("\"").unwrap().to_string() }));
 
                 Ok(RispExp::Bool(true))
               }
@@ -455,7 +459,7 @@ impl Universe {
                 //state.env.data.insert("end".to_string(), num_added);
 
                 //this is the scripting command
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SpawnRoom{name: key.to_string()}));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::SpawnRoom{name: key.to_string()}));
 
                 log!("Returning num: {}", new_end-1);
                 //Ok(RispExp::Bool(true))
@@ -470,7 +474,7 @@ impl Universe {
                 let floats = parse_list_of_floats(args)?;
 
                 log!("Setting exit for id {} - {} to {}", floats[0] as usize, floats[1] as u8, floats[2] as usize);
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::SetExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::SetExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
 
                 Ok(RispExp::Bool(true))
               }
@@ -483,7 +487,7 @@ impl Universe {
                 let floats = parse_list_of_floats(args)?;
                 log!("Appended exit for id {} - {} to {}", floats[0] as usize, floats[1] as u8, floats[2] as usize);
 
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::AppendExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::AppendExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
 
                 Ok(RispExp::Bool(true))
               }
@@ -496,7 +500,7 @@ impl Universe {
                 let floats = parse_list_of_floats(args)?;
                 log!("Edit exit for id {} - {} to {}", floats[0] as usize, floats[1] as u8, floats[2] as usize);
 
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::EditExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::EditExit{id: floats[0] as usize, exit: floats[1] as u8, exit_to: floats[2] as usize}));
 
                 Ok(RispExp::Bool(true))
               }
@@ -509,7 +513,7 @@ impl Universe {
                 let floats = parse_list_of_floats(args)?;
                 log!("Remove exit for id {} {}", floats[0] as usize, floats[1] as u8);
 
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::RemoveExit{id: floats[0] as usize, exit: floats[1] as u8}));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::RemoveExit{id: floats[0] as usize, exit: floats[1] as u8}));
 
                 Ok(RispExp::Bool(true))
               }
@@ -523,7 +527,7 @@ impl Universe {
                 //let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
                 log!("debug");
 
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::DebugList));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::DebugList));
 
                 Ok(RispExp::Bool(true))
               }
@@ -537,7 +541,7 @@ impl Universe {
                 let first = *floats.first().ok_or(RispErr::Reason("expected at least one number".to_string()))?;
                 log!("debug {}", format!("{}", first));
 
-                GLOBAL_SCRIPT_OUTPUT.lock().unwrap().push(Some(ScriptCommand::DebugEntity{id: floats[0] as usize}));
+                GLOBAL_SCRIPT_COMMANDS.lock().unwrap().push(Some(ScriptCommand::DebugEntity{id: floats[0] as usize}));
 
                 Ok(RispExp::Bool(true))
               }
@@ -796,8 +800,8 @@ impl Universe {
         unsafe {
 
             //don't use let here because it makes problems, see universe_private l.350...
-            //let vec = &*GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
-            for cmd in &mut *GLOBAL_SCRIPT_OUTPUT.lock().unwrap() {
+            //let vec = &*GLOBAL_SCRIPT_COMMANDS.lock().unwrap();
+            for cmd in &mut *GLOBAL_SCRIPT_COMMANDS.lock().unwrap() {
                 //debug
                 log!("cmd: {:?}", cmd);
                 //TODO: deduplicate/reuse code for script commands processing from universe_private.rs (l.235)
@@ -864,13 +868,13 @@ impl Universe {
                 } //match ends
 
             }
-            GLOBAL_SCRIPT_OUTPUT.lock().unwrap().clear();
+            GLOBAL_SCRIPT_COMMANDS.lock().unwrap().clear();
         }
 
         //clear
         // unsafe {
-        //     if GLOBAL_SCRIPT_OUTPUT.lock().unwrap().len() == 1 {
-        //         GLOBAL_SCRIPT_OUTPUT.lock().unwrap()[0] = None;
+        //     if GLOBAL_SCRIPT_COMMANDS.lock().unwrap().len() == 1 {
+        //         GLOBAL_SCRIPT_COMMANDS.lock().unwrap()[0] = None;
         //     }
             
         // }

@@ -5,7 +5,7 @@ use super::{Universe, Room, Exit, Distance, DataMaster, ItemPrefab,
     Item, InBackpack, WantsToDropItem, WantsToUseItem, ToRemove, 
     Consumable, ProvidesHealing, ProvidesFood, ProvidesQuench,
     Equippable, Equipped, EquipmentSlot, MeleeBonus, DefenseBonus, Ranged,
-    ScriptCommand, GLOBAL_SCRIPT_OUTPUT, register_var, DATA
+    ScriptCommand, GLOBAL_SCRIPT_COMMANDS, register_var, DATA
 };
 use super::language;
 use super::lispy;
@@ -276,8 +276,8 @@ impl Universe {
         lispy::read_eval(data.lisp_script, &mut self.env);
         //process all of the queued up commands from the lispy script here
         // using directly avoids weird borrow checker problems
-        //let mut vec = &mut *GLOBAL_SCRIPT_OUTPUT.lock().unwrap();
-        for cmd in &mut *GLOBAL_SCRIPT_OUTPUT.lock().unwrap() {
+        //let mut vec = &mut *GLOBAL_SCRIPT_COMMANDS.lock().unwrap();
+        for cmd in &mut *GLOBAL_SCRIPT_COMMANDS.lock().unwrap() {
             match cmd.clone().unwrap() {
                 ScriptCommand::GoRoom{id} => {
                     let new_room = id;
@@ -419,7 +419,7 @@ impl Universe {
         //test (wtf is this not dropped?!)
         //log!("{:?}", vec);
 
-        GLOBAL_SCRIPT_OUTPUT.lock().unwrap().clear();
+        GLOBAL_SCRIPT_COMMANDS.lock().unwrap().clear();
 
     }
 

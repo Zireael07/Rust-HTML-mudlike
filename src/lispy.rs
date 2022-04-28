@@ -60,6 +60,8 @@ pub struct RispEnv {
 */
 
 //this is very simple, based on Peter Norvig's Lispy
+//sucks because only splits by whitespace (can't have multi words strings, for instance)
+// better tokenizer in http://norvig.com/lispy2.html
 fn tokenize(expr: String) -> Vec<String> {
   expr
     .replace("{", " ( ") //is trick! we use brackets not parens
@@ -376,6 +378,7 @@ fn eval_built_in_form(
   }
 }
 
+//simple tree walking interpreter
 fn eval(exp: &RispExp, env: &mut RispEnv) -> Result<RispExp, RispErr> {
   match exp {
     RispExp::Symbol(k) =>
