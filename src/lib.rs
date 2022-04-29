@@ -297,6 +297,12 @@ impl DataGlobal {
 //async loader based on https://rustwasm.github.io/docs/wasm-bindgen/examples/fetch.html
 // returning Universe as a workaround for https://github.com/rustwasm/wasm-bindgen/issues/1858
 pub async fn load_datafile(mut state: Universe) -> Universe {
+
+    //can't use time in WASM :(
+    //use std::time::Instant;
+    //https://rustwasm.github.io/docs/book/reference/time-profiling.html
+    web_sys::console::time_with_label("file load");
+
     let mut opts = RequestInit::new();
     opts.method("GET");
     opts.mode(RequestMode::Cors);
@@ -320,26 +326,30 @@ pub async fn load_datafile(mut state: Universe) -> Universe {
     // Convert this other `Promise` into a rust `Future`, and then to string
     let ron = JsFuture::from(resp.text().unwrap()).await.unwrap().as_string().unwrap(); //?;
 
-    log!("Loaded from rust: {}", &format!("{:?}", ron));
+    //unwrap will panic if it fails
+    log!("Successfully loaded RON file");
+    //log!("Loaded from rust: {}", &format!("{:?}", ron));
 
     let data : DataMaster = ron::from_str(&ron).expect("malformed file");
 
     //debug
-    for r in &data.rooms {
-        log!("{}", &format!("From data: {} {} {} {} {:?}", r.id, r.name, r.desc, r.known, r.exits));
-    }
+    log!("{:?}", &data.rooms); //faster
+    // for r in &data.rooms {
+    //     log!("{}", &format!("From data: {} {} {} {} {:?}", r.id, r.name, r.desc, r.known, r.exits));
+    // }
 
     // for n in &data.names {
     //     log!("{}", &format!("Loaded names: {:?}", n));
     // }
 
-    for i in &data.items {
-        log!("{}", &format!("{} {:?} {:?} {:?}", i.name, i.item, i.equippable, i.defense));
-    }
+    // for i in &data.items {
+    //     log!("{}", &format!("{} {:?} {:?} {:?}", i.name, i.item, i.equippable, i.defense));
+    // }
 
     // for s in &data.toki_pona {
     //     log!("{}", s);
     // }
+    web_sys::console::time_end_with_label("file load");
     
     //game_start() deals with everything else we may need data for (including making part of it global)
     state.game_start(data);
@@ -358,8 +368,6 @@ impl Universe {
             names: HashMap::new(),
             env: lispy::RispEnv::new(),
         };
-
-        //state.map.push(Room{name:"Pub".to_string(), desc:"This is a pub. There's a counter along the furthest wall, and an assortment of tables and chairs.".to_string(), known: true, exits: vec![(Exit::Out, 1)]});
 
         state.env = lispy::default_env();
         state.env.data.insert(
