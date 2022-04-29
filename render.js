@@ -680,8 +680,17 @@ async function initGame(wasm) {
     //only fires when the value is committed
     document.getElementById("console-input").addEventListener('change', e => {
         //console.log("Console input", e.target.value);
-        universe.console_input(e.target.value);
-        e.target.value = null //empty the input after accepting it
+        var input = e.target.value;
+        //add missing parentheses if any - easier on JS side
+        if (input.charAt(0) != "{") {
+            input = "{" + input;
+        }
+        if (input.charAt(input.length-1) != "}"){
+            input = input + "}";
+        }
+
+        universe.console_input(input);
+        e.target.value = null //empty the input element after accepting it
         //redraw the game
         draw();
     });
